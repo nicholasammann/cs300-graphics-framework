@@ -1,0 +1,13 @@
+﻿  Application.cpp
+Source\Core\Application.cpp(141): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Source\Core\Application.cpp(142): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+  Camera.cpp
+  Mesh.cpp
+Source\Core\Mesh.cpp(43): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+  Model.cpp
+  Shader.cpp
+  main.cpp
+  Generating code
+  All 728 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  OpenGLFramework.vcxproj -> G:\Projects\OpenGLFramework\Release\OpenGLFramework.exe
