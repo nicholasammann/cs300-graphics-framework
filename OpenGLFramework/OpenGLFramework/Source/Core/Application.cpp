@@ -6,9 +6,9 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include "Application.hpp"
-#include "Shader.hpp"
+#include "../Graphics/Shader.hpp"
 #include "Camera.hpp"
-#include "Model.hpp"
+#include "../Graphics/Model.hpp"
 
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glfw_gl3.h"

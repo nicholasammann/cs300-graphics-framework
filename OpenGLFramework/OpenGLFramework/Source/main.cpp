@@ -55,7 +55,7 @@ int main()
   ELBA::Application app = ELBA::Application(win);
 
   app.Init();
-  app.CreateShader("Shaders/simple.vert", "Shaders/simple.frag");
+  app.CreateShader("Assets/Shaders/simple.vert", "Assets/Shaders/simple.frag");
 
   // main loop
   while (!glfwWindowShouldClose(app.GetWindow()))

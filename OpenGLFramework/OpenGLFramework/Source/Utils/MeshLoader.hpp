@@ -5,7 +5,7 @@
 #include <memory>
 #include <vector>
 
-#include "../Core/Mesh.hpp"
+#include "../Graphics/Mesh.hpp"
 
 namespace ELBA
 {
