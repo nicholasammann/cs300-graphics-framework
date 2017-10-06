@@ -84,6 +84,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>opengl32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>LinkVerboseLib</ShowProgress>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -169,7 +170,7 @@
     <None Include="Debug\assimp-vc140-mt.dll" />
     <None Include="Debug\D3DCompiler_42.dll" />
     <None Include="Debug\D3DX9_42.dll" />
-    <None Include="Debug\glew32.dll" />
+    <None Include="DLLS\glew32.dll" />
     <None Include="Shaders\simple.frag" />
     <None Include="Shaders\BasicFragment.glsl" />
     <None Include="Shaders\simple.vert" />

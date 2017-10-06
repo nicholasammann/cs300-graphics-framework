@@ -131,6 +131,6 @@
     <None Include="Debug\assimp-vc140-mt.dll" />
     <None Include="Debug\D3DCompiler_42.dll" />
     <None Include="Debug\D3DX9_42.dll" />
-    <None Include="Debug\glew32.dll" />
+    <None Include="DLLS\glew32.dll" />
   </ItemGroup>
 </Project>

@@ -6,8 +6,6 @@
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 
-#include <assimp/Exporter.hpp>
-
 #include "Shader.hpp"
 
 namespace ELBA
@@ -24,7 +22,6 @@ namespace ELBA
   {
     unsigned int mID;
     std::string mType;
-    aiString mPath;
   };
 
   class Mesh
