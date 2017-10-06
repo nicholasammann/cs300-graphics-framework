@@ -5,19 +5,21 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "Application.hpp"
-#include "../Graphics/Shader.hpp"
-#include "Camera.hpp"
-#include "../Graphics/Model.hpp"
-
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glfw_gl3.h"
 
+#include "../Graphics/Shader.hpp"
+#include "../Graphics/Model.hpp"
+
+#include "Application.hpp"
+#include "Camera.hpp"
+#include "Editor.hpp"
 
 namespace ELBA
 {
   Application::Application(GLFWwindow *aWindow)
-    : mWindow(aWindow), mShader(nullptr), mVAO(0), mCamera(new Camera())
+    : mWindow(aWindow), mShader(nullptr), mVAO(0), mCamera(new Camera()),
+      mEditor(new Editor(this))
   {
     
   }
@@ -55,7 +57,7 @@ namespace ELBA
     // input
     ProcessInput();
 
-    EditorUpdate();
+    mEditor->Update();
 
     // rendering commands
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -74,15 +76,6 @@ namespace ELBA
   {
     ImGui_ImplGlfwGL3_Shutdown();
     glfwTerminate();
-  }
-
-  void Application::EditorUpdate()
-  {
-    ImGui::Begin("Test Window");
-
-    ImGui::Text("HEY FAMB");
-
-    ImGui::End();
   }
 
   GLFWwindow * Application::GetWindow()

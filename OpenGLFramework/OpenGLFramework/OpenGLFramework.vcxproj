@@ -130,6 +130,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Core\Application.cpp" />
     <ClCompile Include="Source\Core\Camera.cpp" />
+    <ClCompile Include="Source\Core\Editor.cpp" />
     <ClCompile Include="Source\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\Shader.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="Include\GL\wglew.h" />
     <ClInclude Include="Source\Core\Application.hpp" />
     <ClInclude Include="Source\Core\Camera.hpp" />
+    <ClInclude Include="Source\Core\Editor.hpp" />
     <ClInclude Include="Source\Graphics\Mesh.hpp" />
     <ClInclude Include="Source\Graphics\Model.hpp" />
     <ClInclude Include="Source\Graphics\Shader.hpp" />

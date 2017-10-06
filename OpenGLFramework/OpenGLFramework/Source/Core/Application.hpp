@@ -1,15 +1,17 @@
 #pragma once
 
+#include <vector>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm\vec3.hpp>
-#include <vector>
 
 namespace ELBA
 {
   class Shader;
   class Model;
   class Camera;
+  class Editor;
 
   class Application
   {
@@ -23,10 +25,6 @@ namespace ELBA
     void Update(int aWidth, int aHeight);
     void Shutdown();
 
-
-    void EditorUpdate();
-
-
     GLFWwindow* GetWindow();
 
     int GetWindowWidth();
@@ -38,6 +36,8 @@ namespace ELBA
     Camera* GetCamera();
 
   private:
+
+    Editor *mEditor;
 
     GLFWwindow *mWindow;
 
