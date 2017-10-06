@@ -16,33 +16,10 @@
 
 namespace ELBA
 {
-  Application::Application()
-    : mShader(nullptr), mVAO(0), mCamera(new Camera())
+  Application::Application(GLFWwindow *aWindow)
+    : mWindow(aWindow), mShader(nullptr), mVAO(0), mCamera(new Camera())
   {
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    mWindow = glfwCreateWindow(800, 600, "Open GL Framework", nullptr, nullptr);
-    glfwMakeContextCurrent(mWindow);
-
-    if (!mWindow)
-    {
-      std::cout << "Failed to create GLFW window." << std::endl;
-      glfwTerminate();
-      return;
-    }
-
-    GLenum err = glewInit();
-
-    if (GLEW_OK != err)
-    {
-      std::cout << "glewInit failed." << std::endl;
-    }
-
-    glViewport(0, 0, 800, 600);
-    glfwSetFramebufferSizeCallback(mWindow, FramebufferSizeCallback);
+    
   }
 
   Application::~Application()
@@ -69,8 +46,11 @@ namespace ELBA
     mShader = new Shader(aVertShaderPath, aFragShaderPath);
   }
 
-  void Application::Update()
+  void Application::Update(int aWidth, int aHeight)
   {
+    mWindowWidth = aWidth;
+    mWindowHeight = aHeight;
+
     ImGui_ImplGlfwGL3_NewFrame();
 
     // input
@@ -111,6 +91,16 @@ namespace ELBA
     return mWindow;
   }
 
+  int Application::GetWindowWidth()
+  {
+    return mWindowWidth;
+  }
+
+  int Application::GetWindowHeight()
+  {
+    return mWindowHeight;
+  }
+
   Shader * Application::GetShader()
   {
     return mShader;
@@ -132,11 +122,6 @@ namespace ELBA
     {
       glfwSetWindowShouldClose(mWindow, true);
     }
-  }
-
-  void Application::FramebufferSizeCallback(GLFWwindow * aWindow, int aWidth, int aHeight)
-  {
-    glViewport(0, 0, aWidth, aHeight);
   }
 
   void Application::Render()
@@ -167,7 +152,7 @@ namespace ELBA
     glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
     glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), static_cast<float>(800) / 600, 0.1f, 100.0f);
+    projection = glm::perspective(glm::radians(45.0f), static_cast<float>(mWindowWidth) / mWindowHeight, 0.1f, 100.0f);
     unsigned int projLoc = glGetUniformLocation(mShader->GetShaderProgram(), "projection");
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 

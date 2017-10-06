@@ -15,12 +15,12 @@ namespace ELBA
   {
   public:
 
-    Application();
+    Application(GLFWwindow *aWindow);
     ~Application();
 
     void Init();
     void CreateShader(const char *vertShaderPath, const char *fragShaderPath);
-    void Update();
+    void Update(int aWidth, int aHeight);
     void Shutdown();
 
 
@@ -28,6 +28,9 @@ namespace ELBA
 
 
     GLFWwindow* GetWindow();
+
+    int GetWindowWidth();
+    int GetWindowHeight();
 
     Shader* GetShader();
     unsigned int GetVAO();
@@ -47,9 +50,9 @@ namespace ELBA
     std::vector<Model*> mModels;
 
     Camera *mCamera;
-
-    // callback for window resizing
-    static void FramebufferSizeCallback(GLFWwindow *aWindow, int aWidth, int aHeight);
+  
+    int mWindowWidth;
+    int mWindowHeight;
 
   };
 }

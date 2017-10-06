@@ -1,10 +1,1 @@
-﻿  Model.cpp
-  Application.cpp
-g:\projects\openglframework\openglframework\source\core\application.cpp(161): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-g:\projects\openglframework\openglframework\source\core\application.cpp(162): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-  Generating Code...
-g:\projects\openglframework\openglframework\source\core\model.cpp(226): warning C4715: 'ELBA::Model::LoadBMP': not all control paths return a value
-  Skipping... (no relevant changes detected)
-  main.cpp
-  OpenGLFramework.vcxproj -> G:\Projects\OpenGLFramework\Debug\OpenGLFramework.exe
-  OpenGLFramework.vcxproj -> G:\Projects\OpenGLFramework\Debug\OpenGLFramework.pdb (Partial PDB)
+﻿
