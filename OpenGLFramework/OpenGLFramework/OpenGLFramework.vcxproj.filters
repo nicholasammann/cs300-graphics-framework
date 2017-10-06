@@ -48,33 +48,6 @@
     <ClInclude Include="Source\Core\Model.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\SOIL.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stbi_DDS_aug_c.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stb_image_aug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\image_DXT.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\image_helper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stbi_DDS_aug.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stb_rect_pack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stb_textedit.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\stb_truetype.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\ImGui\imgui_impl_glfw_gl3.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -90,10 +63,7 @@
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />
-    <Library Include="Lib\glew32s.lib" />
     <Library Include="Lib\glfw3.lib" />
-    <Library Include="Lib\assimp.lib" />
-    <Library Include="Lib\SOIL.lib" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\main.cpp">
@@ -128,9 +98,6 @@
     <None Include="Shaders\BasicFragment.glsl" />
     <None Include="Shaders\simple.frag" />
     <None Include="Shaders\simple.vert" />
-    <None Include="Debug\assimp-vc140-mt.dll" />
-    <None Include="Debug\D3DCompiler_42.dll" />
-    <None Include="Debug\D3DX9_42.dll" />
     <None Include="DLLS\glew32.dll" />
   </ItemGroup>
 </Project>
