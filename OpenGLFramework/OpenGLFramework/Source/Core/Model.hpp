@@ -18,13 +18,11 @@ namespace ELBA
 
   private:
 
-    std::vector<Mesh> mMeshes;
+    std::vector<Mesh*> mMeshes;
 
     std::vector<Texture> mLoadedTextures;
 
     std::string mDirectory;
-
-    void LoadModel(std::string aPath);
 
     unsigned int LoadTexture(const char *aFile, std::string aDir);
 

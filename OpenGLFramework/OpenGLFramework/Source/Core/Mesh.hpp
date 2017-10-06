@@ -15,7 +15,21 @@ namespace ELBA
   {
     glm::vec3 mPos;
     glm::vec3 mNormal;
-    glm::vec2 mTexCoords;
+  };
+
+  struct Face
+  {
+    union
+    {
+      struct
+      {
+        unsigned int a, b, c;
+      };
+      unsigned int mIndices[3];
+    };
+
+    Face(unsigned int aA, unsigned int aB, unsigned int aC) : a(aA), b(aB), c(aC) { }
+
   };
 
   struct Texture
@@ -28,21 +42,29 @@ namespace ELBA
   {
   public:
 
-    std::vector<Vertex> mVertices;
-    std::vector<unsigned int> mIndices;
-    std::vector<Texture> mTextures;
-
-    Mesh(std::vector<Vertex> aVertices, std::vector<unsigned int> aIndices, std::vector<Texture> aTextures);
+    Mesh();
 
     void Draw(Shader *aShader);
 
+    void AddVertex(float aA, float aB, float aC);
+    void AddFace(GLuint aA, GLuint aB, GLuint aC);
+
+    void SetUpMesh();
+
+    void Preprocess();
+
   private:
+    
+    std::vector<Vertex> mVertices;
+    std::vector<Face> mFaces;
+    std::vector<glm::vec3> mFaceNormals;
 
     unsigned int mVAO;
     unsigned int mVBO;
     unsigned int mEBO;
 
-    void SetUpMesh();
+    void CenterMesh();
+    void NormalizeVertices();
 
   };
 

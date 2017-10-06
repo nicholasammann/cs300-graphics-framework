@@ -32,7 +32,7 @@ namespace ELBA
 
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
-    Model *crysis = new Model("../OpenGLFramework/Assets/CrysisModel/nanosuit.obj");
+    Model *crysis = new Model("../OpenGLFramework/Assets/CS300/cube.obj");
     mModels.push_back(crysis);
   }
 
@@ -143,8 +143,8 @@ namespace ELBA
 
     Camera *cam = mCamera;
 
-    cam->mPosition.x = sin(glfwGetTime()) * 10;
-    cam->mPosition.z = cos(glfwGetTime()) * 10;
+    cam->mPosition.x = static_cast<float>(sin(glfwGetTime()) * 10);
+    cam->mPosition.z = static_cast<float>(cos(glfwGetTime()) * 10);
 
     glm::mat4 view;
     view = glm::lookAt(cam->mPosition, cam->mTarget, cam->mCameraUp);
