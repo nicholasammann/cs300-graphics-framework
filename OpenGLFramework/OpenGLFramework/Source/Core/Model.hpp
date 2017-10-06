@@ -20,12 +20,6 @@ namespace ELBA
 
     std::vector<Mesh*> mMeshes;
 
-    std::vector<Texture> mLoadedTextures;
-
-    std::string mDirectory;
-
-    unsigned int LoadTexture(const char *aFile, std::string aDir);
-
   };
 
 }

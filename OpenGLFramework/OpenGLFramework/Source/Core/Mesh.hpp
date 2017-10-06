@@ -15,6 +15,8 @@ namespace ELBA
   {
     glm::vec3 mPos;
     glm::vec3 mNormal;
+
+    Vertex() : mPos(glm::vec3()), mNormal(glm::vec3()) { }
   };
 
   struct Face

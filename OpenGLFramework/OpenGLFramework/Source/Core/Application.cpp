@@ -32,8 +32,7 @@ namespace ELBA
 
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
-    Model *crysis = new Model("../OpenGLFramework/Assets/CS300/cube.obj");
-    mModels.push_back(crysis);
+    mModels.push_back(new Model("../OpenGLFramework/Assets/CS300/cube.obj"));
   }
 
   void Application::CreateShader(const char * aVertShaderPath, const char * aFragShaderPath)
@@ -128,8 +127,12 @@ namespace ELBA
   {
     mShader->UseShaderProgram();
 
-    glm::vec3 pos(0, -6.0f, 0);
-    glm::vec3 scale(0.2f, 0.2f, 0.2f);
+    int colorLoc = glGetUniformLocation(mShader->GetShaderProgram(), "Color");
+    glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+
+
+    glm::vec3 pos(0, 0, 0);
+    glm::vec3 scale(1.0f, 1.0f, 1.0f);
     glm::vec3 rotate(0, 0, 0);
 
     glm::mat4 model;

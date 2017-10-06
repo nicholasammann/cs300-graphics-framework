@@ -13,6 +13,7 @@ namespace ELBA
   Model::Model(char * aPath)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath));
+    mMeshes.back()->SetUpMesh();
   }
 
   void Model::Draw(Shader *aShader)
@@ -21,11 +22,5 @@ namespace ELBA
     {
       mMeshes[i]->Draw(aShader);
     }
-  }
-
-  
-  unsigned int Model::LoadTexture(const char * aFile, std::string aDir)
-  {
-    return 0;
   }
 }

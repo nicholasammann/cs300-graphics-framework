@@ -58,11 +58,7 @@ namespace ELBA
 
     Mesh* LoadMesh(std::string const &objFile)
     {
-      std::string path = std::experimental::filesystem::current_path().string();
-
-      std::stringstream strstr;
-      strstr << path << "../OpenGLFramework/Assets/" << objFile;
-      std::ifstream input = std::ifstream(strstr.str());
+      std::ifstream input = std::ifstream(objFile);
       assert(input.good(), "Cannot load mesh: assets/models/%s", objFile.c_str());
       if (!input.good())
         return nullptr;

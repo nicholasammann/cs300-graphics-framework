@@ -27,7 +27,7 @@ namespace ELBA
     Vertex v;
     v.mPos.x = aX;
     v.mPos.y = aY;
-    v.mPos.x = aZ;
+    v.mPos.z = aZ;
 
     mVertices.push_back(v);
   }
@@ -52,11 +52,21 @@ namespace ELBA
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), mVertices.data(), GL_STATIC_DRAW);
     //////////////////////////////
 
+    unsigned int *indices = new unsigned int[mFaces.size() * 3];
+
+    for (unsigned int i = 0; i < mFaces.size(); ++i)
+    {
+      for (unsigned int j = 0; j < 3; ++j)
+      {
+        indices[3 * i + j] = mFaces[i].mIndices[j];
+      }
+    }
+
     //// Element Buffer Object ////
     // create and bind empty element buffer object
     glGenBuffers(1, &mEBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mFaces.size() * sizeof(Face), mFaces.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mFaces.size() * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
     ///////////////////////////////
 
     // tell OpenGL how it should interpret all vertex data
@@ -82,19 +92,24 @@ namespace ELBA
       glm::vec3 v1 = mVertices[face.mIndices[1]].mPos;
       glm::vec3 v2 = mVertices[face.mIndices[2]].mPos;
 
-      glm::vec3 norm = glm::cross(v1 - v0, v2 - v1);
-      norm = glm::normalize(norm);
+      glm::vec3 normRaw = glm::cross(v1 - v0, v2 - v0);
+
+      glm::vec3 norm = glm::normalize(normRaw);
 
       mFaceNormals.push_back(norm);
 
       for (int j = 0; j < 3; ++j)
       {
+        mVertices[face.mIndices[j]].mNormal = glm::vec3(0, 0, 0);
+
         std::vector<glm::vec3> &verts = adjNormals[&mVertices[face.mIndices[j]].mNormal];
+
         auto it = std::find(verts.begin(), verts.end(), norm);
 
         if (it == verts.end())
         {
-          verts.push_back(mFaceNormals[i]);
+          glm::vec3 n = mFaceNormals[i];
+          verts.push_back(n);
         }
       }
     }
