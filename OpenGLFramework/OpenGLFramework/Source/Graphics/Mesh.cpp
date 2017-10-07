@@ -7,12 +7,12 @@
 #include <glm/glm.hpp>
 
 #include "Mesh.hpp"
-
+#include "Model.hpp"
 
 namespace ELBA
 {
 
-  Mesh::Mesh() : mDebugMode(0)
+  Mesh::Mesh(Model *aParent) : mParent(aParent), mDebugMode(0)
   {
   }
 

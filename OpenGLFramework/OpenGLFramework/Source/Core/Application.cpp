@@ -34,13 +34,18 @@ namespace ELBA
 
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
-    mModels.push_back(new Model("../OpenGLFramework/Assets/CS300/cube.obj", "Cube"));
+    CreateShader("Simple", "Assets/Shaders/simple.vert", "Assets/Shaders/simple.frag");
+
+    Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
+    mod->SetShader("Simple");
+
+    mModels.push_back(mod);
   }
 
   void Application::CreateShader(const char *aName, const char * aVertShaderPath, const char * aFragShaderPath)
   {
     // find out if we have already loaded the shader
-    auto it = std::find(mShaders.begin(), mShaders.end(), aName);
+    auto it = mShaders.find(aName);
 
     // shader has already been loaded
     if (it != mShaders.end())
@@ -50,7 +55,7 @@ namespace ELBA
     }
 
     // load the new shader and store it in the map
-    mShaders[aName] = new Shader(aVertShaderPath, aFragShaderPath);
+    mShaders[aName] = new Shader(aName, aVertShaderPath, aFragShaderPath);
   }
 
   void Application::Update(int aWidth, int aHeight)
@@ -64,10 +69,6 @@ namespace ELBA
     ProcessInput();
 
     mEditor->Update();
-
-    // rendering commands
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     Render();
 
@@ -102,7 +103,7 @@ namespace ELBA
   Shader * Application::GetShader(const char *aName)
   {
     // find out if we have loaded the shader
-    auto it = std::find(mShaders.begin(), mShaders.end(), aName);
+    auto it = mShaders.find(aName);
 
     // if not, return nullptr
     if (it == mShaders.end())
@@ -134,25 +135,37 @@ namespace ELBA
 
   void Application::Render()
   {
-    mShader->UseShaderProgram();
-
-    int colorLoc = glGetUniformLocation(mShader->GetShaderProgram(), "Color");
-    glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
-
-    Camera *cam = mCamera;
-
-    glm::mat4 view;
-    view = glm::lookAt(cam->mPosition, cam->mTarget, cam->mCameraUp);
-    unsigned int viewLoc = glGetUniformLocation(mShader->GetShaderProgram(), "view");
-    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
-    glm::mat4 projection;
-    projection = glm::perspective(glm::radians(45.0f), static_cast<float>(mWindowWidth) / mWindowHeight, 0.1f, 100.0f);
-    unsigned int projLoc = glGetUniformLocation(mShader->GetShaderProgram(), "projection");
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+    // rendering commands
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     for (Model *m : mModels)
     {
+      Shader *shdr = m->GetShader();
+
+      if (!shdr)
+      {
+        // TODO: change this to load a default shader
+        continue;
+      }
+
+      unsigned int shdrPrg = shdr->GetShaderProgram();
+
+      int colorLoc = glGetUniformLocation(shdrPrg, "Color");
+      glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+
+      Camera *cam = mCamera;
+
+      glm::mat4 view;
+      view = glm::lookAt(cam->mPosition, cam->mTarget, cam->mCameraUp);
+      unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+      glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+      glm::mat4 projection;
+      projection = glm::perspective(glm::radians(45.0f), static_cast<float>(mWindowWidth) / mWindowHeight, 0.1f, 100.0f);
+      unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+      glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
       Transform &tr = m->GetTransform();
       
       glm::mat4 model;
@@ -161,10 +174,10 @@ namespace ELBA
       model = glm::rotate(model, tr.mWorldRot.y, glm::vec3(0, 1, 0));
       model = glm::rotate(model, tr.mWorldRot.z, glm::vec3(0, 0, 1));
       model = glm::translate(model, tr.mWorldPos);
-      unsigned int modelLoc = glGetUniformLocation(mShader->GetShaderProgram(), "model");
+      unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-      m->Draw(mShader);
+      m->Draw(shdr);
     }
   }
 

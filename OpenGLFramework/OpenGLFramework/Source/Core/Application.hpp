@@ -1,7 +1,8 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
+#include <map>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -46,7 +47,7 @@ namespace ELBA
     void ProcessInput();
     void Render();
 
-    std::unordered_map<std::string, Shader*> mShaders;
+    std::map<std::string, Shader*> mShaders;
 
     std::vector<Model*> mModels;
 

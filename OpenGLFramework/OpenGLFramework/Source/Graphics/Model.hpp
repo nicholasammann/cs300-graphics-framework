@@ -29,6 +29,8 @@ namespace ELBA
 
     void SetShader(std::string aName);
 
+    Shader* GetShader();
+
     std::vector<Mesh*>& GetMeshes();
     
     std::string GetName() const;
@@ -45,7 +47,7 @@ namespace ELBA
 
     std::vector<Mesh*> mMeshes;
 
-    std::string mShaderName;
+    Shader *mShader;
 
   };
 

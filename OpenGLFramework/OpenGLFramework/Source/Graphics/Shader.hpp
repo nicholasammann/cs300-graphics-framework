@@ -12,7 +12,7 @@ namespace ELBA
   public:
 
     // read in shader source code and build shader
-    Shader(const char *vertPath, const char *fragPath);
+    Shader(const char *aName, const char *vertPath, const char *fragPath);
 
     // activate the shader
     void UseShaderProgram();
@@ -27,6 +27,9 @@ namespace ELBA
     unsigned int GetFragShader() const;
 
   private:
+
+    std::string mName;
+
     unsigned int mShaderProgram;
     unsigned int mVertShader;
     unsigned int mFragShader;

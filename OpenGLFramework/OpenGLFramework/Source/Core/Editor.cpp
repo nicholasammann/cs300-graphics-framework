@@ -37,7 +37,7 @@ void ELBA::Editor::Update()
           pos[0] = trans.mWorldPos.x;
           pos[1] = trans.mWorldPos.y;
           pos[2] = trans.mWorldPos.z;
-          ImGui::DragFloat3("Position", pos, 0.1);
+          ImGui::DragFloat3("Position", pos, 0.1f);
           trans.mWorldPos.x = pos[0];
           trans.mWorldPos.y = pos[1];
           trans.mWorldPos.z = pos[2];
@@ -47,7 +47,7 @@ void ELBA::Editor::Update()
           rot[0] = trans.mWorldRot.x;
           rot[1] = trans.mWorldRot.y;
           rot[2] = trans.mWorldRot.z;
-          ImGui::DragFloat3("Rotation", rot, 0.1);
+          ImGui::DragFloat3("Rotation", rot, 0.1f);
           trans.mWorldRot.x = rot[0];
           trans.mWorldRot.y = rot[1];
           trans.mWorldRot.z = rot[2];
@@ -56,7 +56,7 @@ void ELBA::Editor::Update()
           scale[0] = trans.mScale.x;
           scale[1] = trans.mScale.y;
           scale[2] = trans.mScale.z;
-          ImGui::DragFloat3("Scale", scale, 0.1);
+          ImGui::DragFloat3("Scale", scale, 0.1f);
           trans.mScale.x = scale[0];
           trans.mScale.y = scale[1];
           trans.mScale.z = scale[2];

@@ -14,7 +14,7 @@ namespace ELBA
 {
   Model::Model(Application *aApp, char * aPath, std::string aName) : mApp(aApp), mName(aName), mTransform()
   {
-    mMeshes.push_back(Utils::LoadMesh(aPath));
+    mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();
   }
 
@@ -28,8 +28,21 @@ namespace ELBA
 
   void Model::SetShader(std::string aName)
   {
-    mShaderName = aName;
+    Shader *s = mApp->GetShader(aName.c_str());
 
+    if (s)
+    {
+      mShader = s;
+    }
+    else
+    {
+      mShader = mApp->GetShader("Simple");
+    }
+  }
+
+  Shader* Model::GetShader()
+  {
+    return mShader;
   }
 
   std::vector<Mesh*>& Model::GetMeshes()

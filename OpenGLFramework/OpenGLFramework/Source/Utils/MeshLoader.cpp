@@ -2,6 +2,8 @@
 #include <fstream>
 
 #include "MeshLoader.hpp"
+#include "../Graphics/Model.hpp"
+#include "../Graphics/Mesh.hpp"
 
 namespace ELBA
 {
@@ -55,15 +57,16 @@ namespace ELBA
     }
 
 
-
-    Mesh* LoadMesh(std::string const &objFile)
+    Mesh* LoadMesh(std::string const &objFile, Model *aParent)
     {
       std::ifstream input = std::ifstream(objFile);
-      assert(input.good(), "Cannot load mesh: assets/models/%s", objFile.c_str());
+      
+      assert(input.good());
+      
       if (!input.good())
         return nullptr;
 
-      Mesh *mesh = new Mesh();
+      Mesh *mesh = new Mesh(aParent);
 
       std::string line;
       while (getline(input, line))

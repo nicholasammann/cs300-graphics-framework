@@ -10,6 +10,7 @@
 
 namespace ELBA
 {
+  class Model;
 
   struct Vertex
   {
@@ -44,7 +45,7 @@ namespace ELBA
   {
   public:
 
-    Mesh();
+    Mesh(Model *aParent);
 
     void Draw(Shader *aShader);
 
@@ -60,6 +61,8 @@ namespace ELBA
     int* GetDebugMode();
 
   private:
+
+    Model *mParent;
 
     void DrawFaceNormals();
     void DrawVertexNormals();
@@ -95,7 +98,6 @@ namespace ELBA
   private:
 
     int mDebugMode;
-
 
   };
 

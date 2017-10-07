@@ -8,8 +8,8 @@
 namespace ELBA
 {
 
-  Shader::Shader(const char *vertPath, const char *fragPath)
-    : mShaderProgram(0), mVertShader(0), mFragShader(0)
+  Shader::Shader(const char *aName, const char *vertPath, const char *fragPath)
+    : mName(aName), mShaderProgram(0), mVertShader(0), mFragShader(0)
   {
     // read in vertex shader
     const GLchar *vertexShaderSource = ReadShader(vertPath);

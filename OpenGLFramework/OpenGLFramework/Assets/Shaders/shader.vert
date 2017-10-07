@@ -1,11 +1,10 @@
 #version 330 core
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
 
-// These two must perfectly match the structure defined in inc/graphics/Vertex.h
-layout(location = 0) in vec3 vVertex;
-layout(location = 1) in vec3 vNormal;
-
-uniform mat4 ModelViewMatrix; // local->world matrix
-uniform mat4 ModelViewProjectionMatrix; // local->NDC matrix [no camera support]
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 const int MaxLights = 8; // maximum possible lights this shader supports
 
@@ -27,7 +26,9 @@ uniform struct
   vec4 diffuse; // diffuse color of the surface/how much diffuse light to absorb
 } Material;
 
+
 out vec4 litFragColor;
+
 
 vec4 computeLightingTerm(in int lightIdx, in vec4 worldNormal)
 {
@@ -63,19 +64,19 @@ vec4 computeSurfaceColor(in vec4 worldNormal)
   return color; // contribution from all lights onto surface
 }
 
+
 void main()
 {
+    // deal with position and normal in world space
+  vec4 worldPos = projection * view * model * vec4(aPos, 1);
 
-  // deal with position and normal in world space
-  vec4 worldPos = ModelViewMatrix * vec4(vVertex, 1);
-
-  // vec4(vNormal, 0) because we don't want to translate a normal;
+  // vec4(aNormal, 0) because we don't want to translate a normal;
   // NOTE: this code is wrong if we support non-uniform scaling
-  vec4 worldNorm = normalize(ModelViewMatrix * vec4(vNormal, 0));
+  vec4 worldNorm = normalize(view * model * vec4(aNormal, 0));
 
   // compute the final result of passing this vertex through the transformation
   // pipeline and yielding a coordinate in NDC space
-  gl_Position = ModelViewProjectionMatrix * vec4(vVertex, 1);
+  gl_Position = projection * view * model * vec4(aPos, 1);
   
   // compute the contribution of lights onto this vertex and interpolate that
   // color value across the surface of the polygon

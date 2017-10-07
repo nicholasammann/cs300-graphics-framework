@@ -9,10 +9,12 @@
 
 namespace ELBA
 {
+  class Model;
+
   namespace Utils
   {
     void ParseLine(std::string line, Mesh *mesh);
 
-    Mesh* LoadMesh(std::string const &objFile);
+    Mesh* LoadMesh(std::string const &objFile, Model *aParent);
   }
 }
