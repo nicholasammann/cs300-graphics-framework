@@ -22,7 +22,7 @@ namespace ELBA
     ~Application();
 
     void Init();
-    void CreateShader(const char *vertShaderPath, const char *fragShaderPath);
+    void CreateShader(const char *aName, const char *vertShaderPath, const char *fragShaderPath);
     void Update(int aWidth, int aHeight);
     void Shutdown();
 
@@ -31,8 +31,7 @@ namespace ELBA
     int GetWindowWidth();
     int GetWindowHeight();
 
-    Shader* GetShader();
-    unsigned int GetVAO();
+    Shader* GetShader(const char *aName);
 
     Camera* GetCamera();
 
@@ -47,7 +46,7 @@ namespace ELBA
     void ProcessInput();
     void Render();
 
-    Shader *mShader;
+    std::unordered_map<std::string, Shader*> mShaders;
 
     std::vector<Model*> mModels;
 

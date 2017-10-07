@@ -18,7 +18,7 @@
 namespace ELBA
 {
   Application::Application(GLFWwindow *aWindow)
-    : mWindow(aWindow), mShader(nullptr), mCamera(new Camera()),
+    : mWindow(aWindow), mCamera(new Camera()),
       mEditor(new Editor(this))
   {
     
@@ -37,14 +37,20 @@ namespace ELBA
     mModels.push_back(new Model("../OpenGLFramework/Assets/CS300/cube.obj", "Cube"));
   }
 
-  void Application::CreateShader(const char * aVertShaderPath, const char * aFragShaderPath)
+  void Application::CreateShader(const char *aName, const char * aVertShaderPath, const char * aFragShaderPath)
   {
-    if (mShader)
+    // find out if we have already loaded the shader
+    auto it = std::find(mShaders.begin(), mShaders.end(), aName);
+
+    // shader has already been loaded
+    if (it != mShaders.end())
     {
-      delete mShader;
+      // erase it so we can reload it
+      mShaders.erase(aName);
     }
 
-    mShader = new Shader(aVertShaderPath, aFragShaderPath);
+    // load the new shader and store it in the map
+    mShaders[aName] = new Shader(aVertShaderPath, aFragShaderPath);
   }
 
   void Application::Update(int aWidth, int aHeight)
@@ -93,14 +99,19 @@ namespace ELBA
     return mWindowHeight;
   }
 
-  Shader * Application::GetShader()
+  Shader * Application::GetShader(const char *aName)
   {
-    return mShader;
-  }
+    // find out if we have loaded the shader
+    auto it = std::find(mShaders.begin(), mShaders.end(), aName);
 
-  unsigned int Application::GetVAO()
-  {
-    return mVAO;
+    // if not, return nullptr
+    if (it == mShaders.end())
+    {
+      return nullptr;
+    }
+
+    // otherwise return the pointer
+    return it->second;
   }
 
   Camera * Application::GetCamera()

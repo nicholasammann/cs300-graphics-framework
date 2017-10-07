@@ -6,12 +6,13 @@
 #include <GLFW/glfw3.h>
 
 #include "Model.hpp"
+#include "../Core/Application.hpp"
 #include "../Utils/MeshLoader.hpp"
 
 
 namespace ELBA
 {
-  Model::Model(char * aPath, std::string aName) : mName(aName), mTransform()
+  Model::Model(Application *aApp, char * aPath, std::string aName) : mApp(aApp), mName(aName), mTransform()
   {
     mMeshes.push_back(Utils::LoadMesh(aPath));
     mMeshes.back()->SetUpMesh();
@@ -25,6 +26,12 @@ namespace ELBA
     }
   }
 
+  void Model::SetShader(std::string aName)
+  {
+    mShaderName = aName;
+
+  }
+
   std::vector<Mesh*>& Model::GetMeshes()
   {
     return mMeshes;
@@ -34,6 +41,7 @@ namespace ELBA
   {
     return mName;
   }
+
   Transform & Model::GetTransform()
   {
     return mTransform;

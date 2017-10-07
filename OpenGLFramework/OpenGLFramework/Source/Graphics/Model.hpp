@@ -8,6 +8,7 @@
 
 namespace ELBA
 {
+  class Application;
 
   struct Transform
   {
@@ -22,9 +23,11 @@ namespace ELBA
   {
   public:
 
-    Model(char *aPath, std::string aName);
+    Model(Application *aApp, char *aPath, std::string aName);
 
     void Draw(Shader *aShader);
+
+    void SetShader(std::string aName);
 
     std::vector<Mesh*>& GetMeshes();
     
@@ -34,11 +37,15 @@ namespace ELBA
 
   private:
 
+    Application *mApp;
+
     Transform mTransform;
 
     std::string mName;
 
     std::vector<Mesh*> mMeshes;
+
+    std::string mShaderName;
 
   };
 

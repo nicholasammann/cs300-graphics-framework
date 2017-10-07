@@ -108,7 +108,6 @@ namespace ELBA
     ///////////////////////////////
 
     // tell OpenGL how it should interpret all vertex data
-    int posAttrib = glGetAttribLocation(, "aPos");
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 

@@ -13,7 +13,6 @@ ELBA::Editor::Editor(Application * aApp) : mApp(aApp)
 
 void ELBA::Editor::Update()
 {
-  //ImGui::ShowTestWindow();
 
   ImGui::Begin("Test Window");
 
