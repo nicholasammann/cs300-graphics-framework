@@ -18,7 +18,7 @@
 namespace ELBA
 {
   Application::Application(GLFWwindow *aWindow)
-    : mWindow(aWindow), mShader(nullptr), mVAO(0), mCamera(new Camera()),
+    : mWindow(aWindow), mShader(nullptr), mCamera(new Camera()),
       mEditor(new Editor(this))
   {
     
@@ -34,7 +34,7 @@ namespace ELBA
 
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
-    mModels.push_back(new Model("../OpenGLFramework/Assets/CS300/cube.obj"));
+    mModels.push_back(new Model("../OpenGLFramework/Assets/CS300/cube.obj", "Cube"));
   }
 
   void Application::CreateShader(const char * aVertShaderPath, const char * aFragShaderPath)
@@ -108,6 +108,11 @@ namespace ELBA
     return mCamera;
   }
 
+  std::vector<Model*>& Application::GetModels()
+  {
+    return mModels;
+  }
+
   void Application::ProcessInput()
   {
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -123,24 +128,7 @@ namespace ELBA
     int colorLoc = glGetUniformLocation(mShader->GetShaderProgram(), "Color");
     glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
 
-
-    glm::vec3 pos(0, 0, 0);
-    glm::vec3 scale(1.0f, 1.0f, 1.0f);
-    glm::vec3 rotate(0, 0, 0);
-
-    glm::mat4 model;
-    model = glm::scale(model, scale);
-    model = glm::rotate(model, rotate.x, glm::vec3(1, 0, 0));
-    model = glm::rotate(model, rotate.y, glm::vec3(0, 1, 0));
-    model = glm::rotate(model, rotate.z, glm::vec3(0, 0, 1));
-    model = glm::translate(model, pos);
-    unsigned int modelLoc = glGetUniformLocation(mShader->GetShaderProgram(), "model");
-    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
     Camera *cam = mCamera;
-
-    cam->mPosition.x = static_cast<float>(sin(glfwGetTime()) * 10);
-    cam->mPosition.z = static_cast<float>(cos(glfwGetTime()) * 10);
 
     glm::mat4 view;
     view = glm::lookAt(cam->mPosition, cam->mTarget, cam->mCameraUp);
@@ -154,6 +142,17 @@ namespace ELBA
 
     for (Model *m : mModels)
     {
+      Transform &tr = m->GetTransform();
+      
+      glm::mat4 model;
+      model = glm::scale(model, tr.mScale);
+      model = glm::rotate(model, tr.mWorldRot.x, glm::vec3(1, 0, 0));
+      model = glm::rotate(model, tr.mWorldRot.y, glm::vec3(0, 1, 0));
+      model = glm::rotate(model, tr.mWorldRot.z, glm::vec3(0, 0, 1));
+      model = glm::translate(model, tr.mWorldPos);
+      unsigned int modelLoc = glGetUniformLocation(mShader->GetShaderProgram(), "model");
+      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
       m->Draw(mShader);
     }
   }

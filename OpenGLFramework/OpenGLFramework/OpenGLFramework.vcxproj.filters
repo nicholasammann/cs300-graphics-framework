@@ -105,6 +105,9 @@
     <ClCompile Include="Source\Core\Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\ImGui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BasicFragment.glsl" />

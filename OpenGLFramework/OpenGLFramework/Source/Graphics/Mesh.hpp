@@ -55,8 +55,15 @@ namespace ELBA
 
     void Preprocess();
 
+    glm::vec3 GetFaceCentroid(Face aFace);
+
+    int* GetDebugMode();
+
   private:
-    
+
+    void DrawFaceNormals();
+    void DrawVertexNormals();
+
     std::vector<Vertex> mVertices;
     std::vector<Face> mFaces;
     std::vector<glm::vec3> mFaceNormals;
@@ -65,9 +72,32 @@ namespace ELBA
     unsigned int mVBO;
     unsigned int mEBO;
 
+    void BindVertNormals();
+    unsigned int mVertNorm_VAO;
+    unsigned int mVertNorm_VBO;
+
+    void BindFaceNormals();
+    unsigned int mFaceNorm_VAO;
+    unsigned int mFaceNorm_VBO;
+
     void CenterMesh();
     void NormalizeVertices();
 
+  public:
+
+    enum DebugMode
+    {
+      None,
+      VertNormals,
+      FaceNormals
+    };
+
+  private:
+
+    int mDebugMode;
+
+
   };
+
 
 }

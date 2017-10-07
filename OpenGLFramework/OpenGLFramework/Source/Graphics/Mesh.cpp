@@ -1,6 +1,7 @@
 #include <sstream>
 #include <unordered_map>
 #include <algorithm>
+#include <vector>
 
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
@@ -11,15 +12,52 @@
 namespace ELBA
 {
 
-  Mesh::Mesh()
+  Mesh::Mesh() : mDebugMode(0)
   {
   }
 
   void Mesh::Draw(Shader *aShader)
   {
+    switch (mDebugMode)
+    {
+    case VertNormals:
+    {
+      DrawVertexNormals();
+      break;
+    }
+
+    case FaceNormals:
+    {
+      DrawFaceNormals();
+      break;
+    }
+    }
+
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
+  }
+
+  void Mesh::DrawFaceNormals()
+  {
+    for (unsigned int i = 0; i < mFaces.size(); ++i)
+    {
+      glm::vec3 norm = mFaceNormals[i];
+      glm::vec3 a = GetFaceCentroid(mFaces[i]);
+      glm::vec3 b = a + 5.0f * norm;
+
+      glLineWidth(1.5);
+      glColor3f(0, 0, 1.0);
+      glBegin(GL_LINES);
+      glVertex3f(a.x, a.y, a.z);
+      glVertex3f(b.x, b.y, b.z);
+      glEnd();
+    }
+  }
+
+  void Mesh::DrawVertexNormals()
+  {
+    
   }
 
   void Mesh::AddVertex(float aX, float aY, float aZ)
@@ -70,6 +108,7 @@ namespace ELBA
     ///////////////////////////////
 
     // tell OpenGL how it should interpret all vertex data
+    int posAttrib = glGetAttribLocation(, "aPos");
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 
@@ -92,7 +131,7 @@ namespace ELBA
       glm::vec3 v1 = mVertices[face.mIndices[1]].mPos;
       glm::vec3 v2 = mVertices[face.mIndices[2]].mPos;
 
-      glm::vec3 normRaw = glm::cross(v1 - v0, v2 - v0);
+      glm::vec3 normRaw = glm::cross(v1 - v0, v2 - v1);
 
       glm::vec3 norm = glm::normalize(normRaw);
 
@@ -127,9 +166,62 @@ namespace ELBA
       mVertices[i].mNormal = glm::normalize(mVertices[i].mNormal);
     }
 
-
     CenterMesh();
     NormalizeVertices();
+
+  }
+
+  glm::vec3 Mesh::GetFaceCentroid(Face aFace)
+  {
+    glm::vec3 centroid = mVertices[aFace.a].mPos;
+    centroid += mVertices[aFace.b].mPos;
+    centroid += mVertices[aFace.c].mPos;
+    return centroid * (1.f / 3.f);
+  }
+
+  int* Mesh::GetDebugMode()
+  {
+    return &mDebugMode;
+  }
+
+  void Mesh::BindVertNormals()
+  {
+    std::vector<float> mPoints;
+
+    for (unsigned i = 0; i < mVertices.size(); ++i)
+    {
+      Vertex v = mVertices[i];
+      glm::vec3 a = v.mPos;
+      glm::vec3 b = a + v.mNormal;
+
+      // store the beginning of the line
+      mPoints.push_back(a.x);
+      mPoints.push_back(a.y);
+      mPoints.push_back(a.z);
+
+      // store the end of the line
+      mPoints.push_back(b.x);
+      mPoints.push_back(b.y);
+      mPoints.push_back(b.z);
+    }
+
+    //// Vertex Array Object ////
+    // create and bind vertex array object
+    glGenVertexArrays(1, &mVertNorm_VAO);
+    glBindVertexArray(mVertNorm_VAO);
+    //////////////////////////////
+
+    //// Vertex Buffer Object ////
+    // create and bind empty vertex buffer object
+    glGenBuffers(1, &mVertNorm_VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mVertNorm_VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(mPoints), mPoints.data(), GL_STATIC_DRAW);
+    //////////////////////////////
+
+  }
+
+  void Mesh::BindFaceNormals()
+  {
 
   }
 

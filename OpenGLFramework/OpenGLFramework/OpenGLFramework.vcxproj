@@ -135,6 +135,7 @@
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\Shader.cpp" />
     <ClCompile Include="Source\ImGui\imgui.cpp" />
+    <ClCompile Include="Source\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Source\ImGui\imgui_draw.cpp" />
     <ClCompile Include="Source\ImGui\imgui_impl_glfw_gl3.cpp" />
     <ClCompile Include="Source\main.cpp" />

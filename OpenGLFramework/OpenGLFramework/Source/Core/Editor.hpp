@@ -16,7 +16,7 @@ namespace ELBA
 
   private:
 
-
+    Application *mApp;
 
 
   };

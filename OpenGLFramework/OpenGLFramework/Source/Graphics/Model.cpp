@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -10,7 +11,7 @@
 
 namespace ELBA
 {
-  Model::Model(char * aPath)
+  Model::Model(char * aPath, std::string aName) : mName(aName), mTransform()
   {
     mMeshes.push_back(Utils::LoadMesh(aPath));
     mMeshes.back()->SetUpMesh();
@@ -22,5 +23,19 @@ namespace ELBA
     {
       mMeshes[i]->Draw(aShader);
     }
+  }
+
+  std::vector<Mesh*>& Model::GetMeshes()
+  {
+    return mMeshes;
+  }
+
+  std::string Model::GetName() const
+  {
+    return mName;
+  }
+  Transform & Model::GetTransform()
+  {
+    return mTransform;
   }
 }

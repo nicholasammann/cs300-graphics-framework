@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <unordered_map>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -35,6 +36,8 @@ namespace ELBA
 
     Camera* GetCamera();
 
+    std::vector<Model*>& GetModels();
+
   private:
 
     Editor *mEditor;
@@ -45,7 +48,6 @@ namespace ELBA
     void Render();
 
     Shader *mShader;
-    unsigned int mVAO;
 
     std::vector<Model*> mModels;
 
