@@ -34,11 +34,11 @@ namespace ELBA
 
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
-    CreateShader("Simple", "Assets/Shaders/simple.vert", "Assets/Shaders/simple.frag");
+    CreateShader("Shader", "Assets/Shaders/Shader.vert", "Assets/Shaders/Shader.frag");
 
     Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
-    mod->SetShader("Simple");
-
+    mod->SetShader("Shader");
+    
     mModels.push_back(mod);
   }
 

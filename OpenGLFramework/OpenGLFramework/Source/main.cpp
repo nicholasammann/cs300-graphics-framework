@@ -29,6 +29,8 @@ GLFWwindow* InitializeGraphics()
     return nullptr;
   }
 
+  glewExperimental = GL_TRUE;
+
   GLenum err = glewInit();
 
   if (GLEW_OK != err)
