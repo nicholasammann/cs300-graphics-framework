@@ -24,7 +24,7 @@ void ELBA::Editor::Update()
     {
       std::string name = mod->GetName();
 
-      if (ImGui::TreeNode(name.c_str()))
+      if (ImGui::CollapsingHeader(name.c_str()))
       {
 
         if (ImGui::TreeNode("Transform"))
@@ -86,7 +86,6 @@ void ELBA::Editor::Update()
 
         }
 
-        ImGui::TreePop();
       }
       
 

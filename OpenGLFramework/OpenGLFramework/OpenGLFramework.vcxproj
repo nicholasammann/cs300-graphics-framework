@@ -167,6 +167,8 @@
     <Library Include="Lib\glfw3.lib" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Assets\Shaders\debug.frag" />
+    <None Include="Assets\Shaders\debug.vert" />
     <None Include="Assets\Shaders\shader.frag" />
     <None Include="Assets\Shaders\shader.vert" />
     <None Include="Assets\Shaders\simple.frag" />

@@ -124,5 +124,7 @@
     <None Include="Assets\Shaders\shader.vert" />
     <None Include="Assets\Shaders\simple.frag" />
     <None Include="Assets\Shaders\simple.vert" />
+    <None Include="Assets\Shaders\debug.vert" />
+    <None Include="Assets\Shaders\debug.frag" />
   </ItemGroup>
 </Project>

@@ -5,6 +5,8 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/mat4x4.hpp>
+
 #include "Model.hpp"
 #include "../Core/Application.hpp"
 #include "../Utils/MeshLoader.hpp"
@@ -18,11 +20,11 @@ namespace ELBA
     mMeshes.back()->SetUpMesh();
   }
 
-  void Model::Draw(Shader *aShader)
+  void Model::Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
     for (unsigned int i = 0; i < mMeshes.size(); ++i)
     {
-      mMeshes[i]->Draw(aShader);
+      mMeshes[i]->Draw(aShader, aProj, aView, aModel);
     }
   }
 
@@ -43,6 +45,25 @@ namespace ELBA
   Shader* Model::GetShader()
   {
     return mShader;
+  }
+
+  void Model::SetDebugShader()
+  {
+    Shader *s = mApp->GetShader("Debug");
+
+    if (s)
+    {
+      mDebugShader = s;
+    }
+    else
+    {
+      mDebugShader = mApp->GetShader("Simple");
+    }
+  }
+
+  Shader * Model::GetDebugShader()
+  {
+    return mDebugShader;
   }
 
   std::vector<Mesh*>& Model::GetMeshes()

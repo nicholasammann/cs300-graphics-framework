@@ -36,6 +36,8 @@ namespace ELBA
 
     CreateShader("Shader", "Assets/Shaders/Shader.vert", "Assets/Shaders/Shader.frag");
 
+    CreateShader("Debug", "Assets/Shaders/debug.vert", "Assets/Shaders/debug.frag");
+
     CreateInitialModels();
     CreateInitialLights();
   }
@@ -189,14 +191,15 @@ namespace ELBA
       unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-      m->Draw(shdr);
+      m->Draw(shdr, projection, view, model);
     }
   }
 
   void Application::CreateInitialModels()
   {
-    Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/bunny.obj", "Bunny");
+    Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
     mod->SetShader("Shader");
+    mod->SetDebugShader();
 
     mModels.push_back(mod);
   }

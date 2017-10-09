@@ -25,11 +25,13 @@ namespace ELBA
 
     Model(Application *aApp, char *aPath, std::string aName);
 
-    void Draw(Shader *aShader);
+    void Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
     void SetShader(std::string aName);
-
     Shader* GetShader();
+  
+    void SetDebugShader();
+    Shader* GetDebugShader();
 
     std::vector<Mesh*>& GetMeshes();
     
@@ -48,6 +50,8 @@ namespace ELBA
     std::vector<Mesh*> mMeshes;
 
     Shader *mShader;
+
+    Shader *mDebugShader;
 
   };
 

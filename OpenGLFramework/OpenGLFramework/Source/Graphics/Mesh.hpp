@@ -5,6 +5,7 @@
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 #include "Shader.hpp"
 
@@ -47,7 +48,7 @@ namespace ELBA
 
     Mesh(Model *aParent);
 
-    void Draw(Shader *aShader);
+    void Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
     void AddVertex(float aA, float aB, float aC);
     void AddFace(GLuint aA, GLuint aB, GLuint aC);
@@ -64,8 +65,8 @@ namespace ELBA
 
     Model *mParent;
 
-    void DrawFaceNormals();
-    void DrawVertexNormals();
+    void DrawFaceNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
+    void DrawVertexNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
     std::vector<Vertex> mVertices;
     std::vector<Face> mFaces;
@@ -75,16 +76,18 @@ namespace ELBA
     unsigned int mVBO;
     unsigned int mEBO;
 
-    void BindVertNormals();
-    unsigned int mVertNorm_VAO;
-    unsigned int mVertNorm_VBO;
-
-    void BindFaceNormals();
-    unsigned int mFaceNorm_VAO;
-    unsigned int mFaceNorm_VBO;
-
     void CenterMesh();
     void NormalizeVertices();
+
+    void BindVertNorms();
+    std::vector<glm::vec3> mVertNormPoints;
+    unsigned int mVertDebugVAO;
+    unsigned int mVertDebugVBO;
+
+    void BindFaceNorms();
+    std::vector<glm::vec3> mFaceNormPoints;
+    unsigned int mFaceDebugVAO;
+    unsigned int mFaceDebugVBO;
 
   public:
 

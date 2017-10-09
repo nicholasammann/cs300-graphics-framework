@@ -5,9 +5,12 @@
 
 #include <glm/vec3.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 #include "Mesh.hpp"
 #include "Model.hpp"
+#include "../Core/Application.hpp"
 
 namespace ELBA
 {
@@ -16,48 +19,95 @@ namespace ELBA
   {
   }
 
-  void Mesh::Draw(Shader *aShader)
+  void Mesh::Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
     switch (mDebugMode)
     {
     case VertNormals:
     {
-      DrawVertexNormals();
+      DrawVertexNormals(aProj, aView, aModel);
       break;
     }
 
     case FaceNormals:
     {
-      DrawFaceNormals();
+      DrawFaceNormals(aProj, aView, aModel);
       break;
     }
     }
 
+    mParent->GetShader()->UseShaderProgram();
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
   }
 
-  void Mesh::DrawFaceNormals()
+  void Mesh::DrawFaceNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
+    mFaceNormPoints.clear();
+
     for (unsigned int i = 0; i < mFaces.size(); ++i)
     {
       glm::vec3 norm = mFaceNormals[i];
       glm::vec3 a = GetFaceCentroid(mFaces[i]);
-      glm::vec3 b = a + 5.0f * norm;
+      glm::vec3 b = a + 0.5f * norm;
 
-      glLineWidth(1.5);
-      glColor3f(0, 0, 1.0);
-      glBegin(GL_LINES);
-      glVertex3f(a.x, a.y, a.z);
-      glVertex3f(b.x, b.y, b.z);
-      glEnd();
+      mFaceNormPoints.push_back(a);
+      mFaceNormPoints.push_back(b);
     }
+
+    unsigned int shdrPrg = mParent->GetDebugShader()->GetShaderProgram();
+    
+    unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(aProj));
+
+    unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(aView));
+
+    unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
+    
+    glBindVertexArray(mFaceDebugVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, mFaceDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mFaceNormals.size() * sizeof(glm::vec3) * 2, mFaceNormPoints.data(), GL_DYNAMIC_DRAW);
+    
+    glLineWidth(1.5f);
+    glDrawArrays(GL_LINES, 0, mFaceNormPoints.size() * 3.0f);
+    glBindVertexArray(0);
   }
 
-  void Mesh::DrawVertexNormals()
+  void Mesh::DrawVertexNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
+    mVertNormPoints.clear();
+
+    for (unsigned int i = 0; i < mVertices.size(); ++i)
+    {
+      glm::vec3 norm = mVertices[i].mNormal;
+      glm::vec3 a = mVertices[i].mPos;
+      glm::vec3 b = a + 0.5f * norm;
+
+      mVertNormPoints.push_back(a);
+      mVertNormPoints.push_back(b);
+    }
+
+    unsigned int shdrPrg = mParent->GetDebugShader()->GetShaderProgram();
+
+    unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(aProj));
+
+    unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(aView));
+
+    unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
+
+    glBindVertexArray(mVertDebugVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, mVertDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mVertNormPoints.data(), GL_DYNAMIC_DRAW);
     
+    glLineWidth(1.5f);
+    glDrawArrays(GL_LINES, 0, mVertNormPoints.size() * 3.0f);
+    glBindVertexArray(0);
   }
 
   void Mesh::AddVertex(float aX, float aY, float aZ)
@@ -115,6 +165,9 @@ namespace ELBA
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mNormal));
 
     glBindVertexArray(0);
+
+    BindVertNorms();
+    BindFaceNorms();
   }
 
   void Mesh::Preprocess()
@@ -183,47 +236,6 @@ namespace ELBA
     return &mDebugMode;
   }
 
-  void Mesh::BindVertNormals()
-  {
-    std::vector<float> mPoints;
-
-    for (unsigned i = 0; i < mVertices.size(); ++i)
-    {
-      Vertex v = mVertices[i];
-      glm::vec3 a = v.mPos;
-      glm::vec3 b = a + v.mNormal;
-
-      // store the beginning of the line
-      mPoints.push_back(a.x);
-      mPoints.push_back(a.y);
-      mPoints.push_back(a.z);
-
-      // store the end of the line
-      mPoints.push_back(b.x);
-      mPoints.push_back(b.y);
-      mPoints.push_back(b.z);
-    }
-
-    //// Vertex Array Object ////
-    // create and bind vertex array object
-    glGenVertexArrays(1, &mVertNorm_VAO);
-    glBindVertexArray(mVertNorm_VAO);
-    //////////////////////////////
-
-    //// Vertex Buffer Object ////
-    // create and bind empty vertex buffer object
-    glGenBuffers(1, &mVertNorm_VBO);
-    glBindBuffer(GL_ARRAY_BUFFER, mVertNorm_VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(mPoints), mPoints.data(), GL_STATIC_DRAW);
-    //////////////////////////////
-
-  }
-
-  void Mesh::BindFaceNormals()
-  {
-
-  }
-
   void Mesh::CenterMesh()
   {
     glm::vec3 centroid(0.f);
@@ -270,6 +282,48 @@ namespace ELBA
     {
       vert.mPos *= scalar;
     }
+  }
+
+  void Mesh::BindVertNorms()
+  {
+    //// Vertex Array Object ////
+    // create and bind vertex array object
+    glGenVertexArrays(1, &mVertDebugVAO);
+    glBindVertexArray(mVertDebugVAO);
+    //////////////////////////////
+
+    //// Vertex Buffer Object ////
+    // create and bind empty vertex buffer object
+    glGenBuffers(1, &mVertDebugVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mVertDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mVertNormPoints.data(), GL_STATIC_DRAW);
+    //////////////////////////////
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    glBindVertexArray(0);
+  }
+
+  void Mesh::BindFaceNorms()
+  {
+    //// Vertex Array Object ////
+    // create and bind vertex array object
+    glGenVertexArrays(1, &mFaceDebugVAO);
+    glBindVertexArray(mFaceDebugVAO);
+    //////////////////////////////
+
+    //// Vertex Buffer Object ////
+    // create and bind empty vertex buffer object
+    glGenBuffers(1, &mFaceDebugVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mFaceDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mFaceNormals.size() * sizeof(glm::vec3) * 2, mFaceNormPoints.data(), GL_STATIC_DRAW);
+    //////////////////////////////
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    glBindVertexArray(0);
   }
 
 }
