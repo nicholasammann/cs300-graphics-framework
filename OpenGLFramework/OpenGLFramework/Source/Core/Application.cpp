@@ -36,10 +36,8 @@ namespace ELBA
 
     CreateShader("Shader", "Assets/Shaders/Shader.vert", "Assets/Shaders/Shader.frag");
 
-    Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
-    mod->SetShader("Shader");
-    
-    mModels.push_back(mod);
+    CreateInitialModels();
+    CreateInitialLights();
   }
 
   void Application::CreateShader(const char *aName, const char * aVertShaderPath, const char * aFragShaderPath)
@@ -151,8 +149,22 @@ namespace ELBA
 
       unsigned int shdrPrg = shdr->GetShaderProgram();
 
-      int colorLoc = glGetUniformLocation(shdrPrg, "Color");
-      glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
+      BindLights(shdrPrg);
+
+
+      // temporary bind material
+
+      unsigned int matLoc = glGetUniformLocation(shdrPrg, "Material.ambient");
+      glUniform4f(matLoc, 0.2f, 0.2f, 0.2f, 1.0f);
+
+      matLoc = glGetUniformLocation(shdrPrg, "Material.diffuse");
+      glUniform4f(matLoc, 0.8f, 0.8f, 0.8f, 1.0f);
+
+      ////
+
+
+      //int colorLoc = glGetUniformLocation(shdrPrg, "Color");
+      //glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
 
       Camera *cam = mCamera;
 
@@ -179,6 +191,42 @@ namespace ELBA
 
       m->Draw(shdr);
     }
+  }
+
+  void Application::CreateInitialModels()
+  {
+    Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/bunny.obj", "Bunny");
+    mod->SetShader("Shader");
+
+    mModels.push_back(mod);
+  }
+
+  void Application::CreateInitialLights()
+  {
+    Light light;
+    light.SetDirection(-1, -1, 0, 1);
+    light.SetAmbient(1, 0, 0, 1);
+    light.SetDiffuse(1, 0, 0, 1);
+
+    mLights.push_back(light);
+  }
+
+  void Application::BindLights(unsigned int aShaderPrg)
+  {
+    // bind the first light's info
+    unsigned int loc = glGetUniformLocation(aShaderPrg, "Lights[0].direction");
+    glProgramUniform4fv(aShaderPrg, loc, 1, mLights[0].direction);
+
+    loc = glGetUniformLocation(aShaderPrg, "Lights[0].ambient");
+    glProgramUniform4fv(aShaderPrg, loc, 1, mLights[0].ambient);
+
+    loc = glGetUniformLocation(aShaderPrg, "Lights[0].diffuse");
+    glProgramUniform4fv(aShaderPrg, loc, 1, mLights[0].diffuse);
+
+
+    // bind light count
+    loc = glGetUniformLocation(aShaderPrg, "LightCount");
+    glProgramUniform1i(aShaderPrg, loc, mLights.size());
   }
 
 }

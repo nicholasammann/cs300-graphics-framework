@@ -8,6 +8,8 @@
 #include <GLFW/glfw3.h>
 #include <glm\vec3.hpp>
 
+#include "../Graphics/Light.hpp"
+
 namespace ELBA
 {
   class Shader;
@@ -51,10 +53,17 @@ namespace ELBA
 
     std::vector<Model*> mModels;
 
+    std::vector<Light> mLights;
+
     Camera *mCamera;
   
     int mWindowWidth;
     int mWindowHeight;
+
+    void CreateInitialModels();
+    void CreateInitialLights();
+
+    void BindLights(unsigned int aShaderPrg);
 
   };
 }

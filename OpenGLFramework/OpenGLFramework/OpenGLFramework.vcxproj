@@ -151,6 +151,8 @@
     <ClInclude Include="Source\Core\Application.hpp" />
     <ClInclude Include="Source\Core\Camera.hpp" />
     <ClInclude Include="Source\Core\Editor.hpp" />
+    <ClInclude Include="Source\Graphics\Light.hpp" />
+    <ClInclude Include="Source\Graphics\Material.hpp" />
     <ClInclude Include="Source\Graphics\Mesh.hpp" />
     <ClInclude Include="Source\Graphics\Model.hpp" />
     <ClInclude Include="Source\Graphics\Shader.hpp" />
