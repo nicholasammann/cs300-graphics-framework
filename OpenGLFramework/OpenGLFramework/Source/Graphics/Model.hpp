@@ -23,7 +23,7 @@ namespace ELBA
   {
   public:
 
-    Model(Application *aApp, char *aPath, std::string aName);
+    Model(Application *aApp, const char *aPath, std::string aName);
 
     void Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 

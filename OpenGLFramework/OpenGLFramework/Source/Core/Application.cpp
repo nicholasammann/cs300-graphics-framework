@@ -34,10 +34,7 @@ namespace ELBA
 
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
-    CreateShader("Shader", "Assets/Shaders/Shader.vert", "Assets/Shaders/Shader.frag");
-
-    CreateShader("Debug", "Assets/Shaders/debug.vert", "Assets/Shaders/debug.frag");
-
+    CreateInitialShaders();
     CreateInitialModels();
     CreateInitialLights();
   }
@@ -125,6 +122,11 @@ namespace ELBA
     return mModels;
   }
 
+  std::vector<Light>& Application::GetLights()
+  {
+    return mLights;
+  }
+
   void Application::ProcessInput()
   {
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -145,28 +147,13 @@ namespace ELBA
 
       if (!shdr)
       {
-        // TODO: change this to load a default shader
-        continue;
+        shdr = this->GetShader("Simple");
       }
 
       unsigned int shdrPrg = shdr->GetShaderProgram();
 
       BindLights(shdrPrg);
 
-
-      // temporary bind material
-
-      unsigned int matLoc = glGetUniformLocation(shdrPrg, "Material.ambient");
-      glUniform4f(matLoc, 0.2f, 0.2f, 0.2f, 1.0f);
-
-      matLoc = glGetUniformLocation(shdrPrg, "Material.diffuse");
-      glUniform4f(matLoc, 0.8f, 0.8f, 0.8f, 1.0f);
-
-      ////
-
-
-      //int colorLoc = glGetUniformLocation(shdrPrg, "Color");
-      //glUniform4f(colorLoc, 1.0f, 1.0f, 1.0f, 1.0f);
 
       Camera *cam = mCamera;
 
@@ -195,11 +182,16 @@ namespace ELBA
     }
   }
 
+  void Application::CreateInitialShaders()
+  {
+    CreateShader("Shader", "Assets/Shaders/Shader.vert", "Assets/Shaders/Shader.frag");
+    CreateShader("Debug", "Assets/Shaders/debug.vert", "Assets/Shaders/debug.frag");
+  }
+
   void Application::CreateInitialModels()
   {
     Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
     mod->SetShader("Shader");
-    mod->SetDebugShader();
 
     mModels.push_back(mod);
   }
@@ -211,6 +203,11 @@ namespace ELBA
     light.SetAmbient(1, 0, 0, 1);
     light.SetDiffuse(1, 0, 0, 1);
 
+    mLights.push_back(light);
+
+    light.SetDirection(1, 1, 0, 1);
+    light.SetAmbient(0, 1, 0, 1);
+    light.SetDiffuse(0, 1, 0, 1);
     mLights.push_back(light);
   }
 

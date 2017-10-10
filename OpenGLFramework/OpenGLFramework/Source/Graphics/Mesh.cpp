@@ -15,7 +15,7 @@
 namespace ELBA
 {
 
-  Mesh::Mesh(Model *aParent) : mParent(aParent), mDebugMode(0)
+  Mesh::Mesh(Model *aParent) : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f)
   {
   }
 
@@ -37,6 +37,15 @@ namespace ELBA
     }
 
     mParent->GetShader()->UseShaderProgram();
+
+    unsigned int shdrPrg = mParent->GetShader()->GetShaderProgram();
+
+    unsigned int matLoc = glGetUniformLocation(shdrPrg, "Material.ambient");
+    glUniform4f(matLoc, mMaterial.ambient[0], mMaterial.ambient[1], mMaterial.ambient[2], mMaterial.ambient[3]);
+
+    matLoc = glGetUniformLocation(shdrPrg, "Material.diffuse");
+    glUniform4f(matLoc, mMaterial.diffuse[0], mMaterial.diffuse[1], mMaterial.diffuse[2], mMaterial.diffuse[3]);
+
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
@@ -50,7 +59,7 @@ namespace ELBA
     {
       glm::vec3 norm = mFaceNormals[i];
       glm::vec3 a = GetFaceCentroid(mFaces[i]);
-      glm::vec3 b = a + 0.5f * norm;
+      glm::vec3 b = a + mDebugLineLength * norm;
 
       mFaceNormPoints.push_back(a);
       mFaceNormPoints.push_back(b);
@@ -71,8 +80,8 @@ namespace ELBA
     glBindBuffer(GL_ARRAY_BUFFER, mFaceDebugVBO);
     glBufferData(GL_ARRAY_BUFFER, mFaceNormals.size() * sizeof(glm::vec3) * 2, mFaceNormPoints.data(), GL_DYNAMIC_DRAW);
     
-    glLineWidth(1.5f);
-    glDrawArrays(GL_LINES, 0, mFaceNormPoints.size() * 3.0f);
+    glLineWidth(mDebugLineWidth);
+    glDrawArrays(GL_LINES, 0, mFaceNormPoints.size() * 3);
     glBindVertexArray(0);
   }
 
@@ -84,7 +93,7 @@ namespace ELBA
     {
       glm::vec3 norm = mVertices[i].mNormal;
       glm::vec3 a = mVertices[i].mPos;
-      glm::vec3 b = a + 0.5f * norm;
+      glm::vec3 b = a + mDebugLineLength * norm;
 
       mVertNormPoints.push_back(a);
       mVertNormPoints.push_back(b);
@@ -105,8 +114,8 @@ namespace ELBA
     glBindBuffer(GL_ARRAY_BUFFER, mVertDebugVBO);
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mVertNormPoints.data(), GL_DYNAMIC_DRAW);
     
-    glLineWidth(1.5f);
-    glDrawArrays(GL_LINES, 0, mVertNormPoints.size() * 3.0f);
+    glLineWidth(mDebugLineWidth);
+    glDrawArrays(GL_LINES, 0, mVertNormPoints.size() * 3);
     glBindVertexArray(0);
   }
 
@@ -236,6 +245,11 @@ namespace ELBA
     return &mDebugMode;
   }
 
+  Material & Mesh::GetMaterial()
+  {
+    return mMaterial;
+  }
+
   void Mesh::CenterMesh()
   {
     glm::vec3 centroid(0.f);
@@ -324,6 +338,16 @@ namespace ELBA
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
 
     glBindVertexArray(0);
+  }
+
+  float & Mesh::GetDebugLineWidth()
+  {
+    return mDebugLineWidth;
+  }
+
+  float & Mesh::GetDebugLineLength()
+  {
+    return mDebugLineLength;
   }
 
 }

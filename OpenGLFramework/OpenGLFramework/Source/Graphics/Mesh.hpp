@@ -42,6 +42,19 @@ namespace ELBA
     std::string mType;
   };
 
+
+  struct Material
+  {
+    float ambient[4];
+    float diffuse[4];
+
+    Material() 
+      : ambient{ 0.25f, 0.25f, 0.25f, 0.25f },
+        diffuse{ 0.5f, 0.5f, 0.5f, 0.5f }
+    { }
+  };
+
+
   class Mesh
   {
   public:
@@ -61,9 +74,16 @@ namespace ELBA
 
     int* GetDebugMode();
 
+    Material &GetMaterial();
+
+    float& GetDebugLineWidth();
+    float& GetDebugLineLength();
+
   private:
 
     Model *mParent;
+
+    Material mMaterial;
 
     void DrawFaceNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
     void DrawVertexNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
@@ -88,6 +108,9 @@ namespace ELBA
     std::vector<glm::vec3> mFaceNormPoints;
     unsigned int mFaceDebugVAO;
     unsigned int mFaceDebugVBO;
+
+    float mDebugLineWidth;
+    float mDebugLineLength;
 
   public:
 

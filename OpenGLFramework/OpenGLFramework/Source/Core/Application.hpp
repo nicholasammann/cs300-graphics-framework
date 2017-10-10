@@ -40,6 +40,8 @@ namespace ELBA
 
     std::vector<Model*>& GetModels();
 
+    std::vector<Light>& GetLights();
+
   private:
 
     Editor *mEditor;
@@ -60,6 +62,7 @@ namespace ELBA
     int mWindowWidth;
     int mWindowHeight;
 
+    void CreateInitialShaders();
     void CreateInitialModels();
     void CreateInitialLights();
 

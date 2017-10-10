@@ -18,6 +18,8 @@ namespace ELBA
 
     Application *mApp;
 
+    char mLoadBuffer[256];
+
 
   };
 

@@ -14,10 +14,11 @@
 
 namespace ELBA
 {
-  Model::Model(Application *aApp, char * aPath, std::string aName) : mApp(aApp), mName(aName), mTransform()
+  Model::Model(Application *aApp, const char *aPath, std::string aName) : mApp(aApp), mName(aName), mTransform()
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();
+    SetDebugShader();
   }
 
   void Model::Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
