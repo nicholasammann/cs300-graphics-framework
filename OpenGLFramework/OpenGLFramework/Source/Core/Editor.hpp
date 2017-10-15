@@ -1,6 +1,6 @@
 #pragma once
 
-namespace ELBA
+namespace elba
 {
 
   class Application;
@@ -17,9 +17,6 @@ namespace ELBA
   private:
 
     Application *mApp;
-
-    char mLoadBuffer[256];
-
 
   };
 

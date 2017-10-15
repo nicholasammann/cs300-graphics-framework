@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "Core/Application.hpp"
 
 int g_width = 800;
@@ -54,7 +56,7 @@ int main()
     return -1;
   }
 
-  ELBA::Application app = ELBA::Application(win);
+  elba::Application app = elba::Application(win);
 
   app.Init();
   
