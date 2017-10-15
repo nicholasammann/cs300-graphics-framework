@@ -294,6 +294,10 @@
     <ClInclude Include="Source\ImGui\imgui.h" />
     <ClInclude Include="Source\ImGui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="Source\ImGui\imgui_internal.h" />
+    <ClInclude Include="Source\ImGui\stb_rect_pack.h" />
+    <ClInclude Include="Source\ImGui\stb_textedit.h" />
+    <ClInclude Include="Source\ImGui\stb_truetype.h" />
+    <ClInclude Include="Source\Nodes\Node.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />

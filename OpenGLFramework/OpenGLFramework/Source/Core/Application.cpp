@@ -36,8 +36,8 @@ namespace elba
 
     mEditor->Update();
 
-    glClearColor(0.0f, 0.0f, 0.5f, 1.0f);
-    glClear(GL_CLEAR_BUFFER);
+    glClearColor(0.0f, 0.0f, 0.2f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     ImGui::Render();
 
