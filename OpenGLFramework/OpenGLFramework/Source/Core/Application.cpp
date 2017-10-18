@@ -1,5 +1,6 @@
 #include <iostream>
 #include <filesystem>
+#include <exception>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -35,11 +36,14 @@ namespace ELBA
     ImGui_ImplGlfwGL3_Init(mWindow, true);
 
     CreateInitialShaders();
+
+    ReloadShaderNamesForEditor();
+
     CreateInitialModels();
     CreateInitialLights();
   }
 
-  void Application::CreateShader(const char *aName, const char * aVertShaderPath, const char * aFragShaderPath)
+  void Application::CreateShader(std::string aName, std::string aVertShaderPath, std::string aFragShaderPath)
   {
     // find out if we have already loaded the shader
     auto it = mShaders.find(aName);
@@ -51,8 +55,16 @@ namespace ELBA
       mShaders.erase(aName);
     }
 
-    // load the new shader and store it in the map
-    mShaders[aName] = new Shader(aName, aVertShaderPath, aFragShaderPath);
+    try
+    {
+      // load the new shader and store it in the map
+      mShaders[aName] = new Shader(aName.c_str(), aVertShaderPath.c_str(), aFragShaderPath.c_str());
+    }
+    catch (std::string &error)
+    {
+      // print out error to console
+      mEditor->PrintToConsole(error);
+    }
   }
 
   void Application::Update(int aWidth, int aHeight)
@@ -127,6 +139,16 @@ namespace ELBA
     return mLights;
   }
 
+  std::map<std::string, Shader*>& Application::GetShaderMap()
+  {
+    return mShaders;
+  }
+
+  shader_path_vec & Application::GetShaderPaths()
+  {
+    return mShaderPaths;
+  }
+
   void Application::ProcessInput()
   {
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -154,27 +176,15 @@ namespace ELBA
 
       BindLights(shdrPrg);
 
-
-      Camera *cam = mCamera;
-
-      glm::mat4 view;
-      view = glm::lookAt(cam->mPosition, cam->mTarget, cam->mCameraUp);
+      glm::mat4 view = mCamera->ConstructViewMatrix();
       unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
       glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-      glm::mat4 projection;
-      projection = glm::perspective(glm::radians(45.0f), static_cast<float>(mWindowWidth) / mWindowHeight, 0.1f, 100.0f);
+      glm::mat4 projection = mCamera->ConstructProjMatrix(mWindowWidth, mWindowHeight);
       unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
       glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-      Transform &tr = m->GetTransform();
-      
-      glm::mat4 model;
-      model = glm::scale(model, tr.mScale);
-      model = glm::rotate(model, tr.mWorldRot.x, glm::vec3(1, 0, 0));
-      model = glm::rotate(model, tr.mWorldRot.y, glm::vec3(0, 1, 0));
-      model = glm::rotate(model, tr.mWorldRot.z, glm::vec3(0, 0, 1));
-      model = glm::translate(model, tr.mWorldPos);
+      glm::mat4 model = m->ConstructModelMatrix();
       unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -184,8 +194,16 @@ namespace ELBA
 
   void Application::CreateInitialShaders()
   {
-    CreateShader("Shader", "Assets/Shaders/Shader.vert", "Assets/Shaders/Shader.frag");
-    CreateShader("Debug", "Assets/Shaders/debug.vert", "Assets/Shaders/debug.frag");
+    std::string p = "Assets/Shaders/";
+
+    CreateShader("Simple", p+"simple.vert", p+"simple.frag");
+    mShaderPaths.emplace_back(shdr_info("Simple", p+"simple.vert", p+"simple.frag"));
+
+    CreateShader("Phong Lighting", p+"phong_light.vert", p+"phong_light.frag");
+    mShaderPaths.emplace_back(shdr_info("Phong Lighting", p+"phong_light.vert", p+"phong_light.frag"));
+    
+    CreateShader("Debug", p+"debug.vert", p+"debug.frag");
+    mShaderPaths.emplace_back(shdr_info("Debug", p+"debug.vert", p+"debug.frag"));
   }
 
   void Application::CreateInitialModels()
@@ -208,25 +226,50 @@ namespace ELBA
     light.SetDirection(1, 1, 0, 1);
     light.SetAmbient(0, 1, 0, 1);
     light.SetDiffuse(0, 1, 0, 1);
-    mLights.push_back(light);
+    //mLights.push_back(light);
+    //mLights.push_back(light);
+    //mLights.push_back(light);
+    //mLights.push_back(light);
+    //mLights.push_back(light);
+    //mLights.push_back(light);
+    //mLights.push_back(light);
+
   }
 
   void Application::BindLights(unsigned int aShaderPrg)
   {
-    // bind the first light's info
-    unsigned int loc = glGetUniformLocation(aShaderPrg, "Lights[0].direction");
-    glProgramUniform4fv(aShaderPrg, loc, 1, mLights[0].direction);
+    for (unsigned int i = 0; i < mLights.size(); ++i)
+    {
+      std::string lightName = "Lights[" + std::to_string(i) +"].";
 
-    loc = glGetUniformLocation(aShaderPrg, "Lights[0].ambient");
-    glProgramUniform4fv(aShaderPrg, loc, 1, mLights[0].ambient);
+      std::string dir = lightName + "direction";
+      std::string amb = lightName + "ambient";
+      std::string dif = lightName + "diffuse";
 
-    loc = glGetUniformLocation(aShaderPrg, "Lights[0].diffuse");
-    glProgramUniform4fv(aShaderPrg, loc, 1, mLights[0].diffuse);
+      unsigned int loc = glGetUniformLocation(aShaderPrg, dir.c_str());
+      glProgramUniform4fv(aShaderPrg, loc, 1, mLights[i].direction);
 
+      loc = glGetUniformLocation(aShaderPrg, amb.c_str());
+      glProgramUniform4fv(aShaderPrg, loc, 1, mLights[i].ambient);
 
-    // bind light count
-    loc = glGetUniformLocation(aShaderPrg, "LightCount");
-    glProgramUniform1i(aShaderPrg, loc, mLights.size());
+      loc = glGetUniformLocation(aShaderPrg, dif.c_str());
+      glProgramUniform4fv(aShaderPrg, loc, 1, mLights[i].diffuse);
+
+      // bind light count
+      unsigned int countLoc = glGetUniformLocation(aShaderPrg, "LightCount");
+      glProgramUniform1i(aShaderPrg, countLoc, mLights.size());
+    }
   }
+  void Application::ReloadShaderNamesForEditor()
+  {
+    mShaderNames.clear();
 
+    // load names for all shaders
+    for (auto &s : mShaders)
+    {
+      char *name = new char[s.second->GetName().size()];
+      strcpy(name, s.second->GetName().c_str());
+      mShaderNames.push_back(name);
+    }
+  }
 }

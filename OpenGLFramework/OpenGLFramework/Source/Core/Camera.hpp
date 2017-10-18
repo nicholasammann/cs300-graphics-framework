@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/vec3.hpp>
+#include <glm/mat4x4.hpp>
 
 
 namespace ELBA
@@ -10,6 +11,10 @@ namespace ELBA
   {
   public:
     Camera();
+
+    glm::mat4 ConstructViewMatrix();
+
+    glm::mat4 ConstructProjMatrix(int aWidth, int aHeight);
 
     glm::vec3 mPosition;
     glm::vec3 mTarget;

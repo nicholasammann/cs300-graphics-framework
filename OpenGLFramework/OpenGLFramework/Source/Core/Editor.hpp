@@ -13,6 +13,7 @@ namespace ELBA
     
     void Update();
 
+    void PrintToConsole(std::string message);
 
   private:
 
@@ -20,7 +21,7 @@ namespace ELBA
 
     char mLoadBuffer[256];
 
-
+    std::vector<std::string> mConsoleLog;
   };
 
 }

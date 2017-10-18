@@ -69,6 +69,15 @@
     <ClInclude Include="Source\Graphics\Light.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\ImGui\stb_truetype.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\stb_rect_pack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\ImGui\stb_textedit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />
@@ -114,14 +123,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BasicFragment.glsl" />
-    <None Include="Shaders\simple.frag" />
-    <None Include="Shaders\simple.vert" />
     <None Include="DLLS\glew32.dll" />
-    <None Include="Assets\Shaders\shader.frag" />
-    <None Include="Assets\Shaders\shader.vert" />
     <None Include="Assets\Shaders\simple.frag" />
     <None Include="Assets\Shaders\simple.vert" />
     <None Include="Assets\Shaders\debug.vert" />
     <None Include="Assets\Shaders\debug.frag" />
+    <None Include="Assets\Shaders\phong_light.frag" />
+    <None Include="Assets\Shaders\phong_light.vert" />
   </ItemGroup>
 </Project>

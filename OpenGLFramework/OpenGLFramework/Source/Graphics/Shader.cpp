@@ -9,7 +9,8 @@ namespace ELBA
 {
 
   Shader::Shader(const char *aName, const char *vertPath, const char *fragPath)
-    : mName(aName), mShaderProgram(0), mVertShader(0), mFragShader(0)
+    : mName(aName), mShaderProgram(0), mVertShader(0), mFragShader(0),
+      mVertPath(vertPath), mFragPath(fragPath)
   {
     // read in vertex shader
     const GLchar *vertexShaderSource = ReadShader(vertPath);
@@ -25,13 +26,14 @@ namespace ELBA
 
     // check if vertex shader compiled correctly
     int success;
-    char infoLog[512];
+    char infoLog[512] = { '\0' };
     glGetShaderiv(mVertShader, GL_COMPILE_STATUS, &success);
 
     if (!success)
     {
       glGetShaderInfoLog(mVertShader, 512, nullptr, infoLog);
-      std::cout << "Shader compilation failed: " << infoLog << std::endl;
+      std::string error = std::string(vertPath) + " : (Vertex Shader compilation failed) : " + std::string(infoLog);
+      throw error;
     }
 
     // read in fragment shader
@@ -52,7 +54,8 @@ namespace ELBA
     if (!success)
     {
       glGetShaderInfoLog(mFragShader, 512, nullptr, infoLog);
-      std::cout << "Shader compilation failed: " << infoLog << std::endl;
+      std::string error = std::string(fragPath) + " : (Fragment Shader compilation failed) : " + std::string(infoLog);
+      throw error;
     }
 
 
@@ -70,7 +73,10 @@ namespace ELBA
     if (!success)
     {
       glGetProgramInfoLog(mShaderProgram, 512, nullptr, infoLog);
-      std::cout << "Link the shader program failed: " << infoLog << std::endl;
+
+      std::string log = infoLog;
+      std::string error = std::string(aName) + ": (Shader Program failed to link) : " + log;
+      throw error;
     }
 
     glUseProgram(mShaderProgram);
@@ -113,6 +119,21 @@ namespace ELBA
   unsigned int Shader::GetFragShader() const
   {
     return mFragShader;
+  }
+
+  std::string Shader::GetName()
+  {
+    return mName;
+  }
+
+  std::string Shader::GetVertPath()
+  {
+    return mVertPath;
+  }
+
+  std::string Shader::GetFragPath()
+  {
+    return mFragPath;
   }
 
   const GLchar * Shader::ReadShader(const std::string & filename)

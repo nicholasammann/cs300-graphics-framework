@@ -26,9 +26,15 @@ namespace ELBA
     unsigned int GetVertShader() const;
     unsigned int GetFragShader() const;
 
+    std::string GetName();
+    std::string GetVertPath();
+    std::string GetFragPath();
+
   private:
 
     std::string mName;
+    std::string mVertPath;
+    std::string mFragPath;
 
     unsigned int mShaderProgram;
     unsigned int mVertShader;

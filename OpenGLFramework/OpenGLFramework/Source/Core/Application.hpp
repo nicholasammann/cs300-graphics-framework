@@ -8,6 +8,8 @@
 #include <GLFW/glfw3.h>
 #include <glm\vec3.hpp>
 
+#include "../ImGui/imgui.h"
+
 #include "../Graphics/Light.hpp"
 
 namespace ELBA
@@ -17,6 +19,9 @@ namespace ELBA
   class Camera;
   class Editor;
 
+  using shdr_info = std::tuple<std::string, std::string, std::string>;
+  using shader_path_vec = std::vector<shdr_info>;
+
   class Application
   {
   public:
@@ -25,7 +30,7 @@ namespace ELBA
     ~Application();
 
     void Init();
-    void CreateShader(const char *aName, const char *vertShaderPath, const char *fragShaderPath);
+    void CreateShader(std::string aName, std::string vertShaderPath, std::string fragShaderPath);
     void Update(int aWidth, int aHeight);
     void Shutdown();
 
@@ -42,6 +47,14 @@ namespace ELBA
 
     std::vector<Light>& GetLights();
 
+    std::map<std::string, Shader*>& GetShaderMap();
+
+    ImVector<char*> mShaderNames;
+
+    shader_path_vec& GetShaderPaths();
+
+    void ReloadShaderNamesForEditor();
+
   private:
 
     Editor *mEditor;
@@ -52,6 +65,8 @@ namespace ELBA
     void Render();
 
     std::map<std::string, Shader*> mShaders;
+
+    shader_path_vec mShaderPaths;
 
     std::vector<Model*> mModels;
 

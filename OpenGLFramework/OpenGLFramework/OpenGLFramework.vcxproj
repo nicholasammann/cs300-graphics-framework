@@ -159,6 +159,9 @@
     <ClInclude Include="Source\ImGui\imgui.h" />
     <ClInclude Include="Source\ImGui\imgui_impl_glfw_gl3.h" />
     <ClInclude Include="Source\ImGui\imgui_internal.h" />
+    <ClInclude Include="Source\ImGui\stb_rect_pack.h" />
+    <ClInclude Include="Source\ImGui\stb_textedit.h" />
+    <ClInclude Include="Source\ImGui\stb_truetype.h" />
     <ClInclude Include="Source\Utils\MeshLoader.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -168,14 +171,12 @@
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />
     <None Include="Assets\Shaders\debug.vert" />
-    <None Include="Assets\Shaders\shader.frag" />
-    <None Include="Assets\Shaders\shader.vert" />
+    <None Include="Assets\Shaders\phong_light.frag" />
+    <None Include="Assets\Shaders\phong_light.vert" />
     <None Include="Assets\Shaders\simple.frag" />
     <None Include="Assets\Shaders\simple.vert" />
     <None Include="DLLS\glew32.dll" />
-    <None Include="Shaders\simple.frag" />
     <None Include="Shaders\BasicFragment.glsl" />
-    <None Include="Shaders\simple.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -44,8 +44,6 @@ void ELBA::Editor::Update()
 
     if (ImGui::CollapsingHeader(name.c_str()))
     {
-      
-      ImGui::PushID(k);
 
       if (ImGui::TreeNode("Transform"))
       {
@@ -84,7 +82,56 @@ void ELBA::Editor::Update()
         ImGui::TreePop();
       }
 
-      ImGui::PopID();
+
+      if (ImGui::TreeNode("Shaders"))
+      {
+        // display name of current shader
+        // ImGui::Text("Current Shader : ");
+        // ImGui::SameLine();
+        // ImGui::TextColored(ImVec4(0.0f, 1.0f, 0.0f, 1.0f), models[k]->GetShaderName().c_str());
+        
+        // build list of shader names
+
+        //for (auto s : mApp->GetShaderMap())
+        //{
+        //  char *name = new char[512];
+        //  strcpy(name, s.second->GetName().c_str());
+        //  mApp.push_back(name);
+        //}
+
+        ImGui::Text("Current: ");
+        ImGui::SameLine();
+        ImGui::Combo(" ", 
+                     &models[k]->mCurrentShaderSelect, 
+                     mApp->mShaderNames.Data,
+                     mApp->mShaderNames.size(),
+                     mApp->mShaderNames.size());
+
+        if (models[k]->mCurrentShaderSelect != models[k]->mPrevShaderSelect)
+        {
+          std::string nS = mApp->mShaderNames[models[k]->mCurrentShaderSelect];
+          models[k]->SetShader(nS);
+        }
+
+
+        // THIS IS FOR RELOADING SHADERS INDIVIDUALLY - NOT FUNCTIONAL
+
+        //if (ImGui::Button("Reload Shader"))
+        //{
+        //  std::string nS = mApp->mShaderNames[models[k]->mCurrentShaderSelect];
+        //
+        //  Shader *oS = mApp->GetShader(nS.c_str());
+        //
+        //  std::string vPath = oS->GetVertPath();
+        //  std::string fPath = oS->GetFragPath();
+        //
+        //  mApp->CreateShader(nS.c_str(), vPath.c_str(), fPath.c_str());
+        //
+        //  models[k]->SetShader(nS);
+        //}
+
+        ImGui::TreePop();
+      }
 
 
       // for each mesh on the model
@@ -92,13 +139,11 @@ void ELBA::Editor::Update()
       
       for (unsigned int i = 0; i < meshes.size(); ++i)
       {
-        ImGui::PushID(k);
         std::string meshLabel = "Submesh " + std::to_string(i);
 
         if (ImGui::TreeNode(meshLabel.c_str()))
         {
 
-          ImGui::PushID(k);
           if (ImGui::TreeNode("Debug"))
           {
             const char *modes[] = { "None", "Vertex Normals", "Face Normals" };
@@ -115,10 +160,6 @@ void ELBA::Editor::Update()
 
             ImGui::TreePop();
           }
-          ImGui::PopID();
-          
-
-          ImGui::PushID(k);
 
           if (ImGui::TreeNode("Material"))
           {
@@ -129,14 +170,11 @@ void ELBA::Editor::Update()
             ImGui::TreePop();
           }
 
-          ImGui::PopID();
-
           ImGui::TreePop();
         }
-        ImGui::PopID();
-
       }
     }
+
     ImGui::PopID();
   }
 
@@ -155,7 +193,7 @@ void ELBA::Editor::Update()
 
         ImGui::PushID(i);
 
-        ImGui::DragFloat4("Direction", light.direction);
+        ImGui::DragFloat4("Direction", light.direction, 0.001f, -1.0f, 1.0f);
 
         if (ImGui::TreeNode("Ambient"))
         {
@@ -176,5 +214,77 @@ void ELBA::Editor::Update()
     }
   }
 
+
+  if (ImGui::CollapsingHeader("Actions"))
+  {
+    if (ImGui::Button("Reload Shaders"))
+    {
+      std::string name;
+      std::string vertPath;
+      std::string fragPath;
+
+      //std::vector<std::tuple<std::string, std::string, std::string>> shaderStrs;
+      //
+      //for (auto it_s = mApp->GetShaderMap().begin(); it_s != mApp->GetShaderMap().end(); it_s++)
+      //{
+      //  name = it_s->second->GetName();
+      //  vertPath = it_s->second->GetVertPath();
+      //  fragPath = it_s->second->GetFragPath();
+      //
+      //  shaderStrs.emplace_back(name, vertPath, fragPath);
+      //}
+
+      // erase all current shaders
+      mApp->GetShaderMap().clear();
+
+      for (auto t : mApp->GetShaderPaths())
+      {
+        name = std::get<0>(t);
+        vertPath = std::get<1>(t);
+        fragPath = std::get<2>(t);
+        mApp->CreateShader(name.c_str(), vertPath.c_str(), fragPath.c_str());
+      }
+      
+      for (auto m : mApp->GetModels())
+      {
+        name = m->GetShaderName();
+        m->SetShader(name);
+
+        m->SetDebugShader();
+      }
+
+      mApp->ReloadShaderNamesForEditor();
+
+    }
+
+    if (ImGui::Button("Clear Console"))
+    {
+      mConsoleLog.clear();
+    }
+  }
+  
+
   ImGui::End();
+
+
+  // Console
+
+  ImGui::Begin("Debug Console");
+
+  for (std::string line : mConsoleLog)
+  {
+    ImGui::TextWrapped(line.c_str());
+  }
+
+  float scrollMax = ImGui::GetScrollMaxY();
+
+  ImGui::SetScrollY(scrollMax);
+
+  ImGui::End();
+  
+}
+
+void ELBA::Editor::PrintToConsole(std::string message)
+{
+  mConsoleLog.push_back(message);
 }

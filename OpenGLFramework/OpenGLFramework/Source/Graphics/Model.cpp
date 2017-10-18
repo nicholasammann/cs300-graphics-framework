@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include <glm/mat4x4.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #include "Model.hpp"
 #include "../Core/Application.hpp"
@@ -14,7 +15,8 @@
 
 namespace ELBA
 {
-  Model::Model(Application *aApp, const char *aPath, std::string aName) : mApp(aApp), mName(aName), mTransform()
+  Model::Model(Application *aApp, const char *aPath, std::string aName) 
+    : mApp(aApp), mName(aName), mTransform(), mShaderName(""), mCurrentShaderSelect(0)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();
@@ -36,10 +38,23 @@ namespace ELBA
     if (s)
     {
       mShader = s;
+      mShaderName = s->GetName();
     }
     else
     {
       mShader = mApp->GetShader("Simple");
+      mShaderName = "Simple";
+    }
+
+    // set the currently selected shader name
+    for (unsigned i = 0; i < mApp->mShaderNames.size(); ++i)
+    {
+      if (mShaderName == std::string(mApp->mShaderNames[i]))
+      {
+        mCurrentShaderSelect = i;
+        mPrevShaderSelect = i;
+        break;
+      }
     }
   }
 
@@ -77,8 +92,23 @@ namespace ELBA
     return mName;
   }
 
+  std::string Model::GetShaderName()
+  {
+    return mShaderName;
+  }
+
   Transform & Model::GetTransform()
   {
     return mTransform;
+  }
+  glm::mat4 Model::ConstructModelMatrix()
+  {
+    glm::mat4 model;
+    model = glm::scale(model,  mTransform.mScale);
+    model = glm::rotate(model, mTransform.mWorldRot.x, glm::vec3(1, 0, 0));
+    model = glm::rotate(model, mTransform.mWorldRot.y, glm::vec3(0, 1, 0));
+    model = glm::rotate(model, mTransform.mWorldRot.z, glm::vec3(0, 0, 1));
+    model = glm::translate(model, mTransform.mWorldPos);
+    return model;
   }
 }

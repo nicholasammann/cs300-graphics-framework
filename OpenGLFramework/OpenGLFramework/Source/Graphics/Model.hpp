@@ -36,22 +36,38 @@ namespace ELBA
     std::vector<Mesh*>& GetMeshes();
     
     std::string GetName() const;
+    std::string GetShaderName();
 
     Transform &GetTransform();
+
+    glm::mat4 ConstructModelMatrix();
+
+    // shader selection for editor
+    int mCurrentShaderSelect;
+    int mPrevShaderSelect;
+
 
   private:
 
     Application *mApp;
 
-    Transform mTransform;
-
+    // model name
     std::string mName;
 
+    Transform mTransform;
+    
+    // all submeshes
     std::vector<Mesh*> mMeshes;
-
+    
+    // shader for submeshes
     Shader *mShader;
 
+    // storing shader name for reloading
+    std::string mShaderName;
+
+    // shader for drawing debug lines
     Shader *mDebugShader;
+
 
   };
 
