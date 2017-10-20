@@ -173,6 +173,8 @@
     <None Include="Assets\Shaders\debug.vert" />
     <None Include="Assets\Shaders\phong_light.frag" />
     <None Include="Assets\Shaders\phong_light.vert" />
+    <None Include="Assets\Shaders\phong_shade.frag" />
+    <None Include="Assets\Shaders\phong_shade.vert" />
     <None Include="Assets\Shaders\simple.frag" />
     <None Include="Assets\Shaders\simple.vert" />
     <None Include="DLLS\glew32.dll" />

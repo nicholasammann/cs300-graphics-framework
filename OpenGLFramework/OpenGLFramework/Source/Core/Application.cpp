@@ -78,7 +78,7 @@ namespace ELBA
     ProcessInput();
 
     mEditor->Update();
-
+    
     Render();
 
     ImGui::Render();

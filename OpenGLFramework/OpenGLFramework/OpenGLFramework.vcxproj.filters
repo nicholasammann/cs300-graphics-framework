@@ -130,5 +130,7 @@
     <None Include="Assets\Shaders\debug.frag" />
     <None Include="Assets\Shaders\phong_light.frag" />
     <None Include="Assets\Shaders\phong_light.vert" />
+    <None Include="Assets\Shaders\phong_shade.vert" />
+    <None Include="Assets\Shaders\phong_shade.frag" />
   </ItemGroup>
 </Project>
