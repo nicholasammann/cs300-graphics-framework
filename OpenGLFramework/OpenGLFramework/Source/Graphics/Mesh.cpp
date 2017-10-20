@@ -15,7 +15,8 @@
 namespace ELBA
 {
 
-  Mesh::Mesh(Model *aParent) : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f)
+  Mesh::Mesh(Model *aParent) 
+    : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f)
   {
   }
 
@@ -41,10 +42,20 @@ namespace ELBA
     unsigned int shdrPrg = mParent->GetShader()->GetShaderProgram();
 
     unsigned int matLoc = glGetUniformLocation(shdrPrg, "Material.ambient");
-    glUniform4f(matLoc, mMaterial.ambient[0], mMaterial.ambient[1], mMaterial.ambient[2], mMaterial.ambient[3]);
+    glUniform4fv(matLoc, 1, mMaterial.ambient);
 
     matLoc = glGetUniformLocation(shdrPrg, "Material.diffuse");
-    glUniform4f(matLoc, mMaterial.diffuse[0], mMaterial.diffuse[1], mMaterial.diffuse[2], mMaterial.diffuse[3]);
+    glUniform4fv(matLoc, 1, mMaterial.diffuse);
+
+    matLoc = glGetUniformLocation(shdrPrg, "Material.specular");
+    glUniform4fv(matLoc, 1, mMaterial.specular);
+
+    matLoc = glGetUniformLocation(shdrPrg, "Material.emissive");
+    glUniform4fv(matLoc, 1, mMaterial.emissive);
+
+    matLoc = glGetUniformLocation(shdrPrg, "Material.shininess");
+    glUniform1f(matLoc, mMaterial.shininess);
+
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_INT, 0);

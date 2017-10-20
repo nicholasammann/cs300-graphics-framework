@@ -1,8 +1,7 @@
 #version 330 core
+layout(location = 0) out vec4 vFragColor;
 
 in vec4 litFragColor;
-
-layout(location = 0) out vec4 vFragColor;
 
 void main()
 {

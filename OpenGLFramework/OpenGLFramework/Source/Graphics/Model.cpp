@@ -5,6 +5,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <glm/gtx/euler_angles.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -47,7 +48,7 @@ namespace ELBA
     }
 
     // set the currently selected shader name
-    for (unsigned i = 0; i < mApp->mShaderNames.size(); ++i)
+    for (int i = 0; i < mApp->mShaderNames.size(); ++i)
     {
       if (mShaderName == std::string(mApp->mShaderNames[i]))
       {
@@ -103,12 +104,12 @@ namespace ELBA
   }
   glm::mat4 Model::ConstructModelMatrix()
   {
-    glm::mat4 model;
-    model = glm::scale(model,  mTransform.mScale);
-    model = glm::rotate(model, mTransform.mWorldRot.x, glm::vec3(1, 0, 0));
-    model = glm::rotate(model, mTransform.mWorldRot.y, glm::vec3(0, 1, 0));
-    model = glm::rotate(model, mTransform.mWorldRot.z, glm::vec3(0, 0, 1));
-    model = glm::translate(model, mTransform.mWorldPos);
-    return model;
+    glm::mat4 scale = glm::scale(glm::mat4(),  mTransform.mScale);
+
+    glm::mat4 rot = glm::yawPitchRoll(mTransform.mWorldRot[1], mTransform.mWorldRot[0], mTransform.mWorldRot[2]);
+
+    glm::mat4 trans = glm::translate(glm::mat4(), mTransform.mWorldPos);
+    
+    return  trans * rot * scale;
   }
 }

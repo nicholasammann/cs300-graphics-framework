@@ -167,6 +167,12 @@ void ELBA::Editor::Update()
 
             ImGui::ColorEdit4("Diffuse", meshes[i]->GetMaterial().diffuse);
 
+            ImGui::ColorEdit4("Specular", meshes[i]->GetMaterial().specular);
+           
+            ImGui::ColorEdit4("Emissive", meshes[i]->GetMaterial().emissive);
+
+            ImGui::DragFloat("Shininess", &meshes[i]->GetMaterial().shininess, 0.01f, 0.0f, 50.0f);
+
             ImGui::TreePop();
           }
 
@@ -183,35 +189,113 @@ void ELBA::Editor::Update()
   if (ImGui::CollapsingHeader("Lights"))
   {
 
-    for (unsigned int i = 0; i < mApp->GetLights().size(); ++i)
+    auto& lunis = mApp->GetLightUniforms();
+
+    ImGui::ColorEdit4("Global Ambient", lunis.globalAmbient);
+
+    if (ImGui::TreeNode("Spotlight Constants"))
     {
-      std::string lightLabel = "Light " + std::to_string(i) + '\0';
-      
-      if (ImGui::TreeNode(lightLabel.c_str()))
-      {
-        Light &light = mApp->GetLights()[i];
-
-        ImGui::PushID(i);
-
-        ImGui::DragFloat4("Direction", light.direction, 0.001f, -1.0f, 1.0f);
-
-        if (ImGui::TreeNode("Ambient"))
-        {
-          ImGui::ColorPicker4("Ambient", light.ambient);
-          ImGui::TreePop();
-        }
-
-        if (ImGui::TreeNode("Diffuse"))
-        {
-          ImGui::ColorPicker4("Diffuse", light.diffuse);
-          ImGui::TreePop();
-        }
-
-        ImGui::PopID();
-
-        ImGui::TreePop();
-      }
+      ImGui::SliderFloat("Spotlight Inner Angle", &lunis.spotInnerAngle, 0.0f, lunis.spotOuterAngle);
+      ImGui::SliderFloat("Spotlight Outer Angle", &lunis.spotOuterAngle, lunis.spotInnerAngle, 90.0f);
+      ImGui::DragFloat("Spotlight Falloff", &lunis.spotFalloff, 0.001f, 0.0f, 10.0f);
+      ImGui::TreePop();
     }
+    
+
+    if (ImGui::TreeNode("Attenuation Constants"))
+    {
+      ImGui::DragFloat("C1", &lunis.c1, 0.001f, 0.0f, 5.0f);
+      ImGui::DragFloat("C2", &lunis.c2, 0.001f, 0.0f, 5.0f);
+      ImGui::DragFloat("C3", &lunis.c3, 0.001f, 0.0f, 5.0f);
+      ImGui::TreePop();
+    }
+    
+    ImGui::ColorEdit4("Fog Color", lunis.fogColor);
+
+
+
+    if (ImGui::TreeNode("Directional Lights"))
+    {
+      ImGui::PushID("DirLight");
+
+      for (unsigned int i = 0; i < lunis.DirLights.size(); ++i)
+      {
+        std::string lightLabel = "Dir Light " + std::to_string(i) + '\0';
+
+        if (ImGui::TreeNode(lightLabel.c_str()))
+        {
+          ImGui::PushID(i);
+
+          DirLight &light = lunis.DirLights[i];
+          ImGui::DragFloat3("Direction", light.direction, 0.001f, -1.0f, 1.0f);
+          ImGui::ColorEdit4("Ambient", light.ambient);
+          ImGui::ColorEdit4("Diffuse", light.diffuse);
+          ImGui::ColorEdit4("Specular", light.specular);
+          
+          ImGui::PopID();
+          ImGui::TreePop();
+        }
+      }
+      ImGui::PopID();
+      ImGui::TreePop();
+    }
+
+
+    if (ImGui::TreeNode("Spot Lights"))
+    {
+      ImGui::PushID("SpotLight");
+
+      for (unsigned int i = 0; i < lunis.SpotLights.size(); ++i)
+      {
+        std::string lightLabel = "Spot Light " + std::to_string(i) + '\0';
+
+        if (ImGui::TreeNode(lightLabel.c_str()))
+        {
+          ImGui::PushID(i);
+
+          SpotLight &light = lunis.SpotLights[i];
+          ImGui::DragFloat3("Position", light.pos, 0.001f);
+          ImGui::DragFloat3("Direction", light.direction, 0.001f, -1.0f, 1.0f);
+          ImGui::ColorEdit4("Ambient", light.ambient);
+          ImGui::ColorEdit4("Diffuse", light.diffuse);
+          ImGui::ColorEdit4("Specular", light.specular);
+
+          ImGui::PopID();
+          ImGui::TreePop();
+        }
+      }
+      ImGui::PopID();
+      ImGui::TreePop();
+    }
+
+
+    if (ImGui::TreeNode("Point Lights"))
+    {
+      ImGui::PushID("PointLight");
+
+      for (unsigned int i = 0; i < lunis.PointLights.size(); ++i)
+      {
+        std::string lightLabel = "Point Light " + std::to_string(i) + '\0';
+
+        if (ImGui::TreeNode(lightLabel.c_str()))
+        {
+          ImGui::PushID(i);
+
+          PointLight &light = lunis.PointLights[i];
+          ImGui::DragFloat3("Position", light.pos, 0.1f);
+          ImGui::ColorEdit4("Ambient", light.ambient);
+          ImGui::ColorEdit4("Diffuse", light.diffuse);
+          ImGui::ColorEdit4("Specular", light.specular);
+
+          ImGui::PopID();
+          ImGui::TreePop();
+        }
+      }
+      ImGui::PopID();
+      ImGui::TreePop();
+    }
+
+
   }
 
 

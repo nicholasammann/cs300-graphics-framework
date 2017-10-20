@@ -47,6 +47,9 @@ namespace ELBA
   {
     float ambient[4];
     float diffuse[4];
+    float specular[4];
+    float emissive[4];
+    float shininess;
 
     Material() 
       : ambient{ 0.25f, 0.25f, 0.25f, 0.25f },

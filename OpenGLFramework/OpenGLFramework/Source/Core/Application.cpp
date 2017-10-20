@@ -134,11 +134,6 @@ namespace ELBA
     return mModels;
   }
 
-  std::vector<Light>& Application::GetLights()
-  {
-    return mLights;
-  }
-
   std::map<std::string, Shader*>& Application::GetShaderMap()
   {
     return mShaders;
@@ -204,61 +199,176 @@ namespace ELBA
     
     CreateShader("Debug", p+"debug.vert", p+"debug.frag");
     mShaderPaths.emplace_back(shdr_info("Debug", p+"debug.vert", p+"debug.frag"));
+
+    CreateShader("Phong Shading", p + "phong_shade.vert", p + "phong_shade.frag");
+    mShaderPaths.emplace_back(shdr_info("Phong Shading", p + "phong_shade.vert", p + "phong_shade.frag"));
   }
 
   void Application::CreateInitialModels()
   {
     Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
-    mod->SetShader("Shader");
+    mod->SetShader("Phong Shading");
 
     mModels.push_back(mod);
   }
 
   void Application::CreateInitialLights()
   {
-    Light light;
-    light.SetDirection(-1, -1, 0, 1);
+    mLightUniforms.globalAmbient[0] = 0.2f;
+    mLightUniforms.globalAmbient[1] = 0.2f;
+    mLightUniforms.globalAmbient[2] = 0.2f;
+    mLightUniforms.globalAmbient[3] = 1.0f;
+
+    mLightUniforms.spotInnerAngle = 15.0f;
+    mLightUniforms.spotOuterAngle = 30.0f;
+    mLightUniforms.spotFalloff = 1.0f;
+
+    mLightUniforms.c1 = 1.0f;
+    mLightUniforms.c2 = 0.1f;
+    mLightUniforms.c3 = 0.0f;
+
+    mLightUniforms.fogColor[0] = 0.2f;
+    mLightUniforms.fogColor[1] = 0.3f;
+    mLightUniforms.fogColor[2] = 0.3f;
+    mLightUniforms.fogColor[3] = 1.0f;
+
+    mLightUniforms.fogNear = 12.5f;
+    mLightUniforms.fogFar = 25.0f;
+
+    PointLight light;
+    light.SetPos(1.0, 1.0, 0.0, 1.0);
     light.SetAmbient(1, 0, 0, 1);
     light.SetDiffuse(1, 0, 0, 1);
+    light.SetSpecular(1, 0, 0, 1);
 
-    mLights.push_back(light);
-
-    light.SetDirection(1, 1, 0, 1);
-    light.SetAmbient(0, 1, 0, 1);
-    light.SetDiffuse(0, 1, 0, 1);
-    //mLights.push_back(light);
-    //mLights.push_back(light);
-    //mLights.push_back(light);
-    //mLights.push_back(light);
-    //mLights.push_back(light);
-    //mLights.push_back(light);
-    //mLights.push_back(light);
-
+    mLightUniforms.PointLights.push_back(light);
   }
 
   void Application::BindLights(unsigned int aShaderPrg)
   {
-    for (unsigned int i = 0; i < mLights.size(); ++i)
+
+    GLuint loc = glGetUniformLocation(aShaderPrg, "globalAmbient");
+    glUniform4fv(loc, 1, mLightUniforms.globalAmbient);
+
+    // directional lights
+    loc = glGetUniformLocation(aShaderPrg, "DirLightCount");
+    glUniform1i(loc, mLightUniforms.DirLights.size());
+
+    std::vector<DirLight> &dirs = mLightUniforms.DirLights;
+
+    for (unsigned int i = 0; i < dirs.size(); ++i)
     {
-      std::string lightName = "Lights[" + std::to_string(i) +"].";
+      std::string lightName = "DirLights[" + std::to_string(i) + "].";
 
       std::string dir = lightName + "direction";
       std::string amb = lightName + "ambient";
       std::string dif = lightName + "diffuse";
+      std::string spc = lightName + "specular";
 
       unsigned int loc = glGetUniformLocation(aShaderPrg, dir.c_str());
-      glProgramUniform4fv(aShaderPrg, loc, 1, mLights[i].direction);
+      glUniform4fv(loc, 1, dirs[i].direction);
 
       loc = glGetUniformLocation(aShaderPrg, amb.c_str());
-      glProgramUniform4fv(aShaderPrg, loc, 1, mLights[i].ambient);
+      glUniform4fv(loc, 1, dirs[i].ambient);
 
       loc = glGetUniformLocation(aShaderPrg, dif.c_str());
-      glProgramUniform4fv(aShaderPrg, loc, 1, mLights[i].diffuse);
+      glUniform4fv(loc, 1, dirs[i].diffuse);
 
-      // bind light count
-      unsigned int countLoc = glGetUniformLocation(aShaderPrg, "LightCount");
-      glProgramUniform1i(aShaderPrg, countLoc, mLights.size());
+      loc = glGetUniformLocation(aShaderPrg, spc.c_str());
+      glUniform4fv(loc, 1, dirs[i].specular);
     }
+
+
+
+    // spot lights
+    loc = glGetUniformLocation(aShaderPrg, "SpotLightCount");
+    glUniform1i(loc, mLightUniforms.SpotLights.size());
+
+    std::vector<SpotLight> &spots = mLightUniforms.SpotLights;
+
+    for (unsigned int i = 0; i < spots.size(); ++i)
+    {
+      std::string lightName = "SpotLights[" + std::to_string(i) + "].";
+
+      std::string pos = lightName + "pos";
+      std::string dir = lightName + "direction";
+      std::string amb = lightName + "ambient";
+      std::string dif = lightName + "diffuse";
+      std::string spc = lightName + "specular";
+
+      loc = glGetUniformLocation(aShaderPrg, pos.c_str());
+      glUniform4fv(loc, 1, spots[i].pos);
+
+      loc = glGetUniformLocation(aShaderPrg, dir.c_str());
+      glUniform4fv(loc, 1, spots[i].direction);
+
+      loc = glGetUniformLocation(aShaderPrg, amb.c_str());
+      glUniform4fv(loc, 1, spots[i].ambient);
+
+      loc = glGetUniformLocation(aShaderPrg, dif.c_str());
+      glUniform4fv(loc, 1, spots[i].diffuse);
+
+      loc = glGetUniformLocation(aShaderPrg, spc.c_str());
+      glUniform4fv(loc, 1, spots[i].specular);
+    }
+
+
+    // point lights
+    loc = glGetUniformLocation(aShaderPrg, "PointLightCount");
+    glUniform1i(loc, mLightUniforms.PointLights.size());
+
+    std::vector<PointLight> &points = mLightUniforms.PointLights;
+
+    for (unsigned int i = 0; i < points.size(); ++i)
+    {
+      std::string lightName = "PointLights[" + std::to_string(i) + "].";
+
+      std::string pos = lightName + "pos";
+      std::string amb = lightName + "ambient";
+      std::string dif = lightName + "diffuse";
+      std::string spc = lightName + "specular";
+
+      loc = glGetUniformLocation(aShaderPrg, pos.c_str());
+      glUniform4fv(loc, 1, points[i].pos);
+
+      loc = glGetUniformLocation(aShaderPrg, amb.c_str());
+      glUniform4fv(loc, 1, points[i].ambient);
+
+      loc = glGetUniformLocation(aShaderPrg, dif.c_str());
+      glUniform4fv(loc, 1, points[i].diffuse);
+
+      loc = glGetUniformLocation(aShaderPrg, spc.c_str());
+      glUniform4fv(loc, 1, points[i].specular);
+    }
+
+
+    loc = glGetUniformLocation(aShaderPrg, "spotInnerAngle");
+    glUniform1f(loc, mLightUniforms.spotInnerAngle);
+
+    loc = glGetUniformLocation(aShaderPrg, "spotOuterAngle");
+    glUniform1f(loc, mLightUniforms.spotOuterAngle);
+
+    loc = glGetUniformLocation(aShaderPrg, "spotFalloff");
+    glUniform1f(loc, mLightUniforms.spotFalloff);
+
+    loc = glGetUniformLocation(aShaderPrg, "c1");
+    glUniform1f(loc, mLightUniforms.c1);
+
+    loc = glGetUniformLocation(aShaderPrg, "c2");
+    glUniform1f(loc, mLightUniforms.c2);
+
+    loc = glGetUniformLocation(aShaderPrg, "c3");
+    glUniform1f(loc, mLightUniforms.c3);
+
+    loc = glGetUniformLocation(aShaderPrg, "fogColor");
+    glUniform4fv(loc, 1, mLightUniforms.fogColor);
+
+    loc = glGetUniformLocation(aShaderPrg, "fogNear");
+    glUniform1f(loc, mLightUniforms.fogNear);
+
+    loc = glGetUniformLocation(aShaderPrg, "fogFar");
+    glUniform1f(loc, mLightUniforms.fogFar);
+
   }
   void Application::ReloadShaderNamesForEditor()
   {
@@ -271,5 +381,9 @@ namespace ELBA
       strcpy(name, s.second->GetName().c_str());
       mShaderNames.push_back(name);
     }
+  }
+  LightUniforms & Application::GetLightUniforms()
+  {
+    return mLightUniforms;
   }
 }

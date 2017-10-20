@@ -30,8 +30,8 @@ namespace ELBA
     // column 0
     view[0][0] = right.x;            
     view[1][0] = right.y;            
-    view[2][0] = right.z;            
-    view[3][0] = -dot(right, p);     
+    view[2][0] = right.z;
+    view[3][0] = -dot(right, p);
     
     // column 1
     view[0][1] = up.x;
@@ -45,6 +45,9 @@ namespace ELBA
     view[2][2] = -forward.z;
     view[3][2] = dot(forward, p);
 
+    view[3][3] = 1.0f;
+
+
     return view;
   }
 
@@ -52,7 +55,7 @@ namespace ELBA
   {
     glm::mat4 proj;
 
-    float rad = glm::radians(60.0f);
+    float rad = glm::radians(90.0f);
     float tanHalfFovy = tan(rad / 2.0f);
     float aspect = (float)aWidth / aHeight;
     float zNear = 0.5f;

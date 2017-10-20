@@ -45,8 +45,6 @@ namespace ELBA
 
     std::vector<Model*>& GetModels();
 
-    std::vector<Light>& GetLights();
-
     std::map<std::string, Shader*>& GetShaderMap();
 
     ImVector<char*> mShaderNames;
@@ -54,6 +52,8 @@ namespace ELBA
     shader_path_vec& GetShaderPaths();
 
     void ReloadShaderNamesForEditor();
+
+    LightUniforms& GetLightUniforms();
 
   private:
 
@@ -70,7 +70,7 @@ namespace ELBA
 
     std::vector<Model*> mModels;
 
-    std::vector<Light> mLights;
+    LightUniforms mLightUniforms;
 
     Camera *mCamera;
   
