@@ -102,14 +102,15 @@ namespace ELBA
   {
     return mTransform;
   }
+
   glm::mat4 Model::ConstructModelMatrix()
   {
     glm::mat4 scale = glm::scale(glm::mat4(),  mTransform.mScale);
-
+    
     glm::mat4 rot = glm::yawPitchRoll(mTransform.mWorldRot[1], mTransform.mWorldRot[0], mTransform.mWorldRot[2]);
 
     glm::mat4 trans = glm::translate(glm::mat4(), mTransform.mWorldPos);
     
-    return  trans * rot * scale;
+    return  trans *rot * scale;
   }
 }

@@ -235,13 +235,14 @@ namespace ELBA
     mLightUniforms.fogNear = 12.5f;
     mLightUniforms.fogFar = 25.0f;
 
-    PointLight light;
+    SpotLight light;
     light.SetPos(1.0, 1.0, 0.0, 1.0);
+    light.SetDirection(1.0, 1.0, 0.0, 1.0);
     light.SetAmbient(1, 0, 0, 1);
     light.SetDiffuse(1, 0, 0, 1);
     light.SetSpecular(1, 0, 0, 1);
 
-    mLightUniforms.PointLights.push_back(light);
+    mLightUniforms.SpotLights.push_back(light);
   }
 
   void Application::BindLights(unsigned int aShaderPrg)

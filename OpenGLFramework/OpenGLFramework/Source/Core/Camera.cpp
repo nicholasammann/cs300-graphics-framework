@@ -9,7 +9,7 @@ namespace ELBA
 
   Camera::Camera()
   {
-    mPosition = glm::vec3(0.0f, 0.0f, 6.0f);
+    mPosition = glm::vec3(0.0f, 0.0f, 20.0f);
     mTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     mDirection = glm::normalize(mTarget - mPosition);
     mWorldUp = glm::vec3(0.0f, 0.1f, 0.0f);
@@ -55,11 +55,11 @@ namespace ELBA
   {
     glm::mat4 proj;
 
-    float rad = glm::radians(90.0f);
+    float rad = glm::radians(45.0f);
     float tanHalfFovy = tan(rad / 2.0f);
     float aspect = (float)aWidth / aHeight;
-    float zNear = 0.5f;
-    float zFar = 25.0f;
+    float zNear = 0.1f;
+    float zFar = 50.0f;
 
     proj[0][0] = 1.0f / (aspect * tanHalfFovy);
     proj[1][1] = 1.0f / (tanHalfFovy);

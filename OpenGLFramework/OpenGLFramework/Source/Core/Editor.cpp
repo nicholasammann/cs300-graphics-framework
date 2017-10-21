@@ -195,9 +195,9 @@ void ELBA::Editor::Update()
 
     if (ImGui::TreeNode("Spotlight Constants"))
     {
-      ImGui::SliderFloat("Spotlight Inner Angle", &lunis.spotInnerAngle, 0.0f, lunis.spotOuterAngle);
-      ImGui::SliderFloat("Spotlight Outer Angle", &lunis.spotOuterAngle, lunis.spotInnerAngle, 90.0f);
-      ImGui::DragFloat("Spotlight Falloff", &lunis.spotFalloff, 0.001f, 0.0f, 10.0f);
+      ImGui::SliderFloat("Inner Angle", &lunis.spotInnerAngle, 0.0f, 90.0f);
+      ImGui::SliderFloat("Outer Angle", &lunis.spotOuterAngle, 0.0f, 90.0f);
+      ImGui::DragFloat("Falloff", &lunis.spotFalloff, 0.01f, 0.0f, 10.0f);
       ImGui::TreePop();
     }
     

@@ -12,7 +12,6 @@ out vec4 oViewNorm;
 void main()
 {
   // calculate position and normal in view space
-  
   vec4 vPos = view * model * vec4(aPos, 1);
 
   oViewPos = vPos;

@@ -92,7 +92,6 @@ vec4 dirlight_computeColor(in int lightIdx)
   float specFactor = pow(dot(oViewNorm, halfVec), Material.shininess);
   vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
 
-
   vec4 color =  ambient + diffuse + specColor;
 
   return color;
@@ -105,7 +104,7 @@ vec4 spotlight_computeColor(in int lightIdx)
   SpotLight light = SpotLights[lightIdx];
 
   // calculate light vector in view space
-  vec4 lightVec = view * -light.pos;
+  vec4 lightVec = (-light.pos) - oViewPos;
   vec4 lightUnitVec = normalize(lightVec);
 
   // calculate ambient color
@@ -133,18 +132,21 @@ vec4 spotlight_computeColor(in int lightIdx)
   vec4 spotUnitDir = normalize(light.direction);
   float alpha = dot(spotUnitDir, -lightUnitVec);
 
-  float phi = cos(spotOuterAngle);
-  float theta = cos(spotInnerAngle);
+  float phi = cos(radians(spotOuterAngle));
+  float theta = cos(radians(spotInnerAngle));
 
-  float spotEffect = 1.0f;
+  float spotEffect = 0.0f;
 
   if (alpha < phi)
   {
     spotEffect = 0.0;
   }
-  else if (alpha < theta)
+  else if (alpha > theta)
   {
-    spotEffect = pow(( (cos(alpha) - phi) / (theta - phi) ), spotFalloff);
+  }
+  else
+  {
+    spotEffect = pow(( (cos(radians(alpha)) - phi) / (theta - phi) ), spotFalloff);
   }
 
   vec4 color = lightAtt * ambient + lightAtt * spotEffect * (diffuse + specColor);
@@ -159,7 +161,7 @@ vec4 pointlight_computeColor(in int lightIdx)
   PointLight light = PointLights[lightIdx];
 
   // calculate light vector in view space
-  vec4 lightVec = -light.pos;
+  vec4 lightVec = (view * -light.pos) - oViewPos;
   vec4 lightUnitVec = normalize(lightVec);
 
   // calculate ambient color
@@ -182,7 +184,6 @@ vec4 pointlight_computeColor(in int lightIdx)
   float dL = sqrt(d.x*d.x + d.y*d.y + d.z*d.z);
   float lightAtt = min( 1.0 / (c1 + c2*dL + c3*dL*dL), 1);
   
-
   vec4 color = lightAtt * (ambient + diffuse + specColor);
 
   return color;
