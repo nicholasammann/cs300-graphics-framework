@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/vec4.hpp>
+#include "Model.hpp"
 
 using namespace glm;
 
@@ -59,6 +60,8 @@ struct SpotLight
     pos[1] = y;
     pos[2] = z;
     pos[3] = w;
+
+    model->GetTransform().mWorldPos = vec4(x, y, z, w);
   }
 
   void SetDirection(float x, float y, float z, float w)
@@ -92,6 +95,8 @@ struct SpotLight
     specular[2] = b;
     specular[3] = a;
   }
+
+  ELBA::Model *model;
 };
 
 
@@ -108,6 +113,8 @@ struct PointLight
     pos[1] = y;
     pos[2] = z;
     pos[3] = w;
+
+    model->GetTransform().mWorldPos = vec4(x, y, z, w);
   }
 
   void SetAmbient(float r, float g, float b, float a)
@@ -133,6 +140,8 @@ struct PointLight
     specular[2] = b;
     specular[3] = a;
   }
+
+  ELBA::Model *model;
 };
 
 

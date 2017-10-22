@@ -25,7 +25,7 @@ namespace ELBA
 
     Model(Application *aApp, const char *aPath, std::string aName);
 
-    void Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
+    void Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
     void SetShader(std::string aName);
     Shader* GetShader();

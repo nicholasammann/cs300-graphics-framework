@@ -151,6 +151,7 @@
     <ClInclude Include="Source\Core\Application.hpp" />
     <ClInclude Include="Source\Core\Camera.hpp" />
     <ClInclude Include="Source\Core\Editor.hpp" />
+    <ClInclude Include="Source\Core\Scene.hpp" />
     <ClInclude Include="Source\Graphics\Light.hpp" />
     <ClInclude Include="Source\Graphics\Mesh.hpp" />
     <ClInclude Include="Source\Graphics\Model.hpp" />
@@ -171,10 +172,12 @@
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />
     <None Include="Assets\Shaders\debug.vert" />
-    <None Include="Assets\Shaders\phong_light.frag" />
-    <None Include="Assets\Shaders\phong_light.vert" />
-    <None Include="Assets\Shaders\phong_shade.frag" />
-    <None Include="Assets\Shaders\phong_shade.vert" />
+    <None Include="Assets\Shaders\phong_lighting.frag" />
+    <None Include="Assets\Shaders\phong_lighting.vert" />
+    <None Include="Assets\Shaders\blinn.frag" />
+    <None Include="Assets\Shaders\blinn.vert" />
+    <None Include="Assets\Shaders\phong_shading.frag" />
+    <None Include="Assets\Shaders\phong_shading.vert" />
     <None Include="Assets\Shaders\simple.frag" />
     <None Include="Assets\Shaders\simple.vert" />
     <None Include="DLLS\glew32.dll" />

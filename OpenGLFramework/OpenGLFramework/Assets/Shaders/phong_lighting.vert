@@ -1,10 +1,12 @@
 #version 330 core
-layout(location = 0) out vec4 vFragColor;
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 aNormal;
 
-in vec4 oViewPos;
-in vec4 oViewNorm;
-
+uniform mat4 model;
 uniform mat4 view;
+uniform mat4 projection;
+
+out vec4 litFragColor;
 
 // LIGHT UNIFORMS
 
@@ -70,26 +72,26 @@ uniform struct
 } Material;
 
 
-vec4 dirlight_computeColor(in int lightIdx)
+vec4 dirlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 {
   DirLight light = DirLights[lightIdx];
 
   // calculate light vector in view space
-  vec4 lightVec = view * -light.direction;
+  vec4 lightVec = (-light.direction);
   vec4 lightUnitVec = normalize(lightVec);
 
   // calculate ambient color
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(oViewNorm, lightUnitVec), 0);
+  float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
   vec4 diffuse = diffuseFactor * light.diffuse * Material.diffuse;
 
 
   // calculate specular color
-  vec4 viewVec = -vec4(oViewPos.xyz, 0);
-  vec4 halfVec = lightUnitVec + viewVec;
-  float specFactor = pow(dot(oViewNorm, halfVec), Material.shininess);
+  vec4 viewVec = -vec4(viewPos.xyz, 0);
+  vec4 reflec = 2.0 * viewNorm * dot(viewNorm, lightUnitVec) - lightUnitVec;
+  float specFactor = pow(dot(reflec, viewVec), Material.shininess);
   vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
 
   vec4 color =  ambient + diffuse + specColor;
@@ -98,27 +100,26 @@ vec4 dirlight_computeColor(in int lightIdx)
 }
 
 
-
-vec4 spotlight_computeColor(in int lightIdx)
+vec4 spotlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 {
   SpotLight light = SpotLights[lightIdx];
 
   // calculate light vector in view space
-  vec4 lightVec = (-light.pos) - oViewPos;
+  vec4 lightVec = (view * light.pos) - viewPos;
   vec4 lightUnitVec = normalize(lightVec);
 
   // calculate ambient color
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(oViewNorm, lightUnitVec), 0);
+  float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
   vec4 diffuse = diffuseFactor * light.diffuse * Material.diffuse;
 
 
   // calculate specular color
-  vec4 viewVec = -vec4(oViewPos.xyz, 0);
-  vec4 halfVec = lightUnitVec + viewVec;
-  float specFactor = pow(dot(oViewNorm, halfVec), Material.shininess);
+  vec4 viewVec = -vec4(viewPos.xyz, 0);
+  vec4 reflec = 2.0 * viewNorm * dot(viewNorm, lightUnitVec) - lightUnitVec;
+  float specFactor = pow(dot(reflec, viewVec), Material.shininess);
   vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
   
 
@@ -155,27 +156,26 @@ vec4 spotlight_computeColor(in int lightIdx)
 }
 
 
-
-vec4 pointlight_computeColor(in int lightIdx)
+vec4 pointlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 {
   PointLight light = PointLights[lightIdx];
 
   // calculate light vector in view space
-  vec4 lightVec = (view * -light.pos) - oViewPos;
+  vec4 lightVec = (view * light.pos) - viewPos;
   vec4 lightUnitVec = normalize(lightVec);
 
   // calculate ambient color
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(oViewNorm, lightUnitVec), 0);
+  float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
   vec4 diffuse = diffuseFactor * light.diffuse * Material.diffuse;
 
 
   // calculate specular color
-  vec4 viewVec = -vec4(oViewPos.xyz, 0);
-  vec4 halfVec = lightUnitVec + viewVec;
-  float specFactor = pow(dot(oViewNorm, halfVec), Material.shininess);
+  vec4 viewVec = -vec4(viewPos.xyz, 0);
+  vec4 reflec = 2.0 * viewNorm * dot(viewNorm, lightUnitVec) - lightUnitVec;
+  float specFactor = pow(dot(reflec, viewVec), Material.shininess);
   vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
   
 
@@ -189,38 +189,38 @@ vec4 pointlight_computeColor(in int lightIdx)
   return color;
 }
 
-float compute_atmosphericAttenuation()
+float compute_atmosphericAttenuation(in vec4 viewPos)
 {
-  vec4 ld = oViewPos;
+  vec4 ld = viewPos;
   float S = (fogFar - sqrt(ld.x*ld.x + ld.y*ld.y + ld.z*ld.z)) / (fogFar - fogNear);
   return S;
 }
 
 
-vec4 computeFragmentColor()
+vec4 computeColor(in vec4 viewNorm, in vec4 viewPos)
 {
   vec4 color = vec4(0, 0, 0, 0);
 
   for (int i = 0; i < DirLightCount; ++i)
   {
-    color += dirlight_computeColor(i);
+    color += dirlight_computeColor(i, viewNorm, viewPos);
   }
 
   for (int i = 0; i < SpotLightCount; ++i)
   {
-    color += spotlight_computeColor(i);
+    color += spotlight_computeColor(i, viewNorm, viewPos);
   }
 
   for (int i = 0; i < PointLightCount; ++i)
   {
-    color += pointlight_computeColor(i);
+    color += pointlight_computeColor(i, viewNorm, viewPos);
   }
 
   // calculate local
   vec4 local = Material.emissive + Material.ambient*globalAmbient + color;
 
   // calculate final (with atmospheric attenuation)
-  float S = compute_atmosphericAttenuation();
+  float S = compute_atmosphericAttenuation(viewPos);
   
   vec4 final = S * local + (1 - S) * fogColor;
 
@@ -230,5 +230,19 @@ vec4 computeFragmentColor()
 
 void main()
 {
-  vFragColor = computeFragmentColor();
+  // deal with position and normal in world space
+
+  vec4 viewPos = view * model * vec4(aPos, 1);
+  vec4 worldPos = projection * view * model * vec4(aPos, 1);
+
+  vec4 viewNorm = normalize(view * model * vec4(aNormal, 0));
+  vec4 worldNorm = normalize(projection * view * model * vec4(aNormal, 0));
+
+  // compute the final result of passing this vertex through the transformation
+  // pipeline and yielding a coordinate in NDC space
+  gl_Position = worldPos;
+  
+  // compute the contribution of lights onto this vertex and interpolate that
+  // color value across the surface of the polygon
+  litFragColor = computeColor(viewNorm, viewPos);
 }

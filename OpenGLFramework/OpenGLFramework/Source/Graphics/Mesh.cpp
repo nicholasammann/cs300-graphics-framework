@@ -15,12 +15,12 @@
 namespace ELBA
 {
 
-  Mesh::Mesh(Model *aParent) 
+  Mesh::Mesh(Model *aParent)
     : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f)
   {
   }
 
-  void Mesh::Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
+  void Mesh::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
     switch (mDebugMode)
     {
@@ -77,7 +77,8 @@ namespace ELBA
     }
 
     unsigned int shdrPrg = mParent->GetDebugShader()->GetShaderProgram();
-    
+    mParent->GetDebugShader()->UseShaderProgram();
+
     unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(aProj));
 
@@ -86,11 +87,11 @@ namespace ELBA
 
     unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
-    
+
     glBindVertexArray(mFaceDebugVAO);
     glBindBuffer(GL_ARRAY_BUFFER, mFaceDebugVBO);
     glBufferData(GL_ARRAY_BUFFER, mFaceNormals.size() * sizeof(glm::vec3) * 2, mFaceNormPoints.data(), GL_DYNAMIC_DRAW);
-    
+
     glLineWidth(mDebugLineWidth);
     glDrawArrays(GL_LINES, 0, mFaceNormPoints.size() * 3);
     glBindVertexArray(0);
@@ -111,6 +112,7 @@ namespace ELBA
     }
 
     unsigned int shdrPrg = mParent->GetDebugShader()->GetShaderProgram();
+    mParent->GetDebugShader()->UseShaderProgram();
 
     unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(aProj));
@@ -124,7 +126,7 @@ namespace ELBA
     glBindVertexArray(mVertDebugVAO);
     glBindBuffer(GL_ARRAY_BUFFER, mVertDebugVBO);
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mVertNormPoints.data(), GL_DYNAMIC_DRAW);
-    
+
     glLineWidth(mDebugLineWidth);
     glDrawArrays(GL_LINES, 0, mVertNormPoints.size() * 3);
     glBindVertexArray(0);
@@ -264,16 +266,16 @@ namespace ELBA
   void Mesh::CenterMesh()
   {
     glm::vec3 centroid(0.f);
-    
+
     for (auto &vert : mVertices)
     {
       centroid += vert.mPos;
     }
 
     centroid *= 1.f / static_cast<float>(mVertices.size());
-    
+
     centroid = -centroid;
-    
+
     for (auto &vert : mVertices)
     {
       vert.mPos += centroid;
@@ -302,6 +304,19 @@ namespace ELBA
     glm::vec3 extent = maximum - minimum;
 
     float scalar = 1.f / std::min(std::min(extent.x, extent.y), extent.z);
+
+    if (extent.x == 0)
+    {
+      scalar = 1.f / std::min(extent.y, extent.z);
+    }
+    else if (extent.y == 0)
+    {
+      scalar = 1.f / std::min(extent.x, extent.z);
+    }
+    else if (extent.z == 0)
+    {
+      scalar = 1.f / std::min(extent.x, extent.y);
+    }
 
     for (auto &vert : mVertices)
     {

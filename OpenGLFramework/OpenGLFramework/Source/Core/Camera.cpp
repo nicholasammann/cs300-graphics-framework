@@ -9,7 +9,7 @@ namespace ELBA
 
   Camera::Camera()
   {
-    mPosition = glm::vec3(0.0f, 0.0f, 20.0f);
+    mPosition = glm::vec3(0.0f, 0.0f, 10.0f);
     mTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     mDirection = glm::normalize(mTarget - mPosition);
     mWorldUp = glm::vec3(0.0f, 0.1f, 0.0f);

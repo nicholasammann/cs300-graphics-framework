@@ -14,25 +14,6 @@ ELBA::Editor::Editor(Application * aApp) : mApp(aApp), mLoadBuffer{ '\0' }
 void ELBA::Editor::Update()
 {
   ImGui::Begin("Test Window");
-  
-  if (ImGui::CollapsingHeader("Model Loading"))
-  {
-
-    if (ImGui::Button("Load"))
-    {
-      std::string path = "../OpenGLFramework/Assets/CS300/";
-      path += mLoadBuffer;
-
-      Model *mod = new Model(mApp, path.data(), mLoadBuffer);
-      mod->SetShader("Shader");
-
-      mApp->GetModels().push_back(mod);
-    }
-
-    ImGui::SameLine();
-
-    ImGui::InputText("Model", mLoadBuffer, sizeof(mLoadBuffer) / sizeof(char));
-  }
 
   // for each model in the scene
   auto models = mApp->GetModels();
@@ -184,7 +165,6 @@ void ELBA::Editor::Update()
     ImGui::PopID();
   }
 
-  
 
   if (ImGui::CollapsingHeader("Lights"))
   {
@@ -227,7 +207,7 @@ void ELBA::Editor::Update()
           ImGui::PushID(i);
 
           DirLight &light = lunis.DirLights[i];
-          ImGui::DragFloat3("Direction", light.direction, 0.001f, -1.0f, 1.0f);
+          ImGui::DragFloat3("Direction", light.direction, 0.01f, -1.0f, 1.0f);
           ImGui::ColorEdit4("Ambient", light.ambient);
           ImGui::ColorEdit4("Diffuse", light.diffuse);
           ImGui::ColorEdit4("Specular", light.specular);
@@ -254,7 +234,10 @@ void ELBA::Editor::Update()
           ImGui::PushID(i);
 
           SpotLight &light = lunis.SpotLights[i];
-          ImGui::DragFloat3("Position", light.pos, 0.001f);
+
+          ImGui::DragFloat3("Position", light.pos, 0.01f);
+          light.SetPos(light.pos[0], light.pos[1], light.pos[2], light.pos[3]);
+
           ImGui::DragFloat3("Direction", light.direction, 0.001f, -1.0f, 1.0f);
           ImGui::ColorEdit4("Ambient", light.ambient);
           ImGui::ColorEdit4("Diffuse", light.diffuse);
@@ -282,7 +265,9 @@ void ELBA::Editor::Update()
           ImGui::PushID(i);
 
           PointLight &light = lunis.PointLights[i];
-          ImGui::DragFloat3("Position", light.pos, 0.1f);
+          light.SetPos(light.pos[0], light.pos[1], light.pos[2], light.pos[3]);
+
+          ImGui::DragFloat3("Position", light.pos, 0.01f);
           ImGui::ColorEdit4("Ambient", light.ambient);
           ImGui::ColorEdit4("Diffuse", light.diffuse);
           ImGui::ColorEdit4("Specular", light.specular);
@@ -345,6 +330,26 @@ void ELBA::Editor::Update()
     {
       mConsoleLog.clear();
     }
+  }
+
+  if (ImGui::CollapsingHeader("Model Loading"))
+  {
+
+    if (ImGui::Button("Load"))
+    {
+      std::string path = "../OpenGLFramework/Assets/CS300/";
+      path += mLoadBuffer;
+
+      Model *mod = new Model(mApp, path.data(), mLoadBuffer);
+      mod->SetShader("Shader");
+
+      mApp->GetModels().clear();
+      mApp->GetModels().push_back(mod);
+    }
+
+    ImGui::SameLine();
+
+    ImGui::InputText("Model", mLoadBuffer, sizeof(mLoadBuffer) / sizeof(char));
   }
   
 

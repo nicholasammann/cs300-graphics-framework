@@ -64,7 +64,7 @@ namespace ELBA
 
     Mesh(Model *aParent);
 
-    void Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
+    void Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
     void AddVertex(float aA, float aB, float aC);
     void AddFace(GLuint aA, GLuint aB, GLuint aC);

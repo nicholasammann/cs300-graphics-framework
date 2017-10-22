@@ -78,6 +78,9 @@
     <ClInclude Include="Source\ImGui\stb_textedit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Core\Scene.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />
@@ -128,9 +131,11 @@
     <None Include="Assets\Shaders\simple.vert" />
     <None Include="Assets\Shaders\debug.vert" />
     <None Include="Assets\Shaders\debug.frag" />
-    <None Include="Assets\Shaders\phong_light.frag" />
-    <None Include="Assets\Shaders\phong_light.vert" />
-    <None Include="Assets\Shaders\phong_shade.vert" />
-    <None Include="Assets\Shaders\phong_shade.frag" />
+    <None Include="Assets\Shaders\blinn.frag" />
+    <None Include="Assets\Shaders\blinn.vert" />
+    <None Include="Assets\Shaders\phong_shading.vert" />
+    <None Include="Assets\Shaders\phong_shading.frag" />
+    <None Include="Assets\Shaders\phong_lighting.frag" />
+    <None Include="Assets\Shaders\phong_lighting.vert" />
   </ItemGroup>
 </Project>

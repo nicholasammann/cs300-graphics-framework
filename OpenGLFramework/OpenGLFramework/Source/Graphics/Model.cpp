@@ -24,11 +24,11 @@ namespace ELBA
     SetDebugShader();
   }
 
-  void Model::Draw(Shader *aShader, glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
+  void Model::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
     for (unsigned int i = 0; i < mMeshes.size(); ++i)
     {
-      mMeshes[i]->Draw(aShader, aProj, aView, aModel);
+      mMeshes[i]->Draw(aProj, aView, aModel);
     }
   }
 

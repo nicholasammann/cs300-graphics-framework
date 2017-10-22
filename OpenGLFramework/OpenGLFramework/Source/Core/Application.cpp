@@ -15,6 +15,7 @@
 #include "Application.hpp"
 #include "Camera.hpp"
 #include "Editor.hpp"
+#include "Scene.hpp"
 
 namespace ELBA
 {
@@ -76,6 +77,8 @@ namespace ELBA
 
     // input
     ProcessInput();
+
+    UpdateLights();
 
     mEditor->Update();
     
@@ -168,6 +171,7 @@ namespace ELBA
       }
 
       unsigned int shdrPrg = shdr->GetShaderProgram();
+      shdr->UseShaderProgram();
 
       BindLights(shdrPrg);
 
@@ -183,8 +187,10 @@ namespace ELBA
       unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
       glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
-      m->Draw(shdr, projection, view, model);
+      m->Draw(projection, view, model);
     }
+
+    RenderLightModels();
   }
 
   void Application::CreateInitialShaders()
@@ -194,20 +200,24 @@ namespace ELBA
     CreateShader("Simple", p+"simple.vert", p+"simple.frag");
     mShaderPaths.emplace_back(shdr_info("Simple", p+"simple.vert", p+"simple.frag"));
 
-    CreateShader("Phong Lighting", p+"phong_light.vert", p+"phong_light.frag");
-    mShaderPaths.emplace_back(shdr_info("Phong Lighting", p+"phong_light.vert", p+"phong_light.frag"));
-    
-    CreateShader("Debug", p+"debug.vert", p+"debug.frag");
-    mShaderPaths.emplace_back(shdr_info("Debug", p+"debug.vert", p+"debug.frag"));
+    CreateShader("Debug", p + "debug.vert", p + "debug.frag");
+    mShaderPaths.emplace_back(shdr_info("Debug", p + "debug.vert", p + "debug.frag"));
 
-    CreateShader("Phong Shading", p + "phong_shade.vert", p + "phong_shade.frag");
-    mShaderPaths.emplace_back(shdr_info("Phong Shading", p + "phong_shade.vert", p + "phong_shade.frag"));
+    CreateShader("Phong Lighting", p+"phong_lighting.vert", p+"phong_lighting.frag");
+    mShaderPaths.emplace_back(shdr_info("Phong Lighting", p+"phong_lighting.vert", p+"phong_lighting.frag"));
+
+    CreateShader("Phong Shading", p + "phong_shading.vert", p + "phong_shading.frag");
+    mShaderPaths.emplace_back(shdr_info("Phong Shading", p + "phong_shading.vert", p + "phong_shading.frag"));
+
+    CreateShader("Blinn", p + "blinn.vert", p + "blinn.frag");
+    mShaderPaths.emplace_back(shdr_info("Blinn", p + "blinn.vert", p + "blinn.frag"));
   }
 
   void Application::CreateInitialModels()
   {
     Model *mod = new Model(this, "../OpenGLFramework/Assets/CS300/cube.obj", "Cube");
     mod->SetShader("Phong Shading");
+    mod->GetTransform().mWorldPos.z = 0.0f;
 
     mModels.push_back(mod);
   }
@@ -235,14 +245,7 @@ namespace ELBA
     mLightUniforms.fogNear = 12.5f;
     mLightUniforms.fogFar = 25.0f;
 
-    SpotLight light;
-    light.SetPos(1.0, 1.0, 0.0, 1.0);
-    light.SetDirection(1.0, 1.0, 0.0, 1.0);
-    light.SetAmbient(1, 0, 0, 1);
-    light.SetDiffuse(1, 0, 0, 1);
-    light.SetSpecular(1, 0, 0, 1);
-
-    mLightUniforms.SpotLights.push_back(light);
+    Scene2::CreateLights(this);
   }
 
   void Application::BindLights(unsigned int aShaderPrg)
@@ -255,7 +258,7 @@ namespace ELBA
     loc = glGetUniformLocation(aShaderPrg, "DirLightCount");
     glUniform1i(loc, mLightUniforms.DirLights.size());
 
-    std::vector<DirLight> &dirs = mLightUniforms.DirLights;
+    auto &dirs = mLightUniforms.DirLights;
 
     for (unsigned int i = 0; i < dirs.size(); ++i)
     {
@@ -285,7 +288,7 @@ namespace ELBA
     loc = glGetUniformLocation(aShaderPrg, "SpotLightCount");
     glUniform1i(loc, mLightUniforms.SpotLights.size());
 
-    std::vector<SpotLight> &spots = mLightUniforms.SpotLights;
+    auto &spots = mLightUniforms.SpotLights;
 
     for (unsigned int i = 0; i < spots.size(); ++i)
     {
@@ -318,7 +321,7 @@ namespace ELBA
     loc = glGetUniformLocation(aShaderPrg, "PointLightCount");
     glUniform1i(loc, mLightUniforms.PointLights.size());
 
-    std::vector<PointLight> &points = mLightUniforms.PointLights;
+    auto &points = mLightUniforms.PointLights;
 
     for (unsigned int i = 0; i < points.size(); ++i)
     {
@@ -371,6 +374,82 @@ namespace ELBA
     glUniform1f(loc, mLightUniforms.fogFar);
 
   }
+
+  void Application::UpdateLights()
+  {
+    int totalLights = mLightUniforms.SpotLights.size();
+    totalLights += mLightUniforms.PointLights.size();
+
+
+    float offset = 360.0f / totalLights;
+
+    int counter = 0;
+
+    // for each directional light
+    for (auto &s : mLightUniforms.SpotLights)
+    {
+      mat4 rot = rotate(mat4(), cos(static_cast<float>(glfwGetTime()) * counter * offset), vec3(0, 1, 0));
+      vec4 pos = rot * vec4(3, 1, 0, 1);
+
+      vec3 mpos = mModels[0]->GetTransform().mWorldPos;
+      vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
+
+      // update the direction
+      s.SetPos(pos.x, pos.y, pos.z, 1);
+      s.SetDirection(dir.x, dir.y, dir.z, 0.0f);
+
+      counter++;
+    }
+
+  }
+
+  void Application::RenderLightModels()
+  {
+    for (auto &light : mLightUniforms.SpotLights)
+    {
+      auto &m = light.model;
+
+      auto shdrPrg = m->GetShader()->GetShaderProgram();
+      m->GetShader()->UseShaderProgram();
+      
+      glm::mat4 view = mCamera->ConstructViewMatrix();
+      unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+      glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+      glm::mat4 projection = mCamera->ConstructProjMatrix(mWindowWidth, mWindowHeight);
+      unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+      glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+      glm::mat4 model = m->ConstructModelMatrix();
+      unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+      m->Draw(projection, view, model);
+    }
+
+    for (auto &light : mLightUniforms.PointLights)
+    {
+      auto &m = light.model;
+
+      auto shdrPrg = m->GetShader()->GetShaderProgram();
+      m->GetShader()->UseShaderProgram();
+
+      glm::mat4 view = mCamera->ConstructViewMatrix();
+      unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+      glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+      glm::mat4 projection = mCamera->ConstructProjMatrix(mWindowWidth, mWindowHeight);
+      unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+      glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+      glm::mat4 model = m->ConstructModelMatrix();
+      unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+      m->Draw(projection, view, model);
+    }
+  }
+
   void Application::ReloadShaderNamesForEditor()
   {
     mShaderNames.clear();
@@ -383,6 +462,7 @@ namespace ELBA
       mShaderNames.push_back(name);
     }
   }
+
   LightUniforms & Application::GetLightUniforms()
   {
     return mLightUniforms;

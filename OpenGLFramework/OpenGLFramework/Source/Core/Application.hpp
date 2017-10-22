@@ -82,6 +82,8 @@ namespace ELBA
     void CreateInitialLights();
 
     void BindLights(unsigned int aShaderPrg);
+    void UpdateLights();
+    void RenderLightModels();
 
   };
 }
