@@ -301,6 +301,9 @@ namespace ELBA
       maximum.z = std::max(maximum.z, z);
     }
 
+    mParent->pMin = minimum;
+    mParent->pMax = maximum;
+
     glm::vec3 extent = maximum - minimum;
 
     float scalar = 1.f / std::min(std::min(extent.x, extent.y), extent.z);

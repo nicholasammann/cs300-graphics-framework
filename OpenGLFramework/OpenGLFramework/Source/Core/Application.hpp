@@ -55,6 +55,8 @@ namespace ELBA
 
     LightUniforms& GetLightUniforms();
 
+    float* GetLightSpeed();
+
   private:
 
     Editor *mEditor;
@@ -70,7 +72,10 @@ namespace ELBA
 
     std::vector<Model*> mModels;
 
+    float mLightSpeed;
     LightUniforms mLightUniforms;
+
+    glm::vec4 mBackgroundColor;
 
     Camera *mCamera;
   

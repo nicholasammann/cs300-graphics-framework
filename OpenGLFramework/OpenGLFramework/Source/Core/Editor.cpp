@@ -171,28 +171,52 @@ void ELBA::Editor::Update()
 
     auto& lunis = mApp->GetLightUniforms();
 
-    ImGui::ColorEdit4("Global Ambient", lunis.globalAmbient);
-
-    if (ImGui::TreeNode("Spotlight Constants"))
+    if (ImGui::TreeNode("Constants"))
     {
-      ImGui::SliderFloat("Inner Angle", &lunis.spotInnerAngle, 0.0f, 90.0f);
-      ImGui::SliderFloat("Outer Angle", &lunis.spotOuterAngle, 0.0f, 90.0f);
-      ImGui::DragFloat("Falloff", &lunis.spotFalloff, 0.01f, 0.0f, 10.0f);
+      if (ImGui::TreeNode("Spotlight Constants"))
+      {
+        ImGui::PushItemWidth(150.0f);
+        ImGui::SliderFloat("Inner Angle", &lunis.spotInnerAngle, 0.0f, 90.0f);
+        ImGui::SliderFloat("Outer Angle", &lunis.spotOuterAngle, 0.0f, 90.0f);
+        ImGui::DragFloat("Falloff", &lunis.spotFalloff, 0.01f, 0.0f, 10.0f);
+        ImGui::PopItemWidth();
+
+        ImGui::TreePop();
+      }
+
+      if (ImGui::TreeNode("Attenuation Constants"))
+      {
+        ImGui::PushItemWidth(75.0f);
+        ImGui::DragFloat("C1", &lunis.c1, 0.001f, 0.0f, 5.0f);
+        ImGui::DragFloat("C2", &lunis.c2, 0.001f, 0.0f, 5.0f);
+        ImGui::DragFloat("C3", &lunis.c3, 0.001f, 0.0f, 5.0f);
+        ImGui::PopItemWidth();
+
+        ImGui::TreePop();
+      }
+
+
+      if (ImGui::TreeNode("Global Colors"))
+      {
+        ImGui::ColorEdit4("Global Ambient", lunis.globalAmbient);
+        ImGui::ColorEdit4("Fog Color", lunis.fogColor);
+
+        ImGui::TreePop();
+      }
+
+
+      if (ImGui::TreeNode("Misc."))
+      {
+        ImGui::PushItemWidth(50.0f);
+        ImGui::DragFloat("Rotation Speed", mApp->GetLightSpeed(), 0.1f, 0.0f, 0.0f, "%.1f");
+        ImGui::PopItemWidth();
+
+        ImGui::TreePop();
+      }
+
+
       ImGui::TreePop();
     }
-    
-
-    if (ImGui::TreeNode("Attenuation Constants"))
-    {
-      ImGui::DragFloat("C1", &lunis.c1, 0.001f, 0.0f, 5.0f);
-      ImGui::DragFloat("C2", &lunis.c2, 0.001f, 0.0f, 5.0f);
-      ImGui::DragFloat("C3", &lunis.c3, 0.001f, 0.0f, 5.0f);
-      ImGui::TreePop();
-    }
-    
-    ImGui::ColorEdit4("Fog Color", lunis.fogColor);
-
-
 
     if (ImGui::TreeNode("Directional Lights"))
     {
@@ -279,13 +303,36 @@ void ELBA::Editor::Update()
       ImGui::PopID();
       ImGui::TreePop();
     }
-
-
   }
 
 
   if (ImGui::CollapsingHeader("Actions"))
   {
+    if (ImGui::Button("Load Model"))
+    {
+      std::string path = "../OpenGLFramework/Assets/Models/";
+      path += mLoadBuffer;
+
+      Model *mod = new Model(mApp, path.data(), mLoadBuffer);
+      mod->SetShader("Shader");
+
+      mApp->GetModels().clear();
+      mApp->GetModels().push_back(mod);
+
+
+      Model *plane = new Model(mApp, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
+      plane->SetShader("Blinn");
+      plane->GetTransform().mWorldPos.y = -2.0f;
+      plane->GetTransform().mScale.x = 10.0f;
+      plane->GetTransform().mScale.z = 10.0f;
+      mApp->GetModels().push_back(plane);
+    }
+
+    ImGui::SameLine();
+
+    ImGui::InputText("  ", mLoadBuffer, sizeof(mLoadBuffer) / sizeof(char));
+
+
     if (ImGui::Button("Reload Shaders"))
     {
       std::string name;
@@ -330,31 +377,11 @@ void ELBA::Editor::Update()
     {
       mConsoleLog.clear();
     }
+
+    
   }
-
-  if (ImGui::CollapsingHeader("Model Loading"))
-  {
-
-    if (ImGui::Button("Load"))
-    {
-      std::string path = "../OpenGLFramework/Assets/CS300/";
-      path += mLoadBuffer;
-
-      Model *mod = new Model(mApp, path.data(), mLoadBuffer);
-      mod->SetShader("Shader");
-
-      mApp->GetModels().clear();
-      mApp->GetModels().push_back(mod);
-    }
-
-    ImGui::SameLine();
-
-    ImGui::InputText("Model", mLoadBuffer, sizeof(mLoadBuffer) / sizeof(char));
-  }
-  
 
   ImGui::End();
-
 
   // Console
 

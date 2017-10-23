@@ -36,13 +36,6 @@ namespace ELBA
 
   };
 
-  struct Texture
-  {
-    unsigned int mID;
-    std::string mType;
-  };
-
-
   struct Material
   {
     float ambient[4];
@@ -55,6 +48,14 @@ namespace ELBA
       : ambient{ 0.25f, 0.25f, 0.25f, 0.25f },
         diffuse{ 0.5f, 0.5f, 0.5f, 0.5f }
     { }
+
+    void SetAmbient(float r, float g, float b, float a)
+    {
+      ambient[0] = r;
+      ambient[1] = g;
+      ambient[2] = b;
+      ambient[3] = a;
+    }
   };
 
 

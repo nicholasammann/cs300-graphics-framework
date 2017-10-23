@@ -8,6 +8,7 @@
 
 namespace ELBA
 {
+  class Texture;
   class Application;
 
   struct Transform
@@ -46,6 +47,14 @@ namespace ELBA
     int mCurrentShaderSelect;
     int mPrevShaderSelect;
 
+    Texture *mDiffuseTexture;
+    Texture *mSpecularTexture;
+
+    int mUsingTextures;
+    int mMappingType;
+
+    glm::vec3 pMin;
+    glm::vec3 pMax;
 
   private:
 
@@ -67,7 +76,6 @@ namespace ELBA
 
     // shader for drawing debug lines
     Shader *mDebugShader;
-
 
   };
 

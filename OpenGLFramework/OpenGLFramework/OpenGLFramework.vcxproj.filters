@@ -81,6 +81,12 @@
     <ClInclude Include="Source\Core\Scene.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\Texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />
@@ -123,6 +129,9 @@
     <ClCompile Include="Source\ImGui\imgui_demo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BasicFragment.glsl" />
@@ -137,5 +146,7 @@
     <None Include="Assets\Shaders\phong_shading.frag" />
     <None Include="Assets\Shaders\phong_lighting.frag" />
     <None Include="Assets\Shaders\phong_lighting.vert" />
+    <None Include="Assets\Shaders\light_model.vert" />
+    <None Include="Assets\Shaders\light_model.frag" />
   </ItemGroup>
 </Project>

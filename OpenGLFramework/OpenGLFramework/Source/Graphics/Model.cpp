@@ -12,12 +12,15 @@
 #include "Model.hpp"
 #include "../Core/Application.hpp"
 #include "../Utils/MeshLoader.hpp"
+#include "Texture.hpp"
 
 
 namespace ELBA
 {
   Model::Model(Application *aApp, const char *aPath, std::string aName) 
-    : mApp(aApp), mName(aName), mTransform(), mShaderName(""), mCurrentShaderSelect(0)
+    : mApp(aApp), mName(aName), mTransform(), mShaderName(""), 
+      mCurrentShaderSelect(0), mDiffuseTexture(nullptr), 
+      mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();
@@ -26,6 +29,50 @@ namespace ELBA
 
   void Model::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
+    // bind uniforms for texture
+
+    if (mUsingTextures == 0)
+    {
+      // set use textures to "false" so we don't need to bind other uniforms
+      int loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
+      glUniform1i(loc, 0);
+    }
+    else
+    {
+      if (mDiffuseTexture && mSpecularTexture)
+      {
+        auto prg = mShader->GetShaderProgram();
+
+        // set use textures to "true"
+        int loc = glGetUniformLocation(prg, "UseTextures");
+        glUniform1i(loc, mUsingTextures);
+
+        loc = glGetUniformLocation(prg, "MappingType");
+        glUniform1i(loc, mMappingType);
+
+        mDiffuseTexture->Bind(0);
+        mDiffuseTexture->SetUniform(prg, "diffuseTexture");
+        mDiffuseTexture->Unbind();
+
+        mSpecularTexture->Bind(1);
+        mSpecularTexture->SetUniform(prg, "specularTexture");
+        mSpecularTexture->Unbind();
+
+        loc = glGetUniformLocation(prg, "pMin");
+        glUniform3fv(loc, 1, &pMin[0]);
+
+        loc = glGetUniformLocation(prg, "pMax");
+        glUniform3fv(loc, 1, &pMax[0]);
+      }
+      else
+      {
+        // set use textures to "false" so we don't need to bind other uniforms
+        int loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
+        glUniform1i(loc, 0);
+      }
+    }
+
+
     for (unsigned int i = 0; i < mMeshes.size(); ++i)
     {
       mMeshes[i]->Draw(aProj, aView, aModel);
@@ -113,4 +160,5 @@ namespace ELBA
     
     return  trans *rot * scale;
   }
+
 }

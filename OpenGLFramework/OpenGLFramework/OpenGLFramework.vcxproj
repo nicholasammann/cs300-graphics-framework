@@ -134,6 +134,7 @@
     <ClCompile Include="Source\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\Shader.cpp" />
+    <ClCompile Include="Source\Graphics\Texture.cpp" />
     <ClCompile Include="Source\ImGui\imgui.cpp" />
     <ClCompile Include="Source\ImGui\imgui_demo.cpp" />
     <ClCompile Include="Source\ImGui\imgui_draw.cpp" />
@@ -148,6 +149,7 @@
     <ClInclude Include="Include\GL\glew.h" />
     <ClInclude Include="Include\GL\glxew.h" />
     <ClInclude Include="Include\GL\wglew.h" />
+    <ClInclude Include="Source\Utils\stb_image.h" />
     <ClInclude Include="Source\Core\Application.hpp" />
     <ClInclude Include="Source\Core\Camera.hpp" />
     <ClInclude Include="Source\Core\Editor.hpp" />
@@ -156,6 +158,7 @@
     <ClInclude Include="Source\Graphics\Mesh.hpp" />
     <ClInclude Include="Source\Graphics\Model.hpp" />
     <ClInclude Include="Source\Graphics\Shader.hpp" />
+    <ClInclude Include="Source\Graphics\Texture.hpp" />
     <ClInclude Include="Source\ImGui\imconfig.h" />
     <ClInclude Include="Source\ImGui\imgui.h" />
     <ClInclude Include="Source\ImGui\imgui_impl_glfw_gl3.h" />
@@ -172,6 +175,8 @@
   <ItemGroup>
     <None Include="Assets\Shaders\debug.frag" />
     <None Include="Assets\Shaders\debug.vert" />
+    <None Include="Assets\Shaders\light_model.frag" />
+    <None Include="Assets\Shaders\light_model.vert" />
     <None Include="Assets\Shaders\phong_lighting.frag" />
     <None Include="Assets\Shaders\phong_lighting.vert" />
     <None Include="Assets\Shaders\blinn.frag" />
