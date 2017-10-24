@@ -245,13 +245,13 @@ namespace ELBA
 
         if (i % 2)
         {
-          light.SetPos(-4, -1, -4 + i, 1);
-          light.SetDirection(1, -0.5f, 0, 0);
+          light.SetPos(-4.0f, -1.0f, -4.0f + i, 1.0f);
+          light.SetDirection(1.0f, -0.5f, 0.0f, 0.0f);
         }
         else
         {
-          light.SetPos(4, -1, 4 - i, 1);
-          light.SetDirection(-1, -0.5f, 0, 0);
+          light.SetPos(4.0f, -1.0f, 4.0f - i, 1.0f);
+          light.SetDirection(-1.0f, -0.5f, 0.0f, 0.0f);
         }
 
         light.SetAmbient(0, 0, 0, 1);
