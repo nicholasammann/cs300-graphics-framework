@@ -429,7 +429,7 @@ void ELBA::Editor::Update()
         }
       }
 
-      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 10))
+      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 50))
       {
         ImGui::PopItemWidth();
 

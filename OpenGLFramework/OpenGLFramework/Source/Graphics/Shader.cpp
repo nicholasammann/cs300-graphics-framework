@@ -80,8 +80,15 @@ namespace ELBA
     glAttachShader(mShaderProgram, mFragShader);
     glLinkProgram(mShaderProgram);
 
-    // check if linking the shader program was succesful
-    glGetProgramiv(mShaderProgram, GL_LINK_STATUS, &success);
+    try
+    {
+      // check if linking the shader program was succesful
+      glGetProgramiv(mShaderProgram, GL_LINK_STATUS, &success);
+    }
+    catch (...)
+    {
+      std::cout << "Exception" << std::endl;
+    }
 
     if (!success)
     {
@@ -95,8 +102,8 @@ namespace ELBA
     glUseProgram(mShaderProgram);
 
     // delete the shader objects (we don't need them anymore)
-    glDeleteShader(mVertShader);
-    glDeleteShader(mFragShader);
+    //glDeleteShader(mVertShader);
+    //glDeleteShader(mFragShader);
   }
 
   void Shader::UseShaderProgram()
@@ -172,8 +179,10 @@ namespace ELBA
       std::cout << "Unable to open shader: " + filename << std::endl;
     }
 
-    char *sourceChar = new char[source.size()];
+    char *sourceChar = new char[source.size() + 1];
     strcpy(sourceChar, source.data());
+
+    sourceChar[source.size()] = '\0';
 
     return sourceChar;
   }

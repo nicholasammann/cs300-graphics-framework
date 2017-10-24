@@ -22,7 +22,7 @@ uniform mat4 view;
 
 // LIGHT UNIFORMS
 
-const int MaxLights = 10;
+const int MaxLights = 50;
 uniform vec4 globalAmbient;
 
 // directional lights

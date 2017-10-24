@@ -29,7 +29,8 @@ namespace ELBA
 {
 
   Mesh::Mesh(Model *aParent)
-    : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f)
+    : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f),
+    mVertices(), mFaces(), mFaceNormals()
   {
   }
 
