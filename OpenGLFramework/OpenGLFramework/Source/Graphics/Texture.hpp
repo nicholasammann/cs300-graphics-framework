@@ -15,9 +15,7 @@ namespace ELBA
 
     void Bind(char aSlot);
 
-
-    void SetUniform(unsigned int aShaderPrg, std::string aUniform);
-
+    void SetUniform(unsigned int aShaderPrg, std::string aUniform, char aSlot);
 
     void Unbind();
 

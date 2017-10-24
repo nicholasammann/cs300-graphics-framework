@@ -6,11 +6,17 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+out vec3 oObjPos;
+out vec3 oObjNorm;
+
 out vec4 oViewPos;
 out vec4 oViewNorm;
 
 void main()
 {
+  oObjPos = aPos;
+  oObjNorm = aNormal;
+
   // calculate position and normal in view space
   vec4 vPos = view * model * vec4(aPos, 1);
 

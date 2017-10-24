@@ -46,7 +46,8 @@ namespace ELBA
 
     Material() 
       : ambient{ 0.25f, 0.25f, 0.25f, 0.25f },
-        diffuse{ 0.5f, 0.5f, 0.5f, 0.5f }
+        diffuse{ 0.5f, 0.5f, 0.5f, 0.5f },
+        shininess(1.0f)
     { }
 
     void SetAmbient(float r, float g, float b, float a)

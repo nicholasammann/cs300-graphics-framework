@@ -6,8 +6,13 @@
 
 #include "Application.hpp" 
 #include "Editor.hpp"
+#include "../Graphics/Texture.hpp"
 
-ELBA::Editor::Editor(Application * aApp) : mApp(aApp), mLoadBuffer{ '\0' }
+#include "Scene.hpp"
+
+vec3 lightSize = vec3(0.25f, 0.25f, 0.25f);
+
+ELBA::Editor::Editor(Application * aApp) : mApp(aApp), mLoadBuffer{ '\0' }, mNumLights(8)
 {
 }
 
@@ -28,6 +33,8 @@ void ELBA::Editor::Update()
 
       if (ImGui::TreeNode("Transform"))
       {
+        ImGui::PushItemWidth(150.0f);
+
         // do the things for the mesh thing
         Transform &trans = models[k]->GetTransform();
 
@@ -60,11 +67,13 @@ void ELBA::Editor::Update()
         trans.mScale.y = scale[1];
         trans.mScale.z = scale[2];
 
+        ImGui::PopItemWidth();
+
         ImGui::TreePop();
       }
 
 
-      if (ImGui::TreeNode("Shaders"))
+      if (ImGui::TreeNode("Shader"))
       {
         // display name of current shader
         // ImGui::Text("Current Shader : ");
@@ -80,20 +89,19 @@ void ELBA::Editor::Update()
         //  mApp.push_back(name);
         //}
 
-        ImGui::Text("Current: ");
-        ImGui::SameLine();
-        ImGui::Combo(" ", 
+        ImGui::PushItemWidth(130.0f);
+        ImGui::Combo("Current",
                      &models[k]->mCurrentShaderSelect, 
                      mApp->mShaderNames.Data,
                      mApp->mShaderNames.size(),
                      mApp->mShaderNames.size());
+        ImGui::PopItemWidth();
 
         if (models[k]->mCurrentShaderSelect != models[k]->mPrevShaderSelect)
         {
           std::string nS = mApp->mShaderNames[models[k]->mCurrentShaderSelect];
           models[k]->SetShader(nS);
         }
-
 
         // THIS IS FOR RELOADING SHADERS INDIVIDUALLY - NOT FUNCTIONAL
 
@@ -115,51 +123,71 @@ void ELBA::Editor::Update()
       }
 
 
+      if (models[k]->mDiffuseTexture || models[k]->mSpecularTexture)
+      {
+        if (ImGui::TreeNode("Textures"))
+        {
+          static const char *mapTypes[3] = { "Planar", "Cylindrical", "Spherical" };
+
+          ImGui::PushItemWidth(130.0f);
+          ImGui::Combo("Texture Mapping", &models[k]->mMappingType, mapTypes, 3);
+          ImGui::PopItemWidth();
+
+
+          ImGui::TreePop();
+        }
+      }
+
+
       // for each mesh on the model
       auto meshes = models[k]->GetMeshes();
       
-      for (unsigned int i = 0; i < meshes.size(); ++i)
-      {
-        std::string meshLabel = "Submesh " + std::to_string(i);
-
-        if (ImGui::TreeNode(meshLabel.c_str()))
-        {
+      //for (unsigned int i = 0; i < meshes.size(); ++i)
+      //{
+      //  std::string meshLabel = "Submesh " + std::to_string(i);
+      //
+      //  if (ImGui::TreeNode(meshLabel.c_str()))
+      //  {
 
           if (ImGui::TreeNode("Debug"))
           {
-            const char *modes[] = { "None", "Vertex Normals", "Face Normals" };
+            static const char *modes[] = { "None", "Vertex Normals", "Face Normals" };
 
             ImGui::PushItemWidth(130.0f);
 
-            ImGui::Combo("Mode", meshes[i]->GetDebugMode(), modes, sizeof(modes) / sizeof(char*));
+            ImGui::Combo("Mode", meshes[0]->GetDebugMode(), modes, sizeof(modes) / sizeof(char*));
+
+            ImGui::SliderFloat("Line Width", &meshes[0]->GetDebugLineWidth(), 1.0f, 3.0f);
+
+            ImGui::SliderFloat("Line Length", &meshes[0]->GetDebugLineLength(), 0.1f, 3.0f);
 
             ImGui::PopItemWidth();
-
-            ImGui::SliderFloat("Line Width", &meshes[i]->GetDebugLineWidth(), 1.0f, 3.0f);
-
-            ImGui::SliderFloat("Line Length", &meshes[i]->GetDebugLineLength(), 0.1f, 3.0f);
 
             ImGui::TreePop();
           }
 
           if (ImGui::TreeNode("Material"))
           {
-            ImGui::ColorEdit4("Ambient", meshes[i]->GetMaterial().ambient);
+            ImGui::PushItemWidth(200.0f);
+            ImGui::ColorEdit4("Ambient", meshes[0]->GetMaterial().ambient);
 
-            ImGui::ColorEdit4("Diffuse", meshes[i]->GetMaterial().diffuse);
+            ImGui::ColorEdit4("Diffuse", meshes[0]->GetMaterial().diffuse);
 
-            ImGui::ColorEdit4("Specular", meshes[i]->GetMaterial().specular);
+            ImGui::ColorEdit4("Specular", meshes[0]->GetMaterial().specular);
            
-            ImGui::ColorEdit4("Emissive", meshes[i]->GetMaterial().emissive);
+            ImGui::ColorEdit4("Emissive", meshes[0]->GetMaterial().emissive);
+            ImGui::PopItemWidth();
 
-            ImGui::DragFloat("Shininess", &meshes[i]->GetMaterial().shininess, 0.01f, 0.0f, 50.0f);
+            ImGui::PushItemWidth(100.0f);
+            ImGui::DragFloat("Shininess", &meshes[0]->GetMaterial().shininess, 0.01f, 0.0f, 50.0f);
+            ImGui::PopItemWidth();
 
             ImGui::TreePop();
           }
 
-          ImGui::TreePop();
-        }
-      }
+      //   ImGui::TreePop();
+      // }
+      //}
     }
 
     ImGui::PopID();
@@ -198,8 +226,10 @@ void ELBA::Editor::Update()
 
       if (ImGui::TreeNode("Global Colors"))
       {
-        ImGui::ColorEdit4("Global Ambient", lunis.globalAmbient);
-        ImGui::ColorEdit4("Fog Color", lunis.fogColor);
+        ImGui::PushItemWidth(200.0f);
+        ImGui::ColorEdit4("Ambient", lunis.globalAmbient);
+        ImGui::ColorEdit4("Fog", lunis.fogColor);
+        ImGui::PopItemWidth();
 
         ImGui::TreePop();
       }
@@ -230,12 +260,14 @@ void ELBA::Editor::Update()
         {
           ImGui::PushID(i);
 
+          ImGui::PushItemWidth(200.0f);
           DirLight &light = lunis.DirLights[i];
           ImGui::DragFloat3("Direction", light.direction, 0.01f, -1.0f, 1.0f);
           ImGui::ColorEdit4("Ambient", light.ambient);
           ImGui::ColorEdit4("Diffuse", light.diffuse);
           ImGui::ColorEdit4("Specular", light.specular);
-          
+          ImGui::PopItemWidth();
+
           ImGui::PopID();
           ImGui::TreePop();
         }
@@ -259,6 +291,7 @@ void ELBA::Editor::Update()
 
           SpotLight &light = lunis.SpotLights[i];
 
+          ImGui::PushItemWidth(200.0f);
           ImGui::DragFloat3("Position", light.pos, 0.01f);
           light.SetPos(light.pos[0], light.pos[1], light.pos[2], light.pos[3]);
 
@@ -266,6 +299,7 @@ void ELBA::Editor::Update()
           ImGui::ColorEdit4("Ambient", light.ambient);
           ImGui::ColorEdit4("Diffuse", light.diffuse);
           ImGui::ColorEdit4("Specular", light.specular);
+          ImGui::PopItemWidth();
 
           ImGui::PopID();
           ImGui::TreePop();
@@ -291,10 +325,12 @@ void ELBA::Editor::Update()
           PointLight &light = lunis.PointLights[i];
           light.SetPos(light.pos[0], light.pos[1], light.pos[2], light.pos[3]);
 
+          ImGui::PushItemWidth(200.0f);
           ImGui::DragFloat3("Position", light.pos, 0.01f);
           ImGui::ColorEdit4("Ambient", light.ambient);
           ImGui::ColorEdit4("Diffuse", light.diffuse);
           ImGui::ColorEdit4("Specular", light.specular);
+          ImGui::PopItemWidth();
 
           ImGui::PopID();
           ImGui::TreePop();
@@ -303,6 +339,170 @@ void ELBA::Editor::Update()
       ImGui::PopID();
       ImGui::TreePop();
     }
+  }
+
+
+
+  if (ImGui::CollapsingHeader("Scene"))
+  {
+    static int mCurrentScene = 0;
+    static int mLightType = 0;
+
+
+    static const char *lightTypes[] = { "Directional", "Spotlight", "Point" };
+
+    static const char *scenes[] = { "Scene 1", "Scene 2", "Scene 3" };
+
+    ImGui::PushItemWidth(130.0f);
+    if (ImGui::Combo("Current", &mCurrentScene, scenes, 3))
+    {
+      switch (mCurrentScene)
+      {
+      case 0:
+      {
+        Scene1::CreateLights(mApp, mLightType);
+        break;
+      }
+
+      case 1:
+      {
+        Scene2::CreateLights(mApp);
+        break;
+      }
+
+      case 2:
+      {
+        Scene3::CreateLights(mApp);
+        break;
+      }
+      }
+    }
+
+    if (mCurrentScene == 0)
+    {
+      if (ImGui::Combo("Light Type", &mLightType, lightTypes, 3))
+      {
+        switch (mCurrentScene)
+        {
+        case 0:
+        {
+          Scene1::CreateLights(mApp, mLightType);
+          break;
+        }
+
+        case 1:
+        {
+          Scene2::CreateLights(mApp);
+          break;
+        }
+
+        case 2:
+        {
+          Scene3::CreateLights(mApp);
+          break;
+        }
+        }
+      }
+
+      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 8))
+      {
+        ImGui::PopItemWidth();
+
+        auto &lunis = mApp->GetLightUniforms();
+
+        switch (mLightType)
+        {
+        case Directional:
+        {
+          while (mNumLights > lunis.DirLights.size())
+          {
+            Model *mod = new Model(mApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
+            mod->SetShader("Light Model");
+            mod->GetTransform().mScale = lightSize;
+
+            DirLight light;
+            light.model = mod;
+            light.SetModelPos(0, 0, 5, 1);
+            light.SetDirection(0, 0, 0, 0);
+            light.SetAmbient(0, 0, 0, 1);
+            light.SetDiffuse(0, 0, 1, 1);
+            light.SetSpecular(0, 0, 1, 1);
+
+            Material &mat = mod->GetMeshes()[0]->GetMaterial();
+            mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
+
+            lunis.DirLights.push_back(light);
+          }
+
+          while (mNumLights < lunis.DirLights.size())
+          {
+            lunis.DirLights.pop_back();
+          }
+
+          break;
+        }
+
+        case Spot:
+        {
+          while (mNumLights > lunis.SpotLights.size())
+          {
+            Model *mod = new Model(mApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
+            mod->SetShader("Light Model");
+            mod->GetTransform().mScale = lightSize;
+
+            SpotLight light;
+            light.model = mod;
+            light.SetPos(0, 0, 5, 1);
+            light.SetDirection(0, 0, 0, 0);
+            light.SetAmbient(0, 0, 0, 1);
+            light.SetDiffuse(0, 0, 1, 1);
+            light.SetSpecular(0, 0, 1, 1);
+
+            Material &mat = mod->GetMeshes()[0]->GetMaterial();
+            mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
+
+            lunis.SpotLights.push_back(light);
+          }
+
+          while (mNumLights < lunis.SpotLights.size())
+          {
+            lunis.SpotLights.pop_back();
+          }
+          break;
+        }
+
+        case Point:
+        {
+          while (mNumLights > lunis.PointLights.size())
+          {
+            Model *mod = new Model(mApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
+            mod->SetShader("Light Model");
+            mod->GetTransform().mScale = lightSize;
+
+            PointLight light;
+            light.model = mod;
+            light.SetPos(0, 0, 5, 1);
+            light.SetAmbient(0, 0, 0, 1);
+            light.SetDiffuse(0, 0, 1, 1);
+            light.SetSpecular(0, 0, 1, 1);
+
+            Material &mat = mod->GetMeshes()[0]->GetMaterial();
+            mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
+
+            lunis.PointLights.push_back(light);
+          }
+
+          while (mNumLights < lunis.PointLights.size())
+          {
+            lunis.PointLights.pop_back();
+          }
+          break;
+        }
+        }
+      }
+
+    }
+
   }
 
 
@@ -315,6 +515,15 @@ void ELBA::Editor::Update()
 
       Model *mod = new Model(mApp, path.data(), mLoadBuffer);
       mod->SetShader("Shader");
+
+      Texture *diffTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_diff_512x512.tga");
+      mod->mDiffuseTexture = diffTex;
+
+      Texture *specTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
+      mod->mSpecularTexture = specTex;
+
+      mod->mMappingType = 1;
+      mod->mUsingTextures = 1;
 
       mApp->GetModels().clear();
       mApp->GetModels().push_back(mod);
@@ -330,8 +539,9 @@ void ELBA::Editor::Update()
 
     ImGui::SameLine();
 
+    ImGui::PushItemWidth(150.0f);
     ImGui::InputText("  ", mLoadBuffer, sizeof(mLoadBuffer) / sizeof(char));
-
+    ImGui::PopItemWidth();
 
     if (ImGui::Button("Reload Shaders"))
     {

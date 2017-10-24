@@ -50,13 +50,13 @@ namespace ELBA
         loc = glGetUniformLocation(prg, "MappingType");
         glUniform1i(loc, mMappingType);
 
-        mDiffuseTexture->Bind(0);
-        mDiffuseTexture->SetUniform(prg, "diffuseTexture");
-        mDiffuseTexture->Unbind();
 
+        mDiffuseTexture->SetUniform(prg, "diffuseTexture", 0);
+        mDiffuseTexture->Bind(0);
+
+        mSpecularTexture->SetUniform(prg, "specularTexture", 1);
         mSpecularTexture->Bind(1);
-        mSpecularTexture->SetUniform(prg, "specularTexture");
-        mSpecularTexture->Unbind();
+        
 
         loc = glGetUniformLocation(prg, "pMin");
         glUniform3fv(loc, 1, &pMin[0]);
@@ -76,6 +76,12 @@ namespace ELBA
     for (unsigned int i = 0; i < mMeshes.size(); ++i)
     {
       mMeshes[i]->Draw(aProj, aView, aModel);
+    }
+
+    if (mDiffuseTexture && mSpecularTexture)
+    {
+      mDiffuseTexture->Unbind();
+      mSpecularTexture->Unbind();
     }
   }
 

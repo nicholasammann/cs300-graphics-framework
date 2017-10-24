@@ -43,6 +43,13 @@ struct DirLight
     specular[2] = b;
     specular[3] = a;
   }
+
+  void SetModelPos(float x, float y, float z, float w)
+  {
+    model->GetTransform().mWorldPos = vec4(x, y, z, w);
+  }
+
+  ELBA::Model *model;
 };
 
 

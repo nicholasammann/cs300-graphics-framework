@@ -22,6 +22,8 @@ namespace ELBA
     char mLoadBuffer[256];
 
     std::vector<std::string> mConsoleLog;
+
+    int mNumLights;
   };
 
 }

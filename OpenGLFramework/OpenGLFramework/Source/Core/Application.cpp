@@ -220,7 +220,7 @@ namespace ELBA
 
   void Application::CreateInitialModels()
   {
-    Model *mod = new Model(this, "../OpenGLFramework/Assets/Models/bunny.obj", "Bunny");
+    Model *mod = new Model(this, "../OpenGLFramework/Assets/Models/cube.obj", "Cube");
     mod->SetShader("Blinn");
     mod->GetTransform().mWorldPos.z = 0.0f;
     
@@ -230,6 +230,7 @@ namespace ELBA
     Texture *specTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
     mod->mSpecularTexture = specTex;
     
+    mod->mMappingType = 1;
     mod->mUsingTextures = 1;
 
     mModels.push_back(mod);
@@ -267,7 +268,7 @@ namespace ELBA
     mLightUniforms.fogNear = 12.5f;
     mLightUniforms.fogFar = 25.0f;
 
-    Scene2::CreateLights(this);
+    Scene1::CreateLights(this, 0);
   }
 
   void Application::BindLights(unsigned int aShaderPrg)
@@ -399,8 +400,9 @@ namespace ELBA
   {
     int totalLights = mLightUniforms.SpotLights.size();
     totalLights += mLightUniforms.PointLights.size();
+    totalLights += mLightUniforms.DirLights.size();
 
-    float offset = 3.1416f / totalLights;
+    float offset = (2 * 3.1416f) / totalLights;
 
     int counter = 0;
 
@@ -412,10 +414,10 @@ namespace ELBA
     for (auto &s : mLightUniforms.SpotLights)
     {
       // initial rotation
-      mat4 initRot = rotate(mat4(), static_cast<float>(2 * counter * offset), vec3(0, 1, 0));
+      mat4 initRot = rotate(mat4(), static_cast<float>(counter * offset), vec3(0, 1, 0));
   
       // rotation based on time
-      float angle = mLightSpeed * static_cast<float>(glfwGetTime() * offset);
+      float angle = mLightSpeed * static_cast<float>(glfwGetTime());
       mat4 rot = rotate(mat4(), angle, vec3(0, 1, 0));
       
       // apply matrices to initial position
@@ -424,11 +426,11 @@ namespace ELBA
       vec3 mpos = mModels[0]->GetTransform().mWorldPos;
       vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
 
-      // update the direction
+      // update the position and direction
       s.SetPos(pos.x, pos.y, pos.z, 1);
       s.SetDirection(dir.x, dir.y, dir.z, 0.0f);
 
-      s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.ambient[0], s.ambient[1], s.ambient[2], s.ambient[3]);
+      s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.diffuse[0], s.diffuse[1], s.diffuse[2], s.diffuse[3]);
 
       counter++;
     }
@@ -438,10 +440,10 @@ namespace ELBA
     for (auto &s : mLightUniforms.PointLights)
     {
       // initial rotation
-      mat4 initRot = rotate(mat4(), static_cast<float>(2 * counter * offset), vec3(0, 1, 0));
+      mat4 initRot = rotate(mat4(), static_cast<float>(counter * offset), vec3(0, 1, 0));
 
       // rotation based on time
-      float angle = mLightSpeed * static_cast<float>(glfwGetTime() * offset);
+      float angle = mLightSpeed * static_cast<float>(glfwGetTime());
       mat4 rot = rotate(mat4(), angle, vec3(0, 1, 0));
 
       // apply matrices to initial position
@@ -450,10 +452,36 @@ namespace ELBA
       vec3 mpos = mModels[0]->GetTransform().mWorldPos;
       vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
 
-      // update the direction
+      // update the position
       s.SetPos(pos.x, pos.y, pos.z, 1);
 
-      s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.ambient[0], s.ambient[1], s.ambient[2], s.ambient[3]);
+      s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.diffuse[0], s.diffuse[1], s.diffuse[2], s.diffuse[3]);
+
+      counter++;
+    }
+
+
+    // for each directional light
+    for (auto &s : mLightUniforms.DirLights)
+    {
+      // initial rotation
+      mat4 initRot = rotate(mat4(), static_cast<float>(counter * offset), vec3(0, 1, 0));
+
+      // rotation based on time
+      float angle = mLightSpeed * static_cast<float>(glfwGetTime());
+      mat4 rot = rotate(mat4(), angle, vec3(0, 1, 0));
+
+      // apply matrices to initial position
+      vec4 pos = rot * initRot * initPos;
+
+      vec3 mpos = mModels[0]->GetTransform().mWorldPos;
+      vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
+
+      // update the model position & direction
+      s.SetModelPos(pos.x, pos.y, pos.z, 1);
+      s.SetDirection(dir.x, dir.y, dir.z, 0);
+
+      s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.diffuse[0], s.diffuse[1], s.diffuse[2], s.diffuse[3]);
 
       counter++;
     }
@@ -485,6 +513,28 @@ namespace ELBA
     }
 
     for (auto &light : mLightUniforms.PointLights)
+    {
+      auto &m = light.model;
+
+      auto shdrPrg = m->GetShader()->GetShaderProgram();
+      m->GetShader()->UseShaderProgram();
+
+      glm::mat4 view = mCamera->ConstructViewMatrix();
+      unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+      glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+      glm::mat4 projection = mCamera->ConstructProjMatrix(mWindowWidth, mWindowHeight);
+      unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+      glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
+
+      glm::mat4 model = m->ConstructModelMatrix();
+      unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+      glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+      m->Draw(projection, view, model);
+    }
+
+    for (auto &light : mLightUniforms.DirLights)
     {
       auto &m = light.model;
 
