@@ -1,3 +1,16 @@
+/* -------------------------------------------------------
+Copyright (C) 2017 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Camera.cpp
+Purpose: Camera class
+Language: C++, VC 15.0
+Platform: VC 15.0
+Project: nicholas.ammann_CS300_2
+Author: Nicholas Ammann, nicholas.ammann, 180002915
+Creation date: 10/23/17
+--------------------------------------------------------*/
+
 #include "Camera.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -17,36 +30,40 @@ namespace ELBA
     mCameraUp = glm::cross(mDirection, mCameraRight);
   }
 
+  void Camera::UpdateVectors()
+  {
+    mTarget = normalize(mTarget - mPosition);
+    mCameraRight = normalize(cross(mTarget, mWorldUp));
+    mCameraUp = cross(mCameraRight, mTarget);
+  }
+
   glm::mat4 Camera::ConstructViewMatrix()
   {
-    glm::vec3 forward(normalize(mTarget - mPosition));
-    glm::vec3 right(normalize(cross(forward, mWorldUp)));
-    glm::vec3 up(cross(right, forward));
+    UpdateVectors();
 
     glm::vec3 p = mPosition;
 
     glm::mat4 view;
 
     // column 0
-    view[0][0] = right.x;            
-    view[1][0] = right.y;            
-    view[2][0] = right.z;
-    view[3][0] = -dot(right, p);
+    view[0][0] = mCameraRight.x;            
+    view[1][0] = mCameraRight.y;            
+    view[2][0] = mCameraRight.z;
+    view[3][0] = -dot(mCameraRight, p);
     
     // column 1
-    view[0][1] = up.x;
-    view[1][1] = up.y;
-    view[2][1] = up.z;
-    view[3][1] = -dot(up, p);
+    view[0][1] = mCameraUp.x;
+    view[1][1] = mCameraUp.y;
+    view[2][1] = mCameraUp.z;
+    view[3][1] = -dot(mCameraUp, p);
 
     // column 2
-    view[0][2] = -forward.x;
-    view[1][2] = -forward.y;
-    view[2][2] = -forward.z;
-    view[3][2] = dot(forward, p);
+    view[0][2] = -mTarget.x;
+    view[1][2] = -mTarget.y;
+    view[2][2] = -mTarget.z;
+    view[3][2] = dot(mTarget, p);
 
     view[3][3] = 1.0f;
-
 
     return view;
   }
@@ -68,6 +85,18 @@ namespace ELBA
     proj[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear);
 
     return proj;
+  }
+
+  void Camera::SetPosition(glm::vec3 aPos)
+  {
+    mPosition = aPos;
+    UpdateVectors();
+  }
+
+  void Camera::SetTargetPoint(glm::vec3 aPoint)
+  {
+    mTarget = aPoint;
+    UpdateVectors();
   }
 
 }

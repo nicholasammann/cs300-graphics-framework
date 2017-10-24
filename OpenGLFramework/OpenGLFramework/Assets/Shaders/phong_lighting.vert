@@ -22,7 +22,7 @@ uniform vec3 pMax;
 
 // LIGHT UNIFORMS
 
-const int MaxLights = 8;
+const int MaxLights = 10;
 uniform vec4 globalAmbient;
 
 // directional lights
@@ -89,7 +89,7 @@ vec4 dirlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, i
   DirLight light = DirLights[lightIdx];
 
   // calculate light vector in view space
-  vec4 lightVec = (-light.direction);
+  vec4 lightVec = (view * -light.direction);
   vec4 lightUnitVec = normalize(lightVec);
 
   // calculate ambient color
@@ -141,7 +141,7 @@ vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, 
   
 
   // calculate spotlight effect
-  vec4 spotUnitDir = normalize(-light.direction);
+  vec4 spotUnitDir = normalize(view * -light.direction);
   float alpha = dot(spotUnitDir, lightUnitVec);
 
   float phi = cos(radians(spotOuterAngle));

@@ -1,3 +1,16 @@
+/* -------------------------------------------------------
+Copyright (C) 2017 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Editor.cpp
+Purpose: Editor
+Language: C++, VC 15.0
+Platform: VC 15.0
+Project: nicholas.ammann_CS300_2
+Author: Nicholas Ammann, nicholas.ammann, 180002915
+Creation date: 10/23/17
+--------------------------------------------------------*/
+
 #include <string>
 
 #include "../ImGui/imgui.h"
@@ -351,7 +364,6 @@ void ELBA::Editor::Update()
     static int mCurrentScene = 0;
     static int mLightType = 0;
 
-
     static const char *lightTypes[] = { "Directional", "Spotlight", "Point" };
 
     static const char *scenes[] = { "Scene 1", "Scene 2", "Scene 3" };
@@ -382,10 +394,13 @@ void ELBA::Editor::Update()
     }
 
 
+    ImGui::Checkbox("Toggle Camera Rotation", &mApp->mRotateCamera);
+
     if (mCurrentScene == 0 || mCurrentScene == 1)
     {
       ImGui::Checkbox("Toggle Light Rotation", &mApp->mRotateLights);
     }
+    
 
 
     if (mCurrentScene == 0)
@@ -414,7 +429,7 @@ void ELBA::Editor::Update()
         }
       }
 
-      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 8))
+      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 10))
       {
         ImGui::PopItemWidth();
 

@@ -1,3 +1,16 @@
+/* -------------------------------------------------------
+Copyright (C) 2017 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Application.cpp
+Purpose: Main Window
+Language: C++, VC 15.0
+Platform: VC 15.0
+Project: nicholas.ammann_CS300_2
+Author: Nicholas Ammann, nicholas.ammann, 180002915
+Creation date: 10/23/17
+ --------------------------------------------------------*/
+
 #include <iostream>
 #include <filesystem>
 #include <exception>
@@ -24,7 +37,7 @@ namespace ELBA
     : mWindow(aWindow), mCamera(new Camera()),
       mEditor(new Editor(this)), mLightSpeed(1.5f),
       mBackgroundColor(0.15f, 0.15f, 0.15f, 1.0f),
-      mRotateLights(true)
+      mRotateLights(true), mRotateCamera(false)
   {
     
   }
@@ -82,6 +95,8 @@ namespace ELBA
     ProcessInput();
 
     UpdateLights();
+
+    UpdateCamera();
 
     mEditor->Update();
     
@@ -585,8 +600,35 @@ namespace ELBA
   {
     return mLightUniforms;
   }
+
   float* Application::GetLightSpeed()
   {
     return &mLightSpeed;
+  }
+
+  void Application::UpdateCamera()
+  {
+    vec4 initPos = vec4(10, 0.75f * cos(glfwGetTime()), 0, 1);
+
+    // rotation based on time
+    float angle = 0.75f * static_cast<float>(glfwGetTime());
+    mat4 rot = rotate(mat4(), angle, vec3(0, 1, 0));
+
+    // apply matrices to initial position
+    vec4 pos = rot * initPos;
+
+    vec3 mpos = mModels[0]->GetTransform().mWorldPos;
+    vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
+
+    if (mRotateCamera)
+    {
+      mCamera->SetPosition(pos);
+      mCamera->SetTargetPoint(mModels[0]->GetTransform().mWorldPos);
+    }
+    else
+    {
+      mCamera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+      mCamera->SetTargetPoint(mModels[0]->GetTransform().mWorldPos);
+    }
   }
 }

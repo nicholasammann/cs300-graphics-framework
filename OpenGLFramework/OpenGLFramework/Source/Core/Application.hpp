@@ -7,6 +7,18 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm\vec3.hpp>
+/* -------------------------------------------------------
+Copyright (C) 2017 DigiPen Institute of Technology.
+Reproduction or disclosure of this file or its contents without the prior written
+consent of DigiPen Institute of Technology is prohibited.
+File Name: Application.hpp
+Purpose: Main Window
+Language: C++, VC 15.0
+Platform: VC 15.0
+Project: nicholas.ammann_CS300_2
+Author: Nicholas Ammann, nicholas.ammann, 180002915
+Creation date: 10/23/17
+--------------------------------------------------------*/
 
 #include "../ImGui/imgui.h"
 
@@ -58,6 +70,9 @@ namespace ELBA
     float* GetLightSpeed();
 
     bool mRotateLights;
+    bool mRotateCamera;
+
+    void UpdateCamera();
 
   private:
 
