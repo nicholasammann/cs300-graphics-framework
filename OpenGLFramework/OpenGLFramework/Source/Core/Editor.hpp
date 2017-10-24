@@ -24,6 +24,7 @@ namespace ELBA
     std::vector<std::string> mConsoleLog;
 
     int mNumLights;
+
   };
 
 }

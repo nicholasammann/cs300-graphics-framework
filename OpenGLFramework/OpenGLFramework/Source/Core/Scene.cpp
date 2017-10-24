@@ -1,5 +1,8 @@
 #include "Scene.hpp"
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
 #include "../Graphics/Light.hpp"
 
 namespace ELBA
@@ -17,6 +20,10 @@ namespace ELBA
       lunis.SpotLights.clear();
       lunis.PointLights.clear();
 
+      aApp->GetLightUniforms().spotFalloff = 1.0f;
+      aApp->GetLightUniforms().spotInnerAngle = 15.0f;
+      aApp->GetLightUniforms().spotOuterAngle = 30.0f;
+
       switch (aLightType)
       {
       case Directional:
@@ -32,8 +39,8 @@ namespace ELBA
           light.SetModelPos(-2.0f + i / 2.0f, 0, 5, 1);
           light.SetDirection(0, 0, 0, 0);
           light.SetAmbient(0, 0, 0, 1);
-          light.SetDiffuse(0, 0, 1, 1);
-          light.SetSpecular(0, 0, 1, 1);
+          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
 
           Material &mat = mod->GetMeshes()[0]->GetMaterial();
           mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -56,8 +63,8 @@ namespace ELBA
           light.SetPos(-2.0f + i / 2.0f, 0, 5, 1);
           light.SetDirection(0, 0, 0, 0);
           light.SetAmbient(0, 0, 0, 1);
-          light.SetDiffuse(0, 0, 1, 1);
-          light.SetSpecular(0, 0, 1, 1);
+          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
 
           Material &mat = mod->GetMeshes()[0]->GetMaterial();
           mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -79,8 +86,8 @@ namespace ELBA
           light.model = mod;
           light.SetPos(-2.0f + i / 2.0f, 0, 5, 1);
           light.SetAmbient(0, 0, 0, 1);
-          light.SetDiffuse(0, 0, 1, 1);
-          light.SetSpecular(0, 0, 1, 1);
+          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
 
           Material &mat = mod->GetMeshes()[0]->GetMaterial();
           mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -103,7 +110,11 @@ namespace ELBA
       lunis.SpotLights.clear();
       lunis.PointLights.clear();
 
-      for (int i = 0; i < 3; ++i)
+      aApp->GetLightUniforms().spotFalloff = 1.0f;
+      aApp->GetLightUniforms().spotInnerAngle = 15.0f;
+      aApp->GetLightUniforms().spotOuterAngle = 30.0f;
+
+      for (int i = 0; i < 4; ++i)
       {
         Model *mod = new Model(aApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
         mod->SetShader("Light Model");
@@ -116,14 +127,14 @@ namespace ELBA
         if (i % 2)
         {
           light.SetAmbient(0.0f, 0.0f, 0.0f, 1);
-          light.SetDiffuse(1.0f, 1.0f, 1.0f, 1);
-          light.SetSpecular(1.0f, 1.0f, 1.0f, 1);
+          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
         }
         else
         {
           light.SetAmbient(0.0f, 0.0f, 0.0f, 1);
-          light.SetDiffuse(1.0f, 1.0f, 1.0f, 1);
-          light.SetSpecular(1.0f, 1.0f, 1.0f, 1);
+          light.SetDiffuse(0.02f, 0.95f, 1.0f, 1);
+          light.SetSpecular(0.02f, 0.95f, 1.0f, 1);
         }
 
         Material &mat = mod->GetMeshes()[0]->GetMaterial();
@@ -132,7 +143,7 @@ namespace ELBA
         lunis.PointLights.push_back(light);
       }
 
-      for (int i = 0; i < 3; ++i)
+      for (int i = 0; i < 4; ++i)
       {
         Model *mod = new Model(aApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
         mod->SetShader("Light Model");
@@ -146,14 +157,14 @@ namespace ELBA
         if (i % 2)
         {
           light.SetAmbient(0.0f, 0.0f, 0.0f, 1);
-          light.SetDiffuse(1.0f, 0, 0, 1);
-          light.SetSpecular(1.0f, 0, 0, 1);
+          light.SetDiffuse(0.02f, 0.95f, 1.0f, 1);
+          light.SetSpecular(0.02f, 0.95f, 1.0f, 1);
         }
         else
         {
           light.SetAmbient(0.0f, 0.0f, 0.0f, 1);
-          light.SetDiffuse(1.0f, 0, 0, 1);
-          light.SetSpecular(1.0f, 0, 0, 1);
+          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
         }
 
         Material &mat = mod->GetMeshes()[0]->GetMaterial();
@@ -162,7 +173,7 @@ namespace ELBA
         lunis.SpotLights.push_back(light);
       }
 
-      for (int i = 0; i < 3; ++i)
+      for (int i = 0; i < 2; ++i)
       {
         Model *mod = new Model(aApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
         mod->SetShader("Light Model");
@@ -171,10 +182,18 @@ namespace ELBA
         DirLight light;
         light.model = mod;
 
-        light.SetDirection(0, 0, -1, 0);
-        light.SetAmbient(0, 0, 0, 1);
-        light.SetDiffuse(0, 1, 0, 1);
-        light.SetSpecular(0, 1, 0, 1);
+        if (i % 2)
+        {
+          light.SetAmbient(0.0f, 0.0f, 0.0f, 1);
+          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
+        }
+        else
+        {
+          light.SetAmbient(0.0f, 0.0f, 0.0f, 1);
+          light.SetDiffuse(0.02f, 0.95f, 1.0f, 1);
+          light.SetSpecular(0.02f, 0.95f, 1.0f, 1);
+        }
 
         Material &mat = mod->GetMeshes()[0]->GetMaterial();
         mat.SetAmbient(light.ambient[0], light.ambient[1], light.ambient[2], light.ambient[3]);
@@ -194,6 +213,84 @@ namespace ELBA
       lunis.DirLights.clear();
       lunis.SpotLights.clear();
       lunis.PointLights.clear();
+
+      aApp->GetLightUniforms().spotFalloff = 0.3f;
+      aApp->GetLightUniforms().spotInnerAngle = 20.0f;
+      aApp->GetLightUniforms().spotOuterAngle = 22.0f;
+
+      // stop the app from changing the position and direction of our lights
+      aApp->mRotateLights = false;
+
+      for (int i = 0; i < 8; ++i)
+      {
+        Model *mod = new Model(aApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
+        mod->SetShader("Light Model");
+        mod->GetTransform().mScale = lightSize;
+
+        SpotLight light;
+        light.model = mod;
+
+        if (i % 2)
+        {
+          light.SetPos(-4, -1, -4 + i, 1);
+          light.SetDirection(1, -0.5f, 0, 0);
+        }
+        else
+        {
+          light.SetPos(4, -1, 4 - i, 1);
+          light.SetDirection(-1, -0.5f, 0, 0);
+        }
+
+        light.SetAmbient(0, 0, 0, 1);
+        light.SetDiffuse(0.0f, 0.2f, (float)i/10.0f, 1);
+        light.SetSpecular(0.0f, 0.2f, (float)i/10.0f, 1);
+
+        Material &mat = mod->GetMeshes()[0]->GetMaterial();
+        mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
+
+        lunis.SpotLights.push_back(light);
+      }
+
+      float offset = (2 * 3.1416f) / 8;
+
+      for (int i = 0; i < 8; ++i)
+      {
+        Model *mod = new Model(aApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
+        mod->SetShader("Light Model");
+        mod->GetTransform().mScale = lightSize;
+      
+        PointLight light;
+        light.model = mod;
+        light.SetPos(0, 0, 5, 1);
+        light.SetAmbient(0, 0, 0, 1);
+      
+
+        if (i % 2)
+        {
+          light.SetDiffuse(0, (float)i / 50.0f, 0.2f, 1);
+          light.SetSpecular(0, (float)i / 50.0f, 0.2f, 1);
+        }
+        else
+        {
+          light.SetDiffuse(0, 0.2f, (float)i / 50.0f, 1);
+          light.SetSpecular(0, 0.2f, (float)i / 50.0f, 1);
+        }
+
+        Material &mat = mod->GetMeshes()[0]->GetMaterial();
+        mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
+
+        vec4 initPos = vec4(3, 2, 0, 1);
+
+        // initial rotation
+        mat4 initRot = glm::rotate(mat4(), static_cast<float>(i * offset), vec3(0, 1, 0));
+
+        // apply matrices to initial position
+        vec4 pos = initRot * initPos;
+
+        light.SetPos(pos.x, pos.y, pos.z, 1);
+      
+        lunis.PointLights.push_back(light);
+      }
     }
   }
 

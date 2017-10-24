@@ -57,6 +57,8 @@ namespace ELBA
 
     float* GetLightSpeed();
 
+    bool mRotateLights;
+
   private:
 
     Editor *mEditor;
@@ -89,6 +91,7 @@ namespace ELBA
     void BindLights(unsigned int aShaderPrg);
     void UpdateLights();
     void RenderLightModels();
+
 
   };
 }

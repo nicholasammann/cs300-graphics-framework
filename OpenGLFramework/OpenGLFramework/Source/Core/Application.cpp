@@ -23,7 +23,8 @@ namespace ELBA
   Application::Application(GLFWwindow *aWindow)
     : mWindow(aWindow), mCamera(new Camera()),
       mEditor(new Editor(this)), mLightSpeed(1.5f),
-      mBackgroundColor(0.15f, 0.15f, 0.15f, 1.0f)
+      mBackgroundColor(0.15f, 0.15f, 0.15f, 1.0f),
+      mRotateLights(true)
   {
     
   }
@@ -412,23 +413,26 @@ namespace ELBA
 
     // for each spot light
     for (auto &s : mLightUniforms.SpotLights)
-    {
+    { 
       // initial rotation
       mat4 initRot = rotate(mat4(), static_cast<float>(counter * offset), vec3(0, 1, 0));
-  
+
       // rotation based on time
       float angle = mLightSpeed * static_cast<float>(glfwGetTime());
       mat4 rot = rotate(mat4(), angle, vec3(0, 1, 0));
-      
+
       // apply matrices to initial position
       vec4 pos = rot * initRot * initPos;
 
       vec3 mpos = mModels[0]->GetTransform().mWorldPos;
       vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
 
-      // update the position and direction
-      s.SetPos(pos.x, pos.y, pos.z, 1);
-      s.SetDirection(dir.x, dir.y, dir.z, 0.0f);
+      if (mRotateLights)
+      {
+        // update the position and direction
+        s.SetDirection(dir.x, dir.y, dir.z, 0.0f);
+        s.SetPos(pos.x, pos.y, pos.z, 1);
+      }
 
       s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.diffuse[0], s.diffuse[1], s.diffuse[2], s.diffuse[3]);
 
@@ -452,8 +456,11 @@ namespace ELBA
       vec3 mpos = mModels[0]->GetTransform().mWorldPos;
       vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
 
-      // update the position
-      s.SetPos(pos.x, pos.y, pos.z, 1);
+      if (mRotateLights)
+      {
+        // update the position
+        s.SetPos(pos.x, pos.y, pos.z, 1);
+      }
 
       s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.diffuse[0], s.diffuse[1], s.diffuse[2], s.diffuse[3]);
 
@@ -477,9 +484,13 @@ namespace ELBA
       vec3 mpos = mModels[0]->GetTransform().mWorldPos;
       vec3 dir = mpos - vec3(pos.x, pos.y, pos.z);
 
-      // update the model position & direction
-      s.SetModelPos(pos.x, pos.y, pos.z, 1);
-      s.SetDirection(dir.x, dir.y, dir.z, 0);
+      if (mRotateLights)
+      {
+        // update the model position & direction
+        s.SetModelPos(pos.x, pos.y, pos.z, 1);
+        s.SetDirection(dir.x, dir.y, dir.z, 0);
+      }
+
 
       s.model->GetMeshes()[0]->GetMaterial().SetAmbient(s.diffuse[0], s.diffuse[1], s.diffuse[2], s.diffuse[3]);
 

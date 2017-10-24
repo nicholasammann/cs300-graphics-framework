@@ -133,6 +133,9 @@ void ELBA::Editor::Update()
           ImGui::Combo("Texture Mapping", &models[k]->mMappingType, mapTypes, 3);
           ImGui::PopItemWidth();
 
+          ImGui::PushItemWidth(75.0f);
+          ImGui::Checkbox("Display Textures", &models[k]->mUsingTextures);
+          ImGui::PopItemWidth();
 
           ImGui::TreePop();
         }
@@ -378,6 +381,13 @@ void ELBA::Editor::Update()
       }
     }
 
+
+    if (mCurrentScene == 0 || mCurrentScene == 1)
+    {
+      ImGui::Checkbox("Toggle Light Rotation", &mApp->mRotateLights);
+    }
+
+
     if (mCurrentScene == 0)
     {
       if (ImGui::Combo("Light Type", &mLightType, lightTypes, 3))
@@ -414,7 +424,7 @@ void ELBA::Editor::Update()
         {
         case Directional:
         {
-          while (mNumLights > lunis.DirLights.size())
+          while ((unsigned int)mNumLights > lunis.DirLights.size())
           {
             Model *mod = new Model(mApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
             mod->SetShader("Light Model");
@@ -425,8 +435,8 @@ void ELBA::Editor::Update()
             light.SetModelPos(0, 0, 5, 1);
             light.SetDirection(0, 0, 0, 0);
             light.SetAmbient(0, 0, 0, 1);
-            light.SetDiffuse(0, 0, 1, 1);
-            light.SetSpecular(0, 0, 1, 1);
+            light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+            light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
 
             Material &mat = mod->GetMeshes()[0]->GetMaterial();
             mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -434,7 +444,7 @@ void ELBA::Editor::Update()
             lunis.DirLights.push_back(light);
           }
 
-          while (mNumLights < lunis.DirLights.size())
+          while ((unsigned int)mNumLights < lunis.DirLights.size())
           {
             lunis.DirLights.pop_back();
           }
@@ -444,7 +454,7 @@ void ELBA::Editor::Update()
 
         case Spot:
         {
-          while (mNumLights > lunis.SpotLights.size())
+          while ((unsigned int)mNumLights > lunis.SpotLights.size())
           {
             Model *mod = new Model(mApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
             mod->SetShader("Light Model");
@@ -455,8 +465,8 @@ void ELBA::Editor::Update()
             light.SetPos(0, 0, 5, 1);
             light.SetDirection(0, 0, 0, 0);
             light.SetAmbient(0, 0, 0, 1);
-            light.SetDiffuse(0, 0, 1, 1);
-            light.SetSpecular(0, 0, 1, 1);
+            light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+            light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
 
             Material &mat = mod->GetMeshes()[0]->GetMaterial();
             mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -464,7 +474,7 @@ void ELBA::Editor::Update()
             lunis.SpotLights.push_back(light);
           }
 
-          while (mNumLights < lunis.SpotLights.size())
+          while ((unsigned int)mNumLights < lunis.SpotLights.size())
           {
             lunis.SpotLights.pop_back();
           }
@@ -473,7 +483,7 @@ void ELBA::Editor::Update()
 
         case Point:
         {
-          while (mNumLights > lunis.PointLights.size())
+          while ((unsigned int)mNumLights > lunis.PointLights.size())
           {
             Model *mod = new Model(mApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
             mod->SetShader("Light Model");
@@ -483,8 +493,8 @@ void ELBA::Editor::Update()
             light.model = mod;
             light.SetPos(0, 0, 5, 1);
             light.SetAmbient(0, 0, 0, 1);
-            light.SetDiffuse(0, 0, 1, 1);
-            light.SetSpecular(0, 0, 1, 1);
+            light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
+            light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
 
             Material &mat = mod->GetMeshes()[0]->GetMaterial();
             mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -492,7 +502,7 @@ void ELBA::Editor::Update()
             lunis.PointLights.push_back(light);
           }
 
-          while (mNumLights < lunis.PointLights.size())
+          while ((unsigned int)mNumLights < lunis.PointLights.size())
           {
             lunis.PointLights.pop_back();
           }
@@ -514,7 +524,7 @@ void ELBA::Editor::Update()
       path += mLoadBuffer;
 
       Model *mod = new Model(mApp, path.data(), mLoadBuffer);
-      mod->SetShader("Shader");
+      mod->SetShader("Blinn");
 
       Texture *diffTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_diff_512x512.tga");
       mod->mDiffuseTexture = diffTex;

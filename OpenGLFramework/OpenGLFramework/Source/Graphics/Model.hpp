@@ -50,7 +50,7 @@ namespace ELBA
     Texture *mDiffuseTexture;
     Texture *mSpecularTexture;
 
-    int mUsingTextures;
+    bool mUsingTextures;
     int mMappingType;
 
     glm::vec3 pMin;

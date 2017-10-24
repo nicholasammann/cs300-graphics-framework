@@ -8,6 +8,18 @@ uniform mat4 projection;
 
 out vec4 litFragColor;
 
+
+// texture uniforms
+uniform int UseTextures;
+uniform int MappingType;
+
+uniform sampler2D diffuseTexture;
+uniform sampler2D specularTexture;
+
+uniform vec3 pMin;
+uniform vec3 pMax;
+
+
 // LIGHT UNIFORMS
 
 const int MaxLights = 8;
@@ -72,7 +84,7 @@ uniform struct
 } Material;
 
 
-vec4 dirlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
+vec4 dirlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, in vec4 adiffuse, in float shininess)
 {
   DirLight light = DirLights[lightIdx];
 
@@ -85,14 +97,13 @@ vec4 dirlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 
   // calculate diffuse color
   float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
-  vec4 diffuse = diffuseFactor * light.diffuse * Material.diffuse;
-
+  vec4 diffuse = diffuseFactor * light.diffuse * adiffuse;
 
   // calculate specular color
-  vec4 viewVec = -vec4(viewPos.xyz, 0);
-  vec4 reflec = 2.0 * viewNorm * dot(viewNorm, lightUnitVec) - lightUnitVec;
-  float specFactor = pow(dot(reflec, viewVec), Material.shininess);
-  vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
+  vec4 viewVec = normalize(-vec4(viewPos.xyz, 0));
+  vec4 reflec = 2.0 * viewVec * dot(viewVec, lightUnitVec) - lightUnitVec;
+  float specFactor = pow(max(dot(reflec, viewVec), 0), shininess);
+  vec4 specColor = light.specular * Material.specular * specFactor;
 
   vec4 color =  ambient + diffuse + specColor;
 
@@ -100,7 +111,8 @@ vec4 dirlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 }
 
 
-vec4 spotlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
+
+vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, in vec4 adiffuse, in float shininess)
 {
   SpotLight light = SpotLights[lightIdx];
 
@@ -113,14 +125,13 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 
   // calculate diffuse color
   float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
-  vec4 diffuse = diffuseFactor * light.diffuse * Material.diffuse;
-
+  vec4 diff = diffuseFactor * light.diffuse * adiffuse;
 
   // calculate specular color
-  vec4 viewVec = -vec4(viewPos.xyz, 0);
-  vec4 reflec = 2.0 * viewNorm * dot(viewNorm, lightUnitVec) - lightUnitVec;
-  float specFactor = pow(dot(reflec, viewVec), Material.shininess);
-  vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
+  vec4 viewVec = normalize(-vec4(viewPos.xyz, 0));
+  vec4 reflec = 2.0 * viewVec * dot(viewVec, lightUnitVec) - lightUnitVec;
+  float specFactor = pow(max(dot(reflec, viewVec), 0), shininess);
+  vec4 specColor = light.specular * Material.specular * specFactor;
   
 
   // calculate light source attenuation
@@ -130,8 +141,8 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
   
 
   // calculate spotlight effect
-  vec4 spotUnitDir = normalize(light.direction);
-  float alpha = dot(spotUnitDir, -lightUnitVec);
+  vec4 spotUnitDir = normalize(-light.direction);
+  float alpha = dot(spotUnitDir, lightUnitVec);
 
   float phi = cos(radians(spotOuterAngle));
   float theta = cos(radians(spotInnerAngle));
@@ -140,23 +151,24 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 
   if (alpha < phi)
   {
-    spotEffect = 0.0;
+    spotEffect = 0.0f;
   }
   else if (alpha > theta)
   {
+    spotEffect = 1.0f;
   }
   else
   {
-    spotEffect = pow(( (cos(radians(alpha)) - phi) / (theta - phi) ), spotFalloff);
+    spotEffect = pow((alpha - phi) / (theta - phi), spotFalloff);
   }
 
-  vec4 color = lightAtt * ambient + lightAtt * spotEffect * (diffuse + specColor);
+  vec4 color = lightAtt * ambient + lightAtt * spotEffect * (diff + specColor);
 
   return color;
 }
 
 
-vec4 pointlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
+vec4 pointlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, in vec4 adiffuse, in float shininess)
 {
   PointLight light = PointLights[lightIdx];
 
@@ -169,14 +181,14 @@ vec4 pointlight_computeColor(in int lightIdx, in vec4 viewNorm, in vec4 viewPos)
 
   // calculate diffuse color
   float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
-  vec4 diffuse = diffuseFactor * light.diffuse * Material.diffuse;
+  vec4 diffuse = diffuseFactor * light.diffuse * adiffuse;
 
 
   // calculate specular color
-  vec4 viewVec = -vec4(viewPos.xyz, 0);
-  vec4 reflec = 2.0 * viewNorm * dot(viewNorm, lightUnitVec) - lightUnitVec;
-  float specFactor = pow(dot(reflec, viewVec), Material.shininess);
-  vec4 specColor = light.specular * Material.specular * max(specFactor, 0);
+  vec4 viewVec = normalize(-vec4(viewPos.xyz, 0));
+  vec4 reflec = 2.0 * viewVec * dot(viewVec, lightUnitVec) - lightUnitVec;
+  float specFactor = pow(max(dot(reflec, viewVec), 0), shininess);
+  vec4 specColor = light.specular * Material.specular * specFactor;
   
 
   // calculate light source attenuation
@@ -197,23 +209,23 @@ float compute_atmosphericAttenuation(in vec4 viewPos)
 }
 
 
-vec4 computeColor(in vec4 viewNorm, in vec4 viewPos)
+vec4 computeFragmentColor(in vec4 viewPos, in vec4 viewNorm, in vec4 adiffuse, in float shininess)
 {
   vec4 color = vec4(0, 0, 0, 0);
 
   for (int i = 0; i < DirLightCount; ++i)
   {
-    color += dirlight_computeColor(i, viewNorm, viewPos);
+    color += dirlight_computeColor(viewPos, viewNorm, i, adiffuse, shininess);
   }
 
   for (int i = 0; i < SpotLightCount; ++i)
   {
-    color += spotlight_computeColor(i, viewNorm, viewPos);
+    color += spotlight_computeColor(viewPos, viewNorm, i, adiffuse, shininess);
   }
 
   for (int i = 0; i < PointLightCount; ++i)
   {
-    color += pointlight_computeColor(i, viewNorm, viewPos);
+    color += pointlight_computeColor(viewPos, viewNorm, i, adiffuse, shininess);
   }
 
   // calculate local
@@ -226,6 +238,80 @@ vec4 computeColor(in vec4 viewNorm, in vec4 viewPos)
 
   return final;
 }
+
+vec2 planarMapping()
+{
+  // find largest standard basis bias
+  vec3 mag = abs(aPos.xyz);
+
+  vec3 biasUVs = vec3(0.5) + 0.5 * aPos;
+
+  if (mag.x > mag.y && mag.x > mag.z)
+  {
+    // facing pos or neg x axis; use corrected y/z for UV
+    return biasUVs.yz;
+  }
+  else if (mag.y > mag.z)
+  {
+    // facing pos or neg y axis; use corrected x/z for UV
+    return biasUVs.xz;
+  }
+  else // z is the largest
+  {
+    // facing pos or neg z axis; use corrected x/y for UV
+    return biasUVs.xy;
+  }
+}
+
+
+vec2 cylindricalMapping()
+{
+  vec2 uv;
+
+  float theta = atan( aPos.y / aPos.x );
+
+  if (aNormal.x < 0)
+  {
+    theta += 3.1415;
+  }
+  else if (aNormal.y < 0)
+  {
+    theta += 2 * 3.1415;
+  }
+
+  float h = (aPos.z - pMin.z)/(pMax.z - pMin.z);
+
+  uv.x = theta / (2 * 3.1415f);
+  uv.y = h;
+
+  return uv;
+}
+
+
+vec2 sphericalMapping()
+{
+  vec2 uv;
+
+  float theta = atan(aNormal.y / aNormal.x);
+
+  if (aNormal.x < 0)
+  {
+    theta += 3.1415;
+  }
+  else if (aNormal.y < 0)
+  {
+    theta += 2 * 3.1415;
+  }
+
+  float phi = acos(aNormal.z);
+
+  uv.x = theta / (2 * 3.1415);
+
+  uv.y = phi / 3.1415;
+
+  return uv;
+}
+
 
 
 void main()
@@ -242,7 +328,34 @@ void main()
   // pipeline and yielding a coordinate in NDC space
   gl_Position = worldPos;
   
-  // compute the contribution of lights onto this vertex and interpolate that
-  // color value across the surface of the polygon
-  litFragColor = computeColor(viewNorm, viewPos);
+  vec4 diffuse = Material.diffuse;
+  float shininess = Material.shininess;
+
+  // compute final fragment color
+  if (UseTextures == 1)
+  {
+    vec2 uv;
+
+    if (MappingType == 0)
+    {
+      uv = planarMapping();
+    }
+    else if (MappingType == 1)
+    {
+      uv = cylindricalMapping();
+    }
+    else if (MappingType == 2)
+    {
+      uv = sphericalMapping();
+    }
+
+    uv.x = clamp(uv.x, 0, 1);
+    uv.y = clamp(uv.y, 0, 1);
+    
+    diffuse = vec4(texture(diffuseTexture, uv).rgb, 1);
+    shininess = float(texture(specularTexture, uv).r);
+  }
+
+  litFragColor = computeFragmentColor(viewPos, viewNorm, diffuse, shininess);
+
 }

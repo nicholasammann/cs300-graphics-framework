@@ -17,7 +17,6 @@ uniform sampler2D specularTexture;
 uniform vec3 pMin;
 uniform vec3 pMax;
 
-
 uniform mat4 view;
 
 // LIGHT UNIFORMS
@@ -238,7 +237,6 @@ vec4 computeFragmentColor(in vec4 adiffuse, in float shininess)
   return final;
 }
 
-
 vec2 planarMapping()
 {
   // find largest standard basis bias
@@ -270,9 +268,18 @@ vec2 cylindricalMapping()
 
   float theta = atan( oObjPos.y / oObjPos.x );
 
+  if (oObjNorm.x < 0)
+  {
+    theta += 3.1415;
+  }
+  else if (oObjNorm.y < 0)
+  {
+    theta += 2 * 3.1415;
+  }
+
   float h = (oObjPos.z - pMin.z)/(pMax.z - pMin.z);
 
-  uv.x = theta / (2 * 3.1415);
+  uv.x = theta / (2 * 3.1415f);
   uv.y = h;
 
   return uv;
@@ -285,14 +292,23 @@ vec2 sphericalMapping()
 
   float theta = atan(oObjNorm.y / oObjNorm.x);
 
+  if (oObjNorm.x < 0)
+  {
+    theta += 3.1415;
+  }
+  else if (oObjNorm.y < 0)
+  {
+    theta += 2 * 3.1415;
+  }
+
   float phi = acos(oObjNorm.z);
 
   uv.x = theta / (2 * 3.1415);
+
   uv.y = phi / 3.1415;
 
   return uv;
 }
-
 
 void main()
 {
