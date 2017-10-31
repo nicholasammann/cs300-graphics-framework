@@ -13,7 +13,6 @@ Creation date: 10/23/17
 
 #include "Texture.hpp"
 
-
 #define STB_IMAGE_IMPLEMENTATION
 #include "../Utils/stb_image.h"
 #undef STB_IMAGE_IMPLEMENTATION
