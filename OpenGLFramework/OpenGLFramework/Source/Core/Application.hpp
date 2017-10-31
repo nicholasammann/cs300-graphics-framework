@@ -1,12 +1,5 @@
 #pragma once
 
-#include <vector>
-#include <map>
-#include <string>
-
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <glm\vec3.hpp>
 /* -------------------------------------------------------
 Copyright (C) 2017 DigiPen Institute of Technology.
 Reproduction or disclosure of this file or its contents without the prior written
@@ -19,6 +12,14 @@ Project: nicholas.ammann_CS300_2
 Author: Nicholas Ammann, nicholas.ammann, 180002915
 Creation date: 10/23/17
 --------------------------------------------------------*/
+
+#include <vector>
+#include <map>
+#include <string>
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+#include <glm\vec3.hpp>
 
 #include "../ImGui/imgui.h"
 
