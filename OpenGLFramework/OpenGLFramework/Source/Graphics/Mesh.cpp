@@ -21,8 +21,10 @@ Creation date: 10/23/17
 #include <glm/gtc/type_ptr.hpp>
 
 
+#include "../Utils/MathUtils.hpp"
 #include "Mesh.hpp"
 #include "Model.hpp"
+#include "TextureMapping.hpp"
 #include "../Core/Application.hpp"
 
 namespace ELBA
@@ -200,6 +202,12 @@ namespace ELBA
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mNormal));
 
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mTangent));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mBitangent));
+
     glBindVertexArray(0);
 
     BindVertNorms();
@@ -257,6 +265,7 @@ namespace ELBA
     CenterMesh();
     NormalizeVertices();
 
+    PreprocessTangentsAndBitangents();
   }
 
   glm::vec3 Mesh::GetFaceCentroid(Face aFace)
@@ -383,14 +392,141 @@ namespace ELBA
     glBindVertexArray(0);
   }
 
-  void Mesh::CalculateTBs()
+  glm::vec2 Mesh::GetUVs(Vertex const& aVert)
   {
+    switch (mParent->mMappingType)
+    {
+      // planar
+    case 0:
+    {
+      return planarMapping(aVert.mPos);
+    }
+
+    // cylindrical
+    case 1:
+    {
+      return cylindricalMapping(aVert.mPos, aVert.mPos, mParent->pMin, mParent->pMax);
+    }
+
+    // spherical
+    case 2:
+    {
+      return sphericalMapping(aVert.mNormal);
+    }
+    }
+  }
+
+  void Mesh::PreprocessTangentsAndBitangents()
+  {
+    std::unordered_map<Vertex*, std::vector<glm::vec3>> adjTangents;
+    std::unordered_map<Vertex*, std::vector<glm::vec3>> adjBitangents;
 
     // for each face on the mesh
+    for (Face& f : mFaces)
+    {
+      /* calculate its tangent and bitangent vectors */
 
-    // calculate its tangent and bitangent vectors
+      // get the 3 vertices (E,F,G) of the face
+      Vertex E = mVertices[f.a];
+      Vertex F = mVertices[f.b];
+      Vertex G = mVertices[f.c];
+
+      // get the texture coords for each vertex
+      glm::vec2 eTexCoords = GetUVs(E);
+      glm::vec2 fTexCoords = GetUVs(F);
+      glm::vec2 gTexCoords = GetUVs(G);
+
+      // find the vectors P=F-E and Q=G-E
+      glm::vec3 P = F - E;
+      glm::vec3 Q = G - E;
+      
+      // find the tex coords for the vectors
+      glm::vec2 sP = glm::vec2(fTexCoords.x - eTexCoords.x, fTexCoords.x - eTexCoords.y);
+      glm::vec2 sQ = glm::vec2(gTexCoords.x - eTexCoords.x, gTexCoords.x - eTexCoords.y);
+
+      glm::vec3 T;
+      glm::vec3 B;
+
+      /* solve the system of equations to get T and B */
+      // get T.x and B.x
+      auto matrix = MakeMatrix(sP.x, sP.y, P.x,
+                               sQ.x, sQ.y, Q.x);
+
+      auto sol = GaussianElimination(matrix);
+
+      T.x = sol[0];
+      B.x = sol[1];
+      
+      // get T.y and B.y
+      matrix = MakeMatrix(sP.x, sP.y, P.y,
+                          sQ.x, sQ.y, Q.y);
+
+      sol = GaussianElimination(matrix);
+
+      T.y = sol[0];
+      B.y = sol[1];
+
+      // get T.z and B.z
+      matrix = MakeMatrix(sP.x, sP.y, P.z,
+                          sQ.x, sQ.y, Q.z);
+
+      sol = GaussianElimination(matrix);
+
+      T.z = sol[0];
+      B.z = sol[1];
 
 
+      // store the calculated vectors on the face
+      f.tangent = T;
+      f.bitangent = B;
+
+      for (int i = 0; i < 3; ++i)
+      {
+        mVertices[f.mIndices[i]].mTangent = glm::vec3();
+        std::vector<glm::vec3> tangs = adjTangents[&mVertices[f.mIndices[i]]];
+
+        auto it = std::find(tangs.begin(), tangs.end(), f.tangent);
+
+        if (it == tangs.end())
+        {
+          tangs.push_back(f.tangent);
+        }
+
+
+        mVertices[f.mIndices[i]].mBitangent = glm::vec3();
+        std::vector<glm::vec3> bitangs = adjBitangents[&mVertices[f.mIndices[i]]];
+
+        auto it_2 = std::find(bitangs.begin(), bitangs.end(), f.bitangent);
+
+        if (it_2 == bitangs.end())
+        {
+          bitangs.push_back(f.bitangent);
+        }
+      }
+    }
+
+
+    for (auto pair : adjTangents)
+    {
+      for (auto tangent : pair.second)
+      {
+        pair.first->mTangent += tangent;
+      }
+    }
+
+    for (auto pair : adjBitangents)
+    {
+      for (auto bitangent : pair.second)
+      {
+        pair.first->mBitangent += bitangent;
+      }
+    }
+
+    for (Vertex &v : mVertices)
+    {
+      v.mTangent = glm::normalize(v.mTangent);
+      v.mBitangent = glm::normalize(v.mBitangent);
+    }
   }
 
   float & Mesh::GetDebugLineWidth()

@@ -15,6 +15,9 @@ Creation date: 10/23/17
 
 #include "Core/Application.hpp"
 
+#include "Utils/MathUtils.hpp"
+
+
 int g_width = 800;
 int g_height = 600;
 
@@ -70,7 +73,23 @@ int main()
   ELBA::Application app = ELBA::Application(win);
 
   app.Init();
-  
+
+
+  //// test gaussian elimination
+  //std::vector<std::vector<float>> matrix;
+  //matrix.resize(2);
+  //matrix[0].resize(3);
+  //matrix[1].resize(3);
+  //
+  //matrix[0][0] = 1.0f;  matrix[0][1] = 2.0f;  matrix[0][2] = 2.0f;
+  //matrix[1][0] = 3.0f;  matrix[1][1] = 1.0f;  matrix[1][2] = 1.0f;
+  //
+  //auto sol = GaussianElimination(matrix);
+  //
+  //std::cout << "Size : " << sol.size() << std::endl;
+  //
+  //std::cout << "Solution : " << sol[0] << ", " << sol[1] << std::endl;
+
 
   // main loop
   while (!glfwWindowShouldClose(app.GetWindow()))

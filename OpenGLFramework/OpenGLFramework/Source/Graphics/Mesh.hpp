@@ -31,7 +31,20 @@ namespace ELBA
     glm::vec3 mPos;
     glm::vec3 mNormal;
 
-    Vertex() : mPos(glm::vec3()), mNormal(glm::vec3()) { }
+    glm::vec3 mTangent;
+    glm::vec3 mBitangent;
+
+    Vertex() : mPos(), mNormal(), mTangent(), mBitangent() { }
+
+    glm::vec3 operator-(Vertex const& v2)
+    {
+      glm::vec3 ret;
+      ret.x = mPos.x - v2.mPos.x;
+      ret.y = mPos.y - v2.mPos.y;
+      ret.z = mPos.z - v2.mPos.z;
+      return ret;
+    }
+
   };
 
   struct Face
@@ -135,7 +148,8 @@ namespace ELBA
     float mDebugLineWidth;
     float mDebugLineLength;
 
-    void CalculateTBs();
+    glm::vec2 GetUVs(Vertex const& aVert);
+    void PreprocessTangentsAndBitangents();
 
   public:
 
@@ -149,6 +163,8 @@ namespace ELBA
   private:
 
     int mDebugMode;
+
+    bool mDrawTangentAxes;
 
   };
 
