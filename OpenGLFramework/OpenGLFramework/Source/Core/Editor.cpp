@@ -228,17 +228,6 @@ void ELBA::Editor::Update()
         ImGui::TreePop();
       }
 
-      if (ImGui::TreeNode("Attenuation Constants"))
-      {
-        ImGui::PushItemWidth(75.0f);
-        ImGui::DragFloat("C1", &lunis.c1, 0.001f, 0.0f, 5.0f);
-        ImGui::DragFloat("C2", &lunis.c2, 0.001f, 0.0f, 5.0f);
-        ImGui::DragFloat("C3", &lunis.c3, 0.001f, 0.0f, 5.0f);
-        ImGui::PopItemWidth();
-
-        ImGui::TreePop();
-      }
-
 
       if (ImGui::TreeNode("Global Colors"))
       {
@@ -317,6 +306,17 @@ void ELBA::Editor::Update()
           ImGui::ColorEdit4("Specular", light.specular);
           ImGui::PopItemWidth();
 
+          if (ImGui::TreeNode("Attenuation Constants"))
+          {
+            ImGui::PushItemWidth(75.0f);
+            ImGui::DragFloat("C1", &light.c1, 0.001f, 0.0f, 5.0f);
+            ImGui::DragFloat("C2", &light.c2, 0.001f, 0.0f, 5.0f);
+            ImGui::DragFloat("C3", &light.c3, 0.001f, 0.0f, 5.0f);
+            ImGui::PopItemWidth();
+
+            ImGui::TreePop();
+          }
+
           ImGui::PopID();
           ImGui::TreePop();
         }
@@ -347,6 +347,17 @@ void ELBA::Editor::Update()
           ImGui::ColorEdit4("Diffuse", light.diffuse);
           ImGui::ColorEdit4("Specular", light.specular);
           ImGui::PopItemWidth();
+
+          if (ImGui::TreeNode("Attenuation Constants"))
+          {
+            ImGui::PushItemWidth(75.0f);
+            ImGui::DragFloat("C1", &light.c1, 0.001f, 0.0f, 5.0f);
+            ImGui::DragFloat("C2", &light.c2, 0.001f, 0.0f, 5.0f);
+            ImGui::DragFloat("C3", &light.c3, 0.001f, 0.0f, 5.0f);
+            ImGui::PopItemWidth();
+
+            ImGui::TreePop();
+          }
 
           ImGui::PopID();
           ImGui::TreePop();

@@ -44,6 +44,11 @@ struct SpotLight
   vec4 ambient;
   vec4 diffuse;
   vec4 specular;
+
+  // attenuation coefficients
+  float c1;
+  float c2;
+  float c3;
 };
 uniform int SpotLightCount;
 uniform SpotLight SpotLights[MaxLights];
@@ -55,6 +60,11 @@ struct PointLight
   vec4 ambient;
   vec4 diffuse;
   vec4 specular;
+
+  // attenuation coefficients
+  float c1;
+  float c2;
+  float c3;
 };
 uniform int PointLightCount;
 uniform PointLight PointLights[MaxLights];
@@ -63,11 +73,6 @@ uniform PointLight PointLights[MaxLights];
 uniform float spotInnerAngle;
 uniform float spotOuterAngle;
 uniform float spotFalloff;
-
-// attenuation coefficients
-uniform float c1;
-uniform float c2;
-uniform float c3;
 
 uniform vec4 fogColor;
 uniform float fogNear;
@@ -137,7 +142,7 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shinines
   // calculate light source attenuation
   vec4 d = lightVec;
   float dL = sqrt(d.x*d.x + d.y*d.y + d.z*d.z);
-  float lightAtt = min( 1.0 / (c1 + c2*dL + c3*dL*dL), 1);
+  float lightAtt = min( 1.0 / (light.c1 + light.c2*dL + light.c3*dL*dL), 1);
   
 
   // calculate spotlight effect
@@ -194,7 +199,7 @@ vec4 pointlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shinine
   // calculate light source attenuation
   vec4 d = lightVec;
   float dL = sqrt(d.x*d.x + d.y*d.y + d.z*d.z);
-  float lightAtt = min( 1.0 / (c1 + c2*dL + c3*dL*dL), 1);
+  float lightAtt = min( 1.0 / (light.c1 + light.c2*dL + light.c3*dL*dL), 1);
   
   vec4 color = lightAtt * (ambient + diffuse + specColor);
 

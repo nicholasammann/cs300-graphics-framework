@@ -272,10 +272,6 @@ namespace ELBA
     mLightUniforms.spotOuterAngle = 30.0f;
     mLightUniforms.spotFalloff = 1.0f;
 
-    mLightUniforms.c1 = 1.0f;
-    mLightUniforms.c2 = 0.1f;
-    mLightUniforms.c3 = 0.0f;
-
     mLightUniforms.fogColor[0] = mBackgroundColor.r;
     mLightUniforms.fogColor[1] = mBackgroundColor.g;
     mLightUniforms.fogColor[2] = mBackgroundColor.b;
@@ -336,6 +332,9 @@ namespace ELBA
       std::string amb = lightName + "ambient";
       std::string dif = lightName + "diffuse";
       std::string spc = lightName + "specular";
+      std::string dc1 = lightName + "c1";
+      std::string dc2 = lightName + "c2";
+      std::string dc3 = lightName + "c3";
 
       loc = glGetUniformLocation(aShaderPrg, pos.c_str());
       glUniform4fv(loc, 1, spots[i].pos);
@@ -351,6 +350,15 @@ namespace ELBA
 
       loc = glGetUniformLocation(aShaderPrg, spc.c_str());
       glUniform4fv(loc, 1, spots[i].specular);
+
+      loc = glGetUniformLocation(aShaderPrg, dc1.c_str());
+      glUniform1f(loc, spots[i].c1);
+
+      loc = glGetUniformLocation(aShaderPrg, dc2.c_str());
+      glUniform1f(loc, spots[i].c2);
+
+      loc = glGetUniformLocation(aShaderPrg, dc3.c_str());
+      glUniform1f(loc, spots[i].c3);
     }
 
 
@@ -368,6 +376,9 @@ namespace ELBA
       std::string amb = lightName + "ambient";
       std::string dif = lightName + "diffuse";
       std::string spc = lightName + "specular";
+      std::string dc1 = lightName + "c1";
+      std::string dc2 = lightName + "c2";
+      std::string dc3 = lightName + "c3";
 
       loc = glGetUniformLocation(aShaderPrg, pos.c_str());
       glUniform4fv(loc, 1, points[i].pos);
@@ -380,6 +391,15 @@ namespace ELBA
 
       loc = glGetUniformLocation(aShaderPrg, spc.c_str());
       glUniform4fv(loc, 1, points[i].specular);
+
+      loc = glGetUniformLocation(aShaderPrg, dc1.c_str());
+      glUniform1f(loc, points[i].c1);
+
+      loc = glGetUniformLocation(aShaderPrg, dc2.c_str());
+      glUniform1f(loc, points[i].c2);
+
+      loc = glGetUniformLocation(aShaderPrg, dc3.c_str());
+      glUniform1f(loc, points[i].c3);
     }
 
 
@@ -391,15 +411,6 @@ namespace ELBA
 
     loc = glGetUniformLocation(aShaderPrg, "spotFalloff");
     glUniform1f(loc, mLightUniforms.spotFalloff);
-
-    loc = glGetUniformLocation(aShaderPrg, "c1");
-    glUniform1f(loc, mLightUniforms.c1);
-
-    loc = glGetUniformLocation(aShaderPrg, "c2");
-    glUniform1f(loc, mLightUniforms.c2);
-
-    loc = glGetUniformLocation(aShaderPrg, "c3");
-    glUniform1f(loc, mLightUniforms.c3);
 
     loc = glGetUniformLocation(aShaderPrg, "fogColor");
     glUniform4fv(loc, 1, mLightUniforms.fogColor);

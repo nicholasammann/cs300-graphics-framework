@@ -74,6 +74,10 @@ struct SpotLight
   float diffuse[4];
   float specular[4];
 
+  float c1;
+  float c2;
+  float c3;
+
   void SetPos(float x, float y, float z, float w)
   {
     pos[0] = x;
@@ -127,6 +131,10 @@ struct PointLight
   float diffuse[4];
   float specular[4];
 
+  float c1;
+  float c2;
+  float c3;
+
   void SetPos(float x, float y, float z, float w)
   {
     pos[0] = x;
@@ -178,10 +186,6 @@ struct LightUniforms
   float spotInnerAngle;
   float spotOuterAngle;
   float spotFalloff;
-
-  float c1;
-  float c2;
-  float c3;
 
   float fogColor[4];
   float fogNear;

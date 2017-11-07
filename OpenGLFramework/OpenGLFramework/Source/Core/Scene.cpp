@@ -78,6 +78,9 @@ namespace ELBA
           light.SetAmbient(0, 0, 0, 1);
           light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
           light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
+          light.c1 = 1.0f;
+          light.c2 = 0.1f;
+          light.c3 = 0.0f;
 
           Material &mat = mod->GetMeshes()[0]->GetMaterial();
           mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -101,6 +104,9 @@ namespace ELBA
           light.SetAmbient(0, 0, 0, 1);
           light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
           light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
+          light.c1 = 1.0f;
+          light.c2 = 0.1f;
+          light.c3 = 0.0f;
 
           Material &mat = mod->GetMeshes()[0]->GetMaterial();
           mat.SetAmbient(light.diffuse[0], light.diffuse[1], light.diffuse[2], light.diffuse[3]);
@@ -136,6 +142,9 @@ namespace ELBA
         PointLight light;
         light.model = mod;
         light.SetPos(-2.0f + i / 2.0f, 0, 5, 1);
+        light.c1 = 1.0f;
+        light.c2 = 0.1f;
+        light.c3 = 0.0f;
 
         if (i % 2)
         {
@@ -166,6 +175,9 @@ namespace ELBA
         light.model = mod;
         light.SetPos(-2.0f + (i + 3) / 2.0f, 0, 5, 1);
         light.SetDirection(0, 0, -1, 0);
+        light.c1 = 1.0f;
+        light.c2 = 0.1f;
+        light.c3 = 0.0f;
 
         if (i % 2)
         {
@@ -242,6 +254,9 @@ namespace ELBA
 
         SpotLight light;
         light.model = mod;
+        light.c1 = 1.0f;
+        light.c2 = 0.1f;
+        light.c3 = 0.0f;
 
         if (i % 2)
         {
@@ -276,7 +291,9 @@ namespace ELBA
         light.model = mod;
         light.SetPos(0, 0, 5, 1);
         light.SetAmbient(0, 0, 0, 1);
-      
+        light.c1 = 1.0f;
+        light.c2 = 0.1f;
+        light.c3 = 0.0f;
 
         if (i % 2)
         {
