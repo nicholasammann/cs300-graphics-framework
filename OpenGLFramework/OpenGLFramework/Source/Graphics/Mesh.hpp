@@ -45,8 +45,13 @@ namespace ELBA
       unsigned int mIndices[3];
     };
 
-    Face(unsigned int aA, unsigned int aB, unsigned int aC) : a(aA), b(aB), c(aC) { }
+    Face(unsigned int aA, unsigned int aB, unsigned int aC) 
+      : a(aA), b(aB), c(aC), tangent(), bitangent()
+    {
+    }
 
+    glm::vec3 tangent;
+    glm::vec3 bitangent;
   };
 
   struct Material
@@ -129,6 +134,8 @@ namespace ELBA
 
     float mDebugLineWidth;
     float mDebugLineLength;
+
+    void CalculateTBs();
 
   public:
 

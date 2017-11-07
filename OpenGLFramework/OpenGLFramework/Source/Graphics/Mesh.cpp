@@ -383,6 +383,16 @@ namespace ELBA
     glBindVertexArray(0);
   }
 
+  void Mesh::CalculateTBs()
+  {
+
+    // for each face on the mesh
+
+    // calculate its tangent and bitangent vectors
+
+
+  }
+
   float & Mesh::GetDebugLineWidth()
   {
     return mDebugLineWidth;
