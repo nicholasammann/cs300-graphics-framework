@@ -165,13 +165,16 @@ void ELBA::Editor::Update()
       //  if (ImGui::TreeNode(meshLabel.c_str()))
       //  {
 
-          if (ImGui::TreeNode("Debug"))
+          if (ImGui::TreeNode("Debug Options"))
           {
-            static const char *modes[] = { "None", "Vertex Normals", "Face Normals" };
 
             ImGui::PushItemWidth(130.0f);
 
-            ImGui::Combo("Mode", meshes[0]->GetDebugMode(), modes, sizeof(modes) / sizeof(char*));
+            static const char *colorModes[] = { "Standard", "Tangent", "Bitangent", "Normal" };
+            ImGui::Combo("Color Mode", meshes[0]->GetDebugColorMode(), colorModes, sizeof(colorModes) / sizeof(char*));
+
+            static const char *lineModes[] = { "None", "Vertex Normals", "Face Normals", "TBN Frame" };
+            ImGui::Combo("Line Mode", meshes[0]->GetDebugLineMode(), lineModes, sizeof(lineModes) / sizeof(char*));
 
             ImGui::SliderFloat("Line Width", &meshes[0]->GetDebugLineWidth(), 1.0f, 3.0f);
 

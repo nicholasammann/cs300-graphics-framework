@@ -108,7 +108,8 @@ namespace ELBA
 
     glm::vec3 GetFaceCentroid(Face aFace);
 
-    int* GetDebugMode();
+    int* GetDebugColorMode();
+    int* GetDebugLineMode();
 
     Material &GetMaterial();
 
@@ -123,6 +124,8 @@ namespace ELBA
 
     void DrawFaceNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
     void DrawVertexNormals(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
+    void DrawTangents(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
+    void DrawBitangents(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
     std::vector<Vertex> mVertices;
     std::vector<Face> mFaces;
@@ -145,6 +148,16 @@ namespace ELBA
     unsigned int mFaceDebugVAO;
     unsigned int mFaceDebugVBO;
 
+    void BindTangents();
+    std::vector <glm::vec3> mTangentPoints;
+    unsigned int mTangentDebugVAO;
+    unsigned int mTangentDebugVBO;
+
+    void BindBitangents();
+    std::vector <glm::vec3> mBitangentPoints;
+    unsigned int mBitangentDebugVAO;
+    unsigned int mBitangentDebugVBO;
+
     float mDebugLineWidth;
     float mDebugLineLength;
 
@@ -153,16 +166,19 @@ namespace ELBA
 
   public:
 
-    enum DebugMode
+    enum DebugLineMode
     {
       None,
       VertNormals,
-      FaceNormals
+      FaceNormals,
+      TBNFrame
     };
 
   private:
 
-    int mDebugMode;
+    int mDebugColorMode;
+
+    int mDebugLineMode;
 
     bool mDrawTangentAxes;
 

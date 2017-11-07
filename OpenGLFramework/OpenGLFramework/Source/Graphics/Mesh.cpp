@@ -31,14 +31,14 @@ namespace ELBA
 {
 
   Mesh::Mesh(Model *aParent)
-    : mParent(aParent), mDebugMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f),
+    : mParent(aParent), mDebugColorMode(0), mDebugLineMode(0), mDebugLineWidth(1.5f), mDebugLineLength(0.5f),
     mVertices(), mFaces(), mFaceNormals()
   {
   }
 
   void Mesh::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
-    switch (mDebugMode)
+    switch (mDebugLineMode)
     {
     case VertNormals:
     {
@@ -49,6 +49,14 @@ namespace ELBA
     case FaceNormals:
     {
       DrawFaceNormals(aProj, aView, aModel);
+      break;
+    }
+
+    case TBNFrame:
+    {
+      DrawTangents(aProj, aView, aModel);
+      DrawBitangents(aProj, aView, aModel);
+      DrawVertexNormals(aProj, aView, aModel);
       break;
     }
     }
@@ -148,6 +156,76 @@ namespace ELBA
     glBindVertexArray(0);
   }
 
+  void Mesh::DrawTangents(glm::mat4 & aProj, glm::mat4 & aView, glm::mat4 & aModel)
+  {
+    mTangentPoints.clear();
+
+    for (unsigned int i = 0; i < mVertices.size(); ++i)
+    {
+      glm::vec3 tangent = mVertices[i].mTangent;
+      glm::vec3 a = mVertices[i].mPos;
+      glm::vec3 b = a + mDebugLineLength * tangent;
+
+      mTangentPoints.push_back(a);
+      mTangentPoints.push_back(b);
+    }
+
+    unsigned int shdrPrg = mParent->GetDebugShader()->GetShaderProgram();
+    mParent->GetDebugShader()->UseShaderProgram();
+
+    unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(aProj));
+
+    unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(aView));
+
+    unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
+
+    glBindVertexArray(mTangentDebugVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, mTangentDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mTangentPoints.data(), GL_DYNAMIC_DRAW);
+
+    glLineWidth(mDebugLineWidth);
+    glDrawArrays(GL_LINES, 0, mTangentPoints.size() * 3);
+    glBindVertexArray(0);
+  }
+
+  void Mesh::DrawBitangents(glm::mat4 & aProj, glm::mat4 & aView, glm::mat4 & aModel)
+  {
+    mBitangentPoints.clear();
+
+    for (unsigned int i = 0; i < mVertices.size(); ++i)
+    {
+      glm::vec3 bitangent = mVertices[i].mBitangent;
+      glm::vec3 a = mVertices[i].mPos;
+      glm::vec3 b = a + mDebugLineLength * bitangent;
+
+      mBitangentPoints.push_back(a);
+      mBitangentPoints.push_back(b);
+    }
+
+    unsigned int shdrPrg = mParent->GetDebugShader()->GetShaderProgram();
+    mParent->GetDebugShader()->UseShaderProgram();
+
+    unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(aProj));
+
+    unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
+    glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(aView));
+
+    unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
+    glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
+
+    glBindVertexArray(mBitangentDebugVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, mBitangentDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mBitangentPoints.data(), GL_DYNAMIC_DRAW);
+
+    glLineWidth(mDebugLineWidth);
+    glDrawArrays(GL_LINES, 0, mBitangentPoints.size() * 3);
+    glBindVertexArray(0);
+  }
+
   void Mesh::AddVertex(float aX, float aY, float aZ)
   {
     Vertex v;
@@ -212,6 +290,8 @@ namespace ELBA
 
     BindVertNorms();
     BindFaceNorms();
+    BindTangents();
+    BindBitangents();
   }
 
   void Mesh::Preprocess()
@@ -276,9 +356,14 @@ namespace ELBA
     return centroid * (1.f / 3.f);
   }
 
-  int* Mesh::GetDebugMode()
+  int* Mesh::GetDebugColorMode()
   {
-    return &mDebugMode;
+    return &mDebugColorMode;
+  }
+
+  int* Mesh::GetDebugLineMode()
+  {
+    return &mDebugLineMode;
   }
 
   Material & Mesh::GetMaterial()
@@ -392,6 +477,48 @@ namespace ELBA
     glBindVertexArray(0);
   }
 
+  void Mesh::BindTangents()
+  {
+    //// Vertex Array Object ////
+    // create and bind vertex array object
+    glGenVertexArrays(1, &mTangentDebugVAO);
+    glBindVertexArray(mTangentDebugVAO);
+    //////////////////////////////
+
+    //// Vertex Buffer Object ////
+    // create and bind empty vertex buffer object
+    glGenBuffers(1, &mTangentDebugVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mTangentDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mTangentPoints.data(), GL_STATIC_DRAW);
+    //////////////////////////////
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    glBindVertexArray(0);
+  }
+
+  void Mesh::BindBitangents()
+  {
+    //// Vertex Array Object ////
+    // create and bind vertex array object
+    glGenVertexArrays(1, &mBitangentDebugVAO);
+    glBindVertexArray(mBitangentDebugVAO);
+    //////////////////////////////
+
+    //// Vertex Buffer Object ////
+    // create and bind empty vertex buffer object
+    glGenBuffers(1, &mBitangentDebugVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, mBitangentDebugVBO);
+    glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mBitangentPoints.data(), GL_STATIC_DRAW);
+    //////////////////////////////
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (void*)0);
+
+    glBindVertexArray(0);
+  }
+
   glm::vec2 Mesh::GetUVs(Vertex const& aVert)
   {
     switch (mParent->mMappingType)
@@ -413,6 +540,12 @@ namespace ELBA
     {
       return sphericalMapping(aVert.mNormal);
     }
+
+    default:
+    {
+      throw "Trying to use a mapping type that does not exist";
+      return glm::vec2();
+    }
     }
   }
 
@@ -432,25 +565,25 @@ namespace ELBA
       Vertex G = mVertices[f.c];
 
       // get the texture coords for each vertex
-      glm::vec2 eTexCoords = GetUVs(E);
-      glm::vec2 fTexCoords = GetUVs(F);
-      glm::vec2 gTexCoords = GetUVs(G);
+      glm::vec2 eUV = GetUVs(E);
+      glm::vec2 fUV = GetUVs(F);
+      glm::vec2 gUV = GetUVs(G);
 
       // find the vectors P=F-E and Q=G-E
       glm::vec3 P = F - E;
       glm::vec3 Q = G - E;
       
       // find the tex coords for the vectors
-      glm::vec2 sP = glm::vec2(fTexCoords.x - eTexCoords.x, fTexCoords.x - eTexCoords.y);
-      glm::vec2 sQ = glm::vec2(gTexCoords.x - eTexCoords.x, gTexCoords.x - eTexCoords.y);
+      glm::vec2 P_UV = glm::vec2(fUV.s - eUV.s, fUV.t - eUV.t);
+      glm::vec2 Q_UV = glm::vec2(gUV.s - eUV.s, gUV.t - eUV.t);
 
       glm::vec3 T;
       glm::vec3 B;
 
       /* solve the system of equations to get T and B */
       // get T.x and B.x
-      auto matrix = MakeMatrix(sP.x, sP.y, P.x,
-                               sQ.x, sQ.y, Q.x);
+      auto matrix = MakeMatrix(P_UV.s, P_UV.t, P.x,
+                               Q_UV.s, Q_UV.t, Q.x);
 
       auto sol = GaussianElimination(matrix);
 
@@ -458,8 +591,8 @@ namespace ELBA
       B.x = sol[1];
       
       // get T.y and B.y
-      matrix = MakeMatrix(sP.x, sP.y, P.y,
-                          sQ.x, sQ.y, Q.y);
+      matrix = MakeMatrix(P_UV.s, P_UV.t, P.y,
+                          Q_UV.s, Q_UV.t, Q.y);
 
       sol = GaussianElimination(matrix);
 
@@ -467,8 +600,8 @@ namespace ELBA
       B.y = sol[1];
 
       // get T.z and B.z
-      matrix = MakeMatrix(sP.x, sP.y, P.z,
-                          sQ.x, sQ.y, Q.z);
+      matrix = MakeMatrix(P_UV.s, P_UV.t, P.z,
+                          Q_UV.s, Q_UV.t, Q.z);
 
       sol = GaussianElimination(matrix);
 
