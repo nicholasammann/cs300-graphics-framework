@@ -54,11 +54,31 @@ std::vector<float> GaussianElimination(std::vector<std::vector<float>> matrix)
 
   for (int i = height - 1; i >= 0; --i)
   {
+    //float denom = matrix[i][i];
+    //
+    //if (denom == 0.0f)
+    //{
+    //  denom = 0.0001f;
+    //}
+
     solution[i] = matrix[i][height] / matrix[i][i];
+
+    //if (isnan(solution[i]))
+    //{
+    //  solution[i] = 0.0f;
+    //}
 
     for (int k = i - 1; k >= 0; --k)
     {
       matrix[k][height] -= matrix[k][i] * solution[i];
+    }
+  }
+
+  for (unsigned i = 0; i < solution.size(); ++i)
+  {
+    if (isnan(solution[i]))
+    {
+      solution[i] = 0.0f;
     }
   }
 

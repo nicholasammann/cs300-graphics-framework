@@ -76,19 +76,19 @@ int main()
 
 
   //// test gaussian elimination
-  //std::vector<std::vector<float>> matrix;
-  //matrix.resize(2);
-  //matrix[0].resize(3);
-  //matrix[1].resize(3);
-  //
-  //matrix[0][0] = 1.0f;  matrix[0][1] = 2.0f;  matrix[0][2] = 2.0f;
-  //matrix[1][0] = 3.0f;  matrix[1][1] = 1.0f;  matrix[1][2] = 1.0f;
-  //
-  //auto sol = GaussianElimination(matrix);
-  //
-  //std::cout << "Size : " << sol.size() << std::endl;
-  //
-  //std::cout << "Solution : " << sol[0] << ", " << sol[1] << std::endl;
+  std::vector<std::vector<float>> matrix;
+  matrix.resize(2);
+  matrix[0].resize(3);
+  matrix[1].resize(3);
+  
+  matrix[0][0] = 3.0f;  matrix[0][1] = 1.0f;  matrix[0][2] = 5.0f;
+  matrix[1][0] = 1.0f;  matrix[1][1] = 5.0f;  matrix[1][2] = 4.0f;
+  
+  auto sol = GaussianElimination(matrix);
+  
+  std::cout << "Size : " << sol.size() << std::endl;
+  
+  std::cout << "Solution : " << sol[0] << ", " << sol[1] << std::endl;
 
 
   // main loop
