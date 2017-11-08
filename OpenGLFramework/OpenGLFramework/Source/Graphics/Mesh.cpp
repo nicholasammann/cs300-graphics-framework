@@ -57,7 +57,7 @@ namespace ELBA
     {
       DrawTangents(aProj, aView, aModel);
       DrawBitangents(aProj, aView, aModel);
-      //DrawVertexNormals(aProj, aView, aModel);
+      DrawVertexNormals(aProj, aView, aModel);
       break;
     }
     }
@@ -148,6 +148,10 @@ namespace ELBA
     unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
 
+    unsigned int colorLoc = glGetUniformLocation(shdrPrg, "FinalColor");
+    glm::vec4 blue(0.0f, 0.0f, 1.0f, 1.0f);
+    glUniform4fv(colorLoc, 1, &blue[0]);
+
     glBindVertexArray(mVertDebugVAO);
     glBindBuffer(GL_ARRAY_BUFFER, mVertDebugVBO);
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mVertNormPoints.data(), GL_DYNAMIC_DRAW);
@@ -183,6 +187,10 @@ namespace ELBA
     unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
 
+    unsigned int colorLoc = glGetUniformLocation(shdrPrg, "FinalColor");
+    glm::vec4 red(1.0f, 0.0f, 0.0f, 1.0f);
+    glUniform4fv(colorLoc, 1, &red[0]);
+
     glBindVertexArray(mTangentDebugVAO);
     glBindBuffer(GL_ARRAY_BUFFER, mTangentDebugVBO);
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mTangentPoints.data(), GL_DYNAMIC_DRAW);
@@ -217,6 +225,10 @@ namespace ELBA
 
     unsigned int modelLoc = glGetUniformLocation(shdrPrg, "model");
     glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(aModel));
+
+    unsigned int colorLoc = glGetUniformLocation(shdrPrg, "FinalColor");
+    glm::vec4 green(0.0f, 1.0f, 0.0f, 1.0f);
+    glUniform4fv(colorLoc, 1, &green[0]);
 
     glBindVertexArray(mBitangentDebugVAO);
     glBindBuffer(GL_ARRAY_BUFFER, mBitangentDebugVBO);
@@ -580,18 +592,23 @@ namespace ELBA
 
       float den = (P_UV.x * Q_UV.y - P_UV.y * Q_UV.x);
 
-      if (den == 0.0f)
-      {
-        den = 1.0f;
-      }
+      //if (den == 0.0f)
+      //{
+      //  den = 0.0f;
+      //}
 
       float r = 1.0f / den;
+
+      if (isinf(r) || isnan(r))
+      {
+        r = 1.0f;
+      }
 
       glm::vec3 T = (P * Q_UV.y - Q * P_UV.y) * r;
       glm::vec3 B = (Q * P_UV.x - P * Q_UV.x) * r;
 
-      std::cout << "Tangent: " << T.x << ", " << T.y << std::endl;
-      std::cout << "Bitangent: " << B.x << ", " << B.y << std::endl;
+      //std::cout << "Tangent: " << T.x << ", " << T.y << std::endl;
+      //std::cout << "Bitangent: " << B.x << ", " << B.y << std::endl;
 
       ///* solve the system of equations to get T and B */
       //// get T.x and B.x
@@ -629,23 +646,23 @@ namespace ELBA
 
       for (int i = 0; i < 3; ++i)
       {
-        mVertices[f.mIndices[i]].mTangent = glm::vec3();
+        //mVertices[f.mIndices[i]].mTangent = glm::vec3();
         std::vector<glm::vec3> &tangs = adjTangents[&mVertices[f.mIndices[i]]];
 
         auto it = std::find(tangs.begin(), tangs.end(), f.tangent);
 
-        if (it == tangs.end())
+        if (true || it == tangs.end())
         {
           tangs.push_back(f.tangent);
         }
 
 
-        mVertices[f.mIndices[i]].mBitangent = glm::vec3();
+        //mVertices[f.mIndices[i]].mBitangent = glm::vec3();
         std::vector<glm::vec3> &bitangs = adjBitangents[&mVertices[f.mIndices[i]]];
 
         auto it_2 = std::find(bitangs.begin(), bitangs.end(), f.bitangent);
 
-        if (it_2 == bitangs.end())
+        if (true || it_2 == bitangs.end())
         {
           bitangs.push_back(f.bitangent);
         }
@@ -673,11 +690,11 @@ namespace ELBA
       //std::cout << "BiTangent: " << pair.first->mBitangent.x << ", " << pair.first->mBitangent.y << std::endl;
     }
 
-    //for (Vertex &v : mVertices)
-    //{
-    //  v.mTangent = glm::normalize(v.mTangent);
-    //  v.mBitangent = glm::normalize(v.mBitangent);
-    //}
+    for (Vertex &v : mVertices)
+    {
+      v.mTangent = glm::normalize(v.mTangent);
+      v.mBitangent = glm::normalize(v.mBitangent);
+    }
   }
 
   float & Mesh::GetDebugLineWidth()

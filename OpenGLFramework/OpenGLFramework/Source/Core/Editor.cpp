@@ -176,9 +176,9 @@ void ELBA::Editor::Update()
             static const char *lineModes[] = { "None", "Vertex Normals", "Face Normals", "TBN Frame" };
             ImGui::Combo("Line Mode", meshes[0]->GetDebugLineMode(), lineModes, sizeof(lineModes) / sizeof(char*));
 
-            ImGui::SliderFloat("Line Width", &meshes[0]->GetDebugLineWidth(), 1.0f, 3.0f);
+            ImGui::SliderFloat("Line Width", &meshes[0]->GetDebugLineWidth(), 0.01f, 3.0f);
 
-            ImGui::SliderFloat("Line Length", &meshes[0]->GetDebugLineLength(), 0.1f, 3.0f);
+            ImGui::SliderFloat("Line Length", &meshes[0]->GetDebugLineLength(), 0.001f, 3.0f);
 
             ImGui::PopItemWidth();
 
