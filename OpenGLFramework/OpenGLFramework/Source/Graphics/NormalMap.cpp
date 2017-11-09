@@ -46,11 +46,35 @@ ELBA::NormalMap::NormalMap(const char *aPath)
   // iterate through the height map, calculating the normal at each position
   for (int j = 0; j < mHeight; j++)
   {
+    int jWoo = j + 1;
+    if (jWoo >= mHeight)
+    {
+      jWoo = 0;
+    }
+
+    int jSwooce = j - 1;
+    if (jSwooce < 0)
+    {
+      jSwooce = 0;
+    }
+
     for (int i = 0; i < mWidth - 1; i++)
     {
-      glm::vec3 s(1, 0, mHeightMap[j][i + 1] - mHeightMap[j][i - 1]);
+      int iWoo = i + 1;
+      if (iWoo >= mWidth)
+      {
+        iWoo = 0;
+      }
 
-      glm::vec3 t(0, 1, mHeightMap[j + 1][i] - mHeightMap[j - 1][i]);
+      int iSwooce = i - 1;
+      if (iSwooce < 0)
+      {
+        iSwooce = mWidth - 1;
+      }
+
+      glm::vec3 s(1, 0, mHeightMap[j][iWoo] - mHeightMap[j][iSwooce]);
+
+      glm::vec3 t(0, 1, mHeightMap[jWoo][i] - mHeightMap[jSwooce][i]);
       
       glm::vec3 n = glm::cross(s, t);
       

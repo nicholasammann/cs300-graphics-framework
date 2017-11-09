@@ -23,6 +23,7 @@ namespace ELBA
 {
   class Texture;
   class Application;
+  class NormalMap;
 
   struct Transform
   {
@@ -62,9 +63,12 @@ namespace ELBA
 
     Texture *mDiffuseTexture;
     Texture *mSpecularTexture;
-
+    
     bool mUsingTextures;
     int mMappingType;
+    
+    NormalMap *mNormalTexture;
+    bool mUsingNormalMap;
 
     glm::vec3 pMin;
     glm::vec3 pMax;

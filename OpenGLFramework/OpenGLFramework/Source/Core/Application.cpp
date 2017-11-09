@@ -25,6 +25,7 @@ Creation date: 10/23/17
 #include "../Graphics/Shader.hpp"
 #include "../Graphics/Model.hpp"
 #include "../Graphics/Texture.hpp"
+#include "../Graphics/NormalMap.hpp"
 
 #include "Application.hpp"
 #include "Camera.hpp"
@@ -246,11 +247,14 @@ namespace ELBA
     Texture *specTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
     mod->mSpecularTexture = specTex;
     
-    mod->mMappingType = 1;
-    mod->mUsingTextures = 1;
+    mod->mMappingType = 0;
+    mod->mUsingTextures = true;
+
+    NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
+    mod->mNormalTexture = normTex;
+    mod->mUsingNormalMap = true;
 
     mModels.push_back(mod);
-
 
     Model *plane = new Model(this, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
     plane->SetShader("Blinn");

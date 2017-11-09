@@ -592,53 +592,18 @@ namespace ELBA
 
       float den = (P_UV.x * Q_UV.y - P_UV.y * Q_UV.x);
 
-      //if (den == 0.0f)
-      //{
-      //  den = 0.0f;
-      //}
+      if (abs(den) < 0.0000001f)
+      {
+        den = 1.0f;
+      }
 
       float r = 1.0f / den;
-
-      if (isinf(r) || isnan(r))
-      {
-        r = 1.0f;
-      }
 
       glm::vec3 T = (P * Q_UV.y - Q * P_UV.y) * r;
       glm::vec3 B = (Q * P_UV.x - P * Q_UV.x) * r;
 
       //std::cout << "Tangent: " << T.x << ", " << T.y << std::endl;
       //std::cout << "Bitangent: " << B.x << ", " << B.y << std::endl;
-
-      ///* solve the system of equations to get T and B */
-      //// get T.x and B.x
-      //auto matrix = MakeMatrix(P_UV.s, P_UV.t, P.x,
-      //                         Q_UV.s, Q_UV.t, Q.x);
-      //
-      //auto sol = GaussianElimination(matrix);
-      //
-      ////std::cout << sol[0] << ", " << sol[1] << std::endl;
-      //
-      //T.x = sol[0];
-      //B.x = sol[1];
-      //
-      //// get T.y and B.y
-      //matrix = MakeMatrix(P_UV.s, P_UV.t, P.y,
-      //                    Q_UV.s, Q_UV.t, Q.y);
-      //
-      //sol = GaussianElimination(matrix);
-      //
-      //T.y = sol[0];
-      //B.y = sol[1];
-      //
-      //// get T.z and B.z
-      //matrix = MakeMatrix(P_UV.s, P_UV.t, P.z,
-      //                    Q_UV.s, Q_UV.t, Q.z);
-      //
-      //sol = GaussianElimination(matrix);
-      //
-      //T.z = sol[0];
-      //B.z = sol[1];
 
       // store the calculated vectors on the face
       f.tangent = T;
@@ -677,6 +642,8 @@ namespace ELBA
         pair.first->mTangent += tangent;
       }
 
+      pair.first->mTangent *= (1.0f / pair.second.size());
+
       //std::cout << "Tangent: " << pair.first->mTangent.x << ", " << pair.first->mTangent.y << std::endl;
     }
 
@@ -687,14 +654,16 @@ namespace ELBA
         pair.first->mBitangent += bitangent;
       }
 
+      pair.first->mBitangent *= (1.0f / pair.second.size());
+
       //std::cout << "BiTangent: " << pair.first->mBitangent.x << ", " << pair.first->mBitangent.y << std::endl;
     }
 
-    for (Vertex &v : mVertices)
-    {
-      v.mTangent = glm::normalize(v.mTangent);
-      v.mBitangent = glm::normalize(v.mBitangent);
-    }
+    //for (Vertex &v : mVertices)
+    //{
+    //  v.mTangent = glm::normalize(v.mTangent);
+    //  v.mBitangent = glm::normalize(v.mBitangent);
+    //}
   }
 
   float & Mesh::GetDebugLineWidth()

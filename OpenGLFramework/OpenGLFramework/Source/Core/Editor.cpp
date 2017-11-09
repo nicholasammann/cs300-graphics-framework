@@ -20,6 +20,7 @@ Creation date: 10/23/17
 #include "Application.hpp" 
 #include "Editor.hpp"
 #include "../Graphics/Texture.hpp"
+#include "../Graphics/NormalMap.hpp"
 
 #include "Scene.hpp"
 
@@ -560,13 +561,16 @@ void ELBA::Editor::Update()
 
       Texture *specTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
       mod->mSpecularTexture = specTex;
-
+      
       mod->mMappingType = 1;
       mod->mUsingTextures = 1;
 
+      NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
+      mod->mNormalTexture = normTex;
+      mod->mUsingNormalMap = true;
+
       mApp->GetModels().clear();
       mApp->GetModels().push_back(mod);
-
 
       Model *plane = new Model(mApp, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
       plane->SetShader("Blinn");

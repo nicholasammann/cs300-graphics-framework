@@ -30,9 +30,9 @@ Creation date: 10/23/17
 
 namespace ELBA
 {
-  Model::Model(Application *aApp, const char *aPath, std::string aName) 
-    : mApp(aApp), mName(aName), mTransform(), mShaderName(""), 
-      mCurrentShaderSelect(0), mDiffuseTexture(nullptr), 
+  Model::Model(Application *aApp, const char *aPath, std::string aName)
+    : mApp(aApp), mName(aName), mTransform(), mShaderName(""),
+      mCurrentShaderSelect(0), mDiffuseTexture(nullptr),
       mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
@@ -42,34 +42,25 @@ namespace ELBA
 
   void Model::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
   {
-    // bind uniforms for texture
+    auto prg = mShader->GetShaderProgram();
 
-    if (mUsingTextures == 0)
-    {
-      // set use textures to "false" so we don't need to bind other uniforms
-      int loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
-      glUniform1i(loc, 0);
-    }
-    else
+    int loc = glGetUniformLocation(prg, "MappingType");
+    glUniform1i(loc, mMappingType);
+
+    // set use textures to "false" so we don't need to bind other uniforms
+    loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
+    glUniform1i(loc, 0);
+
+    // bind uniforms for texture
+    if (mUsingTextures)
     {
       if (mDiffuseTexture && mSpecularTexture)
       {
-        auto prg = mShader->GetShaderProgram();
-
-        // set use textures to "true"
-        int loc = glGetUniformLocation(prg, "UseTextures");
-        glUniform1i(loc, mUsingTextures);
-
-        loc = glGetUniformLocation(prg, "MappingType");
-        glUniform1i(loc, mMappingType);
-
-
         mDiffuseTexture->SetUniform(prg, "diffuseTexture", 0);
         mDiffuseTexture->Bind(0);
 
         mSpecularTexture->SetUniform(prg, "specularTexture", 1);
         mSpecularTexture->Bind(1);
-        
 
         loc = glGetUniformLocation(prg, "pMin");
         glUniform3fv(loc, 1, &pMin[0]);
@@ -77,11 +68,18 @@ namespace ELBA
         loc = glGetUniformLocation(prg, "pMax");
         glUniform3fv(loc, 1, &pMax[0]);
       }
-      else
+    }
+
+    // set use textures to "true"
+    loc = glGetUniformLocation(prg, "UseNormalMap");
+    glUniform1i(loc, mUsingNormalMap);
+
+    if (mUsingNormalMap)
+    {
+      if (mNormalTexture)
       {
-        // set use textures to "false" so we don't need to bind other uniforms
-        int loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
-        glUniform1i(loc, 0);
+        mDiffuseTexture->SetUniform(prg, "normalTexture", 2);
+        mDiffuseTexture->Bind(2);
       }
     }
 
