@@ -50,7 +50,7 @@ namespace ELBA
 
     // set use textures to "false" so we don't need to bind other uniforms
     loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
-    glUniform1i(loc, 0);
+    glUniform1i(loc, mUsingTextures);
 
     // bind uniforms for texture
     if (mUsingTextures)
@@ -69,6 +69,12 @@ namespace ELBA
         loc = glGetUniformLocation(prg, "pMax");
         glUniform3fv(loc, 1, &pMax[0]);
       }
+      else
+      {
+        // set use textures to "false" so we don't need to bind other uniforms
+        loc = glGetUniformLocation(mShader->GetShaderProgram(), "UseTextures");
+        glUniform1i(loc, 0);
+      }
     }
 
     // set use textures to "true"
@@ -81,6 +87,11 @@ namespace ELBA
       {
         mDiffuseTexture->SetUniform(prg, "normalTexture", 2);
         mDiffuseTexture->Bind(2);
+      }
+      else
+      {
+        loc = glGetUniformLocation(prg, "UseNormalMap");
+        glUniform1i(loc, 0);
       }
     }
 

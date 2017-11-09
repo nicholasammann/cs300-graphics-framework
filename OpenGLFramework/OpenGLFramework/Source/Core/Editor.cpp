@@ -427,6 +427,7 @@ void ELBA::Editor::Update()
         case 0:
         {
           Scene1::CreateLights(mApp, mLightType);
+          mNumLights = 8;
           break;
         }
 
@@ -444,7 +445,7 @@ void ELBA::Editor::Update()
         }
       }
 
-      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 50))
+      if (ImGui::SliderInt("Light Count", &mNumLights, 0, 20))
       {
         ImGui::PopItemWidth();
 

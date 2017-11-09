@@ -26,7 +26,7 @@ uniform mat4 view;
 
 // LIGHT UNIFORMS
 
-const int MaxLights = 50;
+const int MaxLights = 20;
 uniform vec4 globalAmbient;
 
 // directional lights
@@ -357,6 +357,7 @@ void main()
   {
     trueNormal = vec4(texture(normalTexture, uv).rgb, 0);
     trueNormal = vec4(TBN * vec3(trueNormal.xyz), 0);
+    trueNormal = normalize(trueNormal);
   }
 
   vFragColor = computeFragmentColor(diffuse, shininess, trueNormal);

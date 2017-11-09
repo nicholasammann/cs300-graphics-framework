@@ -27,7 +27,6 @@ void main()
   oViewPos = vPos;
   oViewNorm = normalize(view * model * vec4(aNormal, 0));
 
-
   // calculate TBN matrix
 
   vec4 viewTan4 = view * model * vec4(aTangent, 0);
