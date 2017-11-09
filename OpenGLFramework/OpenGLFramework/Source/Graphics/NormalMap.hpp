@@ -9,8 +9,8 @@ namespace ELBA
 
     NormalMap(const char *aPath);
     
-    unsigned char** GetNormalMap();
-    unsigned char** GetHeightMap();
+    unsigned char* GetNormalMap();
+    unsigned char* GetHeightMap();
 
     void BindNormalMapTexture(char aSlot);
     void SetNormalMapUniform(unsigned int aShaderPrg, const char* aUniform, char aSlot);
@@ -18,8 +18,8 @@ namespace ELBA
 
   private:
 
-    unsigned char** mNormalMap;
-    unsigned char** mHeightMap;
+    unsigned char* mNormalMap;
+    unsigned char* mHeightMap;
 
     int mBufferLength;
     int mWidth;

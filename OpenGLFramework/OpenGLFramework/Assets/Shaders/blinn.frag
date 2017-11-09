@@ -93,7 +93,7 @@ uniform struct
 } Material;
 
 
-vec4 dirlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess, in vec3 trueNormal)
+vec4 dirlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   DirLight light = DirLights[lightIdx];
 
@@ -121,7 +121,7 @@ vec4 dirlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess
 }
 
 
-vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess, in vec3 trueNormal)
+vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   SpotLight light = SpotLights[lightIdx];
 
@@ -177,7 +177,7 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shinines
 }
 
 
-vec4 pointlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess, in vec3 trueNormal)
+vec4 pointlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   PointLight light = PointLights[lightIdx];
 
@@ -218,7 +218,7 @@ float compute_atmosphericAttenuation()
 }
 
 
-vec4 computeFragmentColor(in vec4 adiffuse, in float shininess, in vec3 trueNormal)
+vec4 computeFragmentColor(in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   vec4 color = vec4(0, 0, 0, 0);
 
@@ -327,7 +327,7 @@ void main()
 {
   vec4 diffuse = Material.diffuse;
   float shininess = Material.shininess;
-  vec3 trueNormal = oViewNorm;
+  vec4 trueNormal = oViewNorm;
 
   vec2 uv;
 
@@ -353,9 +353,10 @@ void main()
     shininess = float(texture(specularTexture, uv).r);
   }
 
-  if (UseNormalMap)
+  if (UseNormalMap == 1)
   {
-    trueNormal = vec3(texture(normalTexture, uv));
+    trueNormal = vec4(texture(normalTexture, uv).rgb, 0);
+    trueNormal = vec4(TBN * vec3(trueNormal.xyz), 0);
   }
 
   vFragColor = computeFragmentColor(diffuse, shininess, trueNormal);

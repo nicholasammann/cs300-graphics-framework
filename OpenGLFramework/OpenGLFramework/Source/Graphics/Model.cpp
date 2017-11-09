@@ -33,7 +33,8 @@ namespace ELBA
   Model::Model(Application *aApp, const char *aPath, std::string aName)
     : mApp(aApp), mName(aName), mTransform(), mShaderName(""),
       mCurrentShaderSelect(0), mDiffuseTexture(nullptr),
-      mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0)
+      mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0),
+      mNormalTexture(nullptr), mUsingNormalMap(true)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();

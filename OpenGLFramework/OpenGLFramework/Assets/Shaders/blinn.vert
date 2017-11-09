@@ -30,15 +30,15 @@ void main()
 
   // calculate TBN matrix
 
-  vec4 viewTan4 = view * model * vec4(normalize(aTangent), 0);
-  vec4 viewBitan4 = view * model * vec4(normalize(aBitangent), 0);
+  vec4 viewTan4 = view * model * vec4(aTangent, 0);
+  vec4 viewBitan4 = view * model * vec4(aBitangent, 0);
 
   vec3 viewTangent = viewTan4.xyz;
   vec3 viewBitangent = viewBitan4.xyz;
 
   mat3 temp = mat3(viewTangent, viewBitangent, oViewNorm);
 
-  TBN = transpose(temp);
+  TBN = temp;
 
   // final world coordinates
   gl_Position = projection * view * model * vec4(aPos, 1);

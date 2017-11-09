@@ -10,38 +10,13 @@
 ELBA::NormalMap::NormalMap(const char *aPath)
 {
   // load the raw image and store as our height map
-  unsigned char *tex = stbi_load(aPath, &mWidth, &mHeight, &mChannels, 3);
-
-
-  // allocate a 2D array for the height map
-  mHeightMap = new unsigned char*[mHeight];
-  for (int i = 0; i < mHeight; ++i)
-  {
-    mHeightMap[i] = new unsigned char[mWidth];
-  }
-
-  // copy the R values into our height map
-  for (int i = 0; i < mHeight; ++i)
-  {
-    for (int j = 0; j < mWidth; ++j)
-    {
-      int rowInd = i * mWidth * 3;
-
-      int colInd = j * 3;
-
-      mHeightMap[i][j] = tex[rowInd + colInd];
-    }
-  }
+  mHeightMap = stbi_load(aPath, &mWidth, &mHeight, &mChannels, 3);
 
   // calculate the total length of our frame buffer
   mBufferLength = mWidth * mHeight * 3;
 
   // allocate a 2D array for the normal map
-  mNormalMap = new unsigned char*[mHeight];
-  for (int i = 0; i < mHeight; ++i)
-  {
-    mNormalMap[i] = new unsigned char[mWidth * 3];
-  }
+  mNormalMap = new unsigned char[mBufferLength];
 
   // iterate through the height map, calculating the normal at each position
   for (int j = 0; j < mHeight; j++)
@@ -72,9 +47,9 @@ ELBA::NormalMap::NormalMap(const char *aPath)
         iSwooce = mWidth - 1;
       }
 
-      glm::vec3 s(1, 0, mHeightMap[j][iWoo] - mHeightMap[j][iSwooce]);
+      glm::vec3 s(1, 0, mHeightMap[j * iWoo * 3] - mHeightMap[j * iSwooce * 3]);
 
-      glm::vec3 t(0, 1, mHeightMap[jWoo][i] - mHeightMap[jSwooce][i]);
+      glm::vec3 t(0, 1, mHeightMap[jWoo * i * 3] - mHeightMap[jSwooce * i * 3]);
       
       glm::vec3 n = glm::cross(s, t);
       
@@ -82,9 +57,9 @@ ELBA::NormalMap::NormalMap(const char *aPath)
       
       int ind = 3 * i;
 
-      mNormalMap[j][ind] = 255 * 0.5f * (s.x + 1);      // R
-      mNormalMap[j][ind + 1] = 255 * 0.5f * (s.y + 1);  // G
-      mNormalMap[j][ind + 2] = 255 * 0.5f * (s.z + 1);  // B
+      mNormalMap[j * ind] = 255 * 0.5f * (s.x + 1);      // R
+      mNormalMap[j * (ind + 1)] = 255 * 0.5f * (s.y + 1);  // G
+      mNormalMap[j * (ind + 2)] = 255 * 0.5f * (s.z + 1);  // B
     }
   }
 
@@ -100,12 +75,12 @@ ELBA::NormalMap::NormalMap(const char *aPath)
   glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-unsigned char** ELBA::NormalMap::GetNormalMap()
+unsigned char* ELBA::NormalMap::GetNormalMap()
 {
   return mNormalMap;
 }
 
-unsigned char** ELBA::NormalMap::GetHeightMap()
+unsigned char* ELBA::NormalMap::GetHeightMap()
 {
   return mHeightMap;
 }
