@@ -10,7 +10,7 @@ in vec4 oViewNorm;
 in vec3 oViewTangent;
 in vec3 oViewBitangent;
 
-in mat3 TBN;
+in mat4 TBN;
 
 // texture uniforms
 uniform int UseTextures;
@@ -359,7 +359,7 @@ void main()
   if (UseNormalMap == 1)
   {
     trueNormal = vec4(texture(normalTexture, uv).rgb, 0);
-    trueNormal = vec4(TBN * vec3(trueNormal.xyz), 0);
+    trueNormal = TBN * trueNormal;
     trueNormal = normalize(trueNormal);
   }
 

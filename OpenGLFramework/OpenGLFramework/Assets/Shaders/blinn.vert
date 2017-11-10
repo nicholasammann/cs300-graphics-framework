@@ -14,10 +14,7 @@ out vec3 oObjNorm;
 out vec4 oViewPos;
 out vec4 oViewNorm;
 
-out vec3 oViewTangent;
-out vec3 oViewBitangent;
-
-out mat3 TBN;
+out mat4 TBN;
 
 void main()
 {
@@ -31,15 +28,14 @@ void main()
   vec4 viewNorm = normalize(view * model * vec4(aNormal, 0));
   oViewNorm = viewNorm;
 
-  vec4 viewTan4 = view * model * vec4(aTangent, 0);
-  vec4 viewBitan4 = view * model * vec4(aBitangent, 0);
-
-  vec3 oViewTangent = viewTan4.xyz;
-  vec3 oViewBitangent = viewBitan4.xyz;
-
   // invert
   // model space
-  TBN = mat3(viewTan4.xyz, viewBitan4.xyz, viewNorm);
+
+  mat4 temp = mat4(vec4(aTangent, 0), vec4(aBitangent, 0), vec4(aNormal, 0), vec4(0, 0, 0, 1));
+
+  temp = transpose(temp);
+
+  TBN = view * temp;
 
   // final world coordinates
   gl_Position = projection * view * model * vec4(aPos, 1);
