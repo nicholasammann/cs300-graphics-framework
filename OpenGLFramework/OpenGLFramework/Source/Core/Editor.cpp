@@ -137,19 +137,30 @@ void ELBA::Editor::Update()
       }
 
 
-      if (models[k]->mDiffuseTexture || models[k]->mSpecularTexture)
+      if (models[k]->mDiffuseTexture || models[k]->mSpecularTexture || models[k]->mNormalTexture)
       {
         if (ImGui::TreeNode("Textures"))
         {
+
           static const char *mapTypes[3] = { "Planar", "Cylindrical", "Spherical" };
 
           ImGui::PushItemWidth(130.0f);
           ImGui::Combo("Texture Mapping", &models[k]->mMappingType, mapTypes, 3);
           ImGui::PopItemWidth();
 
-          ImGui::PushItemWidth(75.0f);
-          ImGui::Checkbox("Display Textures", &models[k]->mUsingTextures);
-          ImGui::PopItemWidth();
+          if (models[k]->mDiffuseTexture || models[k]->mSpecularTexture)
+          {
+            ImGui::PushItemWidth(75.0f);
+            ImGui::Checkbox("Display Textures", &models[k]->mUsingTextures);
+            ImGui::PopItemWidth();
+          }
+
+          if (models[k]->mNormalTexture)
+          {
+            ImGui::PushItemWidth(75.0f);
+            ImGui::Checkbox("Use Normal Map", &models[k]->mUsingNormalMap);
+            ImGui::PopItemWidth();
+          }
 
           ImGui::TreePop();
         }

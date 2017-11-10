@@ -32,9 +32,9 @@ namespace ELBA
 
   void Camera::UpdateVectors()
   {
-    mTarget = normalize(mTarget - mPosition);
-    mCameraRight = normalize(cross(mTarget, mWorldUp));
-    mCameraUp = cross(mCameraRight, mTarget);
+    mDirection = normalize(mTarget - mPosition);
+    mCameraRight = normalize(cross(mDirection, mWorldUp));
+    mCameraUp = cross(mCameraRight, mDirection);
   }
 
   glm::mat4 Camera::ConstructViewMatrix()
@@ -46,8 +46,8 @@ namespace ELBA
     glm::mat4 view;
 
     // column 0
-    view[0][0] = mCameraRight.x;            
-    view[1][0] = mCameraRight.y;            
+    view[0][0] = mCameraRight.x;
+    view[1][0] = mCameraRight.y;
     view[2][0] = mCameraRight.z;
     view[3][0] = -dot(mCameraRight, p);
     
@@ -58,10 +58,10 @@ namespace ELBA
     view[3][1] = -dot(mCameraUp, p);
 
     // column 2
-    view[0][2] = -mTarget.x;
-    view[1][2] = -mTarget.y;
-    view[2][2] = -mTarget.z;
-    view[3][2] = dot(mTarget, p);
+    view[0][2] = -mDirection.x;
+    view[1][2] = -mDirection.y;
+    view[2][2] = -mDirection.z;
+    view[3][2] = dot(mDirection, p);
 
     view[3][3] = 1.0f;
 

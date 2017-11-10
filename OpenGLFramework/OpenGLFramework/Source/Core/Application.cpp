@@ -168,9 +168,52 @@ namespace ELBA
 
   void Application::ProcessInput()
   {
+    float camSpeed = 0.01f;
+
+    if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
+    {
+      camSpeed = 0.025f;
+    }
+
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
       glfwSetWindowShouldClose(mWindow, true);
+    }
+    
+    if (glfwGetKey(mWindow, GLFW_KEY_W) == GLFW_PRESS)
+    {
+      mCamera->mPosition += camSpeed * mCamera->mDirection;
+      mCamera->UpdateVectors();
+    }
+
+    if (glfwGetKey(mWindow, GLFW_KEY_S) == GLFW_PRESS)
+    {
+      mCamera->mPosition -= camSpeed * mCamera->mDirection;
+      mCamera->UpdateVectors();
+    }
+
+    if (glfwGetKey(mWindow, GLFW_KEY_A) == GLFW_PRESS)
+    {
+      mCamera->mPosition -= camSpeed * mCamera->mCameraRight;
+      mCamera->UpdateVectors();
+    }
+
+    if (glfwGetKey(mWindow, GLFW_KEY_D) == GLFW_PRESS)
+    {
+      mCamera->mPosition += camSpeed * mCamera->mCameraRight;
+      mCamera->UpdateVectors();
+    }
+
+    if (glfwGetKey(mWindow, GLFW_KEY_Z) == GLFW_PRESS)
+    {
+      mCamera->mPosition -= camSpeed * mCamera->mCameraUp;
+      mCamera->UpdateVectors();
+    }
+
+    if (glfwGetKey(mWindow, GLFW_KEY_C) == GLFW_PRESS)
+    {
+      mCamera->mPosition += camSpeed * mCamera->mCameraUp;
+      mCamera->UpdateVectors();
     }
   }
 
@@ -642,8 +685,8 @@ namespace ELBA
     }
     else
     {
-      mCamera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-      mCamera->SetTargetPoint(mModels[0]->GetTransform().mWorldPos);
+      //mCamera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
+      //mCamera->SetTargetPoint(mModels[0]->GetTransform().mWorldPos);
     }
   }
 }
