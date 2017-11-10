@@ -14,6 +14,9 @@ out vec3 oObjNorm;
 out vec4 oViewPos;
 out vec4 oViewNorm;
 
+out vec3 oViewTangent;
+out vec3 oViewBitangent;
+
 out mat3 TBN;
 
 void main()
@@ -25,19 +28,18 @@ void main()
   vec4 vPos = view * model * vec4(aPos, 1);
 
   oViewPos = vPos;
-  oViewNorm = normalize(view * model * vec4(aNormal, 0));
-
-  // calculate TBN matrix
+  vec4 viewNorm = normalize(view * model * vec4(aNormal, 0));
+  oViewNorm = viewNorm;
 
   vec4 viewTan4 = view * model * vec4(aTangent, 0);
   vec4 viewBitan4 = view * model * vec4(aBitangent, 0);
 
-  vec3 viewTangent = viewTan4.xyz;
-  vec3 viewBitangent = viewBitan4.xyz;
+  vec3 oViewTangent = viewTan4.xyz;
+  vec3 oViewBitangent = viewBitan4.xyz;
 
-  mat3 temp = mat3(viewTangent, viewBitangent, oViewNorm);
-
-  TBN = temp;
+  // invert
+  // model space
+  TBN = mat3(viewTan4.xyz, viewBitan4.xyz, viewNorm);
 
   // final world coordinates
   gl_Position = projection * view * model * vec4(aPos, 1);

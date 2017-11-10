@@ -594,7 +594,7 @@ namespace ELBA
 
       if (abs(den) < 0.0000001f)
       {
-        den = 1.0f;
+        den = 0.0001f;
       }
 
       float r = 1.0f / den;
@@ -611,27 +611,119 @@ namespace ELBA
 
       for (int i = 0; i < 3; ++i)
       {
-        //mVertices[f.mIndices[i]].mTangent = glm::vec3();
-        std::vector<glm::vec3> &tangs = adjTangents[&mVertices[f.mIndices[i]]];
-
-        auto it = std::find(tangs.begin(), tangs.end(), f.tangent);
-
-        if (true || it == tangs.end())
-        {
-          tangs.push_back(f.tangent);
-        }
-
-
-        //mVertices[f.mIndices[i]].mBitangent = glm::vec3();
-        std::vector<glm::vec3> &bitangs = adjBitangents[&mVertices[f.mIndices[i]]];
-
-        auto it_2 = std::find(bitangs.begin(), bitangs.end(), f.bitangent);
-
-        if (true || it_2 == bitangs.end())
-        {
-          bitangs.push_back(f.bitangent);
-        }
+        Vertex *pVert = &mVertices[f.mIndices[i]];
+        adjTangents[pVert].push_back(f.tangent);
+        adjBitangents[pVert].push_back(f.bitangent);
       }
+    }
+
+
+    for (auto pair : adjTangents)
+    {
+      for (auto tangent : pair.second)
+      {
+        pair.first->mTangent += tangent;
+      }
+
+      pair.first->mTangent *= (1.0f / pair.second.size());
+    }
+
+    for (auto pair : adjBitangents)
+    {
+      for (auto bitangent : pair.second)
+      {
+        pair.first->mBitangent += bitangent;
+      }
+
+      pair.first->mBitangent *= (1.0f / pair.second.size());
+    }
+  }
+
+  float & Mesh::GetDebugLineWidth()
+  {
+    return mDebugLineWidth;
+  }
+
+  float & Mesh::GetDebugLineLength()
+  {
+    return mDebugLineLength;
+  }
+
+}
+
+
+
+/*
+
+void Mesh::PreprocessTangentsAndBitangents()
+{
+std::unordered_map<Vertex*, std::vector<glm::vec3>> adjTangents;
+std::unordered_map<Vertex*, std::vector<glm::vec3>> adjBitangents;
+
+// for each face on the mesh
+for (Face& f : mFaces)
+{
+
+// get the 3 vertices (E,F,G) of the face
+Vertex E = mVertices[f.a];
+Vertex F = mVertices[f.b];
+Vertex G = mVertices[f.c];
+
+// get the texture coords for each vertex
+glm::vec2 eUV = GetUVs(E);
+glm::vec2 fUV = GetUVs(F);
+glm::vec2 gUV = GetUVs(G);
+
+// find the vectors P=F-E and Q=G-E
+glm::vec3 P = F - E;
+glm::vec3 Q = G - E;
+
+// find the tex coords for the vectors
+glm::vec2 P_UV = fUV - eUV;
+glm::vec2 Q_UV = gUV - eUV;
+
+float den = (P_UV.x * Q_UV.y - P_UV.y * Q_UV.x);
+
+if (abs(den) < 0.0000001f)
+{
+  den = 1.0f;
+}
+
+float r = 1.0f / den;
+
+glm::vec3 T = (P * Q_UV.y - Q * P_UV.y) * r;
+glm::vec3 B = (Q * P_UV.x - P * Q_UV.x) * r;
+
+//std::cout << "Tangent: " << T.x << ", " << T.y << std::endl;
+//std::cout << "Bitangent: " << B.x << ", " << B.y << std::endl;
+
+// store the calculated vectors on the face
+f.tangent = T;
+f.bitangent = B;
+
+for (int i = 0; i < 3; ++i)
+{
+  //mVertices[f.mIndices[i]].mTangent = glm::vec3();
+  std::vector<glm::vec3> &tangs = adjTangents[&mVertices[f.mIndices[i]]];
+
+  auto it = std::find(tangs.begin(), tangs.end(), f.tangent);
+
+  if (it == tangs.end())
+  {
+    tangs.push_back(f.tangent);
+  }
+
+
+  //mVertices[f.mIndices[i]].mBitangent = glm::vec3();
+  std::vector<glm::vec3> &bitangs = adjBitangents[&mVertices[f.mIndices[i]]];
+
+  auto it_2 = std::find(bitangs.begin(), bitangs.end(), f.bitangent);
+
+  if (it_2 == bitangs.end())
+  {
+    bitangs.push_back(f.bitangent);
+  }
+}
     }
 
 
@@ -666,14 +758,4 @@ namespace ELBA
     //}
   }
 
-  float & Mesh::GetDebugLineWidth()
-  {
-    return mDebugLineWidth;
-  }
-
-  float & Mesh::GetDebugLineLength()
-  {
-    return mDebugLineLength;
-  }
-
-}
+*/

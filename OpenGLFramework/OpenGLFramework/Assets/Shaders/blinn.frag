@@ -7,6 +7,9 @@ in vec3 oObjNorm;
 in vec4 oViewPos;
 in vec4 oViewNorm;
 
+in vec3 oViewTangent;
+in vec3 oViewBitangent;
+
 in mat3 TBN;
 
 // texture uniforms
