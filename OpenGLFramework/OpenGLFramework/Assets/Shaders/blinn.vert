@@ -35,7 +35,7 @@ void main()
 
   temp = transpose(temp);
 
-  TBN = view * temp;
+  TBN = view * model * temp;
 
   // final world coordinates
   gl_Position = projection * view * model * vec4(aPos, 1);
