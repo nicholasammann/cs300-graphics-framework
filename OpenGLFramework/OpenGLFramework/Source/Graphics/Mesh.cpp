@@ -602,6 +602,17 @@ namespace ELBA
       glm::vec3 T = (P * Q_UV.y - Q * P_UV.y) * r;
       glm::vec3 B = (Q * P_UV.x - P * Q_UV.x) * r;
 
+
+      //T.x = r * (Q_UV.y * P.x - P_UV.y * Q.x);
+      //T.y = r * (Q_UV.y * P.y - P_UV.y * Q.y);
+      //T.z = r * (Q_UV.y * P.z - P_UV.y * Q.z);
+      //T = glm::normalize(T);
+
+      //B.x = r * (-Q_UV.x * P.x + P_UV.x * Q.x);
+      //B.y = r * (-Q_UV.x * P.y + P_UV.x * Q.y);
+      //B.z = r * (-Q_UV.x * P.z + P_UV.x * Q.z);
+      //B = glm::normalize(B);
+
       //std::cout << "Tangent: " << T.x << ", " << T.y << std::endl;
       //std::cout << "Bitangent: " << B.x << ", " << B.y << std::endl;
 
