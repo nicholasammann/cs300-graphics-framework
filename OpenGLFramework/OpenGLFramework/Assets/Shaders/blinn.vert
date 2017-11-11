@@ -23,11 +23,11 @@ void main()
 
   // invert
   // model space
-  vec3 tang = normalize(vec3(view * model * vec4(aTangent, 0)).xyz);
-  vec3 bitang = normalize(vec3(view * model * vec4(aBitangent, 0)).xyz);
-  vec3 norm = normalize(vec3(view * model * vec4(aNormal, 0)).xyz);
+  vec3 tang = vec3((view * model * vec4(aTangent, 0)).xyz);
+  vec3 bitang = vec3((view * model * vec4(aBitangent, 0)).xyz);
+  vec3 norm = vec3((view * model * vec4(aNormal, 0)).xyz);
 
-  TBN = transpose(mat3(tang, bitang, norm));
+  TBN = mat3(tang, bitang, norm);
   
   // calculate position and normal in view space
   vec4 vPos = view * model * vec4(aPos, 1);

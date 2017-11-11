@@ -594,7 +594,7 @@ namespace ELBA
 
       if (abs(den) < 0.0000001f)
       {
-        den = 0.0001f;
+        den = 0.000001f;
       }
 
       float r = 1.0f / den;
@@ -602,7 +602,8 @@ namespace ELBA
       glm::vec3 T = (P * Q_UV.y - Q * P_UV.y) * r;
       glm::vec3 B = (Q * P_UV.x - P * Q_UV.x) * r;
 
-
+      //glm::vec3 T;
+      //glm::vec3 B;
       //T.x = r * (Q_UV.y * P.x - P_UV.y * Q.x);
       //T.y = r * (Q_UV.y * P.y - P_UV.y * Q.y);
       //T.z = r * (Q_UV.y * P.z - P_UV.y * Q.z);
@@ -617,8 +618,8 @@ namespace ELBA
       //std::cout << "Bitangent: " << B.x << ", " << B.y << std::endl;
 
       // store the calculated vectors on the face
-      f.tangent = T;
-      f.bitangent = B;
+      f.tangent = glm::normalize(T);
+      f.bitangent = glm::normalize(B);
 
       for (int i = 0; i < 3; ++i)
       {
@@ -650,16 +651,15 @@ namespace ELBA
     }
   }
 
-  float & Mesh::GetDebugLineWidth()
+  float& Mesh::GetDebugLineWidth()
   {
     return mDebugLineWidth;
   }
 
-  float & Mesh::GetDebugLineLength()
+  float& Mesh::GetDebugLineLength()
   {
     return mDebugLineLength;
   }
-
 }
 
 
