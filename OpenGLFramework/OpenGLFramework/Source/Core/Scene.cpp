@@ -65,7 +65,7 @@ namespace ELBA
 
       case Spot:
       {
-        for (int i = 0; i < 8; ++i)
+        for (int i = 0; i < 1; ++i)
         {
           Model *mod = new Model(aApp, "../OpenGLFramework/Assets/Models/sphere.obj", "Sphere");
           mod->SetShader("Light Model");
@@ -76,8 +76,8 @@ namespace ELBA
           light.SetPos(-2.0f + i / 2.0f, 0, 5, 1);
           light.SetDirection(0, 0, 0, 0);
           light.SetAmbient(0, 0, 0, 1);
-          light.SetDiffuse(1.0f, 0.4f, 1.0f, 1);
-          light.SetSpecular(1.0f, 0.4f, 1.0f, 1);
+          light.SetDiffuse(1.0f, 1.0f, 1.0f, 1);
+          light.SetSpecular(1.0f, 1.0f, 1.0f, 1);
           light.c1 = 1.0f;
           light.c2 = 0.1f;
           light.c3 = 0.0f;

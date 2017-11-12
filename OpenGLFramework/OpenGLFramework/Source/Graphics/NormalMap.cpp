@@ -1,6 +1,7 @@
 #include <GL/glew.h>
 #include <glm/vec3.hpp>
 #include <glm/gtx/matrix_cross_product.hpp>
+#include <fstream>
 
 #include "../Utils/stb_image.h"
 
@@ -62,7 +63,6 @@ ELBA::NormalMap::NormalMap(const char *aPath)
       mNormalMap[j * (ind + 2)] = 255 * 0.5f * (s.z + 1);  // B
     }
   }
-
 
   glGenTextures(1, &mTexture);
 

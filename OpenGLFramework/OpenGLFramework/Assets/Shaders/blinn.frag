@@ -360,9 +360,9 @@ void main()
   {
     trueNormal = vec4(texture(normalTexture, uv).rgb, 0);
     trueNormal = vec4(TBN * trueNormal.xyz, 0);
-    trueNormal = trueNormal;
+    trueNormal = normalize(trueNormal);
   }
 
   
-  vFragColor = trueNormal;//computeFragmentColor(diffuse, shininess, trueNormal);
+  vFragColor = computeFragmentColor(diffuse, shininess, trueNormal);
 }
