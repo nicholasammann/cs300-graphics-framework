@@ -7,14 +7,15 @@ in vec3 oObjNorm;
 in vec4 oViewPos;
 in vec4 oViewNorm;
 
-in vec3 oViewTangent;
-in vec3 oViewBitangent;
+in vec4 oViewTangent;
+in vec4 oViewBitangent;
 
 in mat3 TBN;
 
 // texture uniforms
 uniform int UseTextures;
 uniform int MappingType;
+uniform int DebugColors;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
@@ -136,13 +137,13 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shinines
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(trueNormal, lightUnitVec), 0);
+  float diffuseFactor = max(dot(trueNormal.xyz, lightUnitVec.xyz), 0);
   vec4 diff = diffuseFactor * light.diffuse * adiffuse;
 
   // calculate specular color
   vec4 viewVec = -vec4(oViewPos.xyz, 0);
   vec4 halfVec = lightUnitVec + viewVec;
-  float specFactor = pow(max(dot(trueNormal, halfVec), 0), Material.shininess);
+  float specFactor = pow(max(dot(trueNormal.xyz, halfVec.xyz), 0), Material.shininess);
   vec4 specColor = light.specular * Material.specular * specFactor;
   
 
@@ -154,7 +155,7 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shinines
 
   // calculate spotlight effect
   vec4 spotUnitDir = normalize(view * -light.direction);
-  float alpha = dot(spotUnitDir, lightUnitVec);
+  float alpha = dot(spotUnitDir.xyz, lightUnitVec.xyz);
 
   float phi = cos(radians(spotOuterAngle));
   float theta = cos(radians(spotInnerAngle));
@@ -358,11 +359,33 @@ void main()
 
   if (UseNormalMap == 1)
   {
-    trueNormal = vec4(texture(normalTexture, uv).rgb, 0);
-    trueNormal = vec4(TBN * trueNormal.xyz, 0);
-    trueNormal = normalize(trueNormal);
+    vec3 sampledNorm = texture(normalTexture, uv).rgb;
+    vec3 viewspaceNorm = TBN * sampledNorm;
+    trueNormal = vec4(normalize(viewspaceNorm), 0);
   }
 
+  vec4 finalColor = vec4(0, 0, 0, 1);
   
-  vFragColor = computeFragmentColor(diffuse, shininess, trueNormal);
+  // draw normally
+  if (DebugColors == 0)
+  {
+    finalColor = computeFragmentColor(diffuse, shininess, trueNormal);
+  }
+  // use Tangent for RBG
+  else if (DebugColors == 1)
+  {
+    finalColor.rgb = oViewTangent.xyz;
+  }
+  // use Bitangent for RBG
+  else if (DebugColors == 2)
+  {
+    finalColor.rgb = oViewBitangent.xyz;
+  }
+  // use Normal for RBG
+  else if (DebugColors == 3)
+  {
+    finalColor.rgb = trueNormal.xyz;
+  }
+
+  vFragColor = finalColor;
 }

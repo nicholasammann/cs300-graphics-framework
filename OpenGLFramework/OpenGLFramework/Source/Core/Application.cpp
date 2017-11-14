@@ -168,11 +168,11 @@ namespace ELBA
 
   void Application::ProcessInput()
   {
-    float camSpeed = 0.01f;
+    float camSpeed = 0.1f;
 
     if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-      camSpeed = 0.025f;
+      camSpeed = 0.2f;
     }
 
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)

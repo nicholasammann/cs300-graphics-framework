@@ -48,19 +48,20 @@ ELBA::NormalMap::NormalMap(const char *aPath)
         iSwooce = mWidth - 1;
       }
 
-      glm::vec3 s(1, 0, mHeightMap[j * iWoo * 3] - mHeightMap[j * iSwooce * 3]);
+      glm::vec3 s(1, 0, mHeightMap[j * mWidth * 3 + iWoo * 3] - mHeightMap[j * mWidth + iSwooce * 3]);
 
-      glm::vec3 t(0, 1, mHeightMap[jWoo * i * 3] - mHeightMap[jSwooce * i * 3]);
+      glm::vec3 t(0, 1, mHeightMap[jWoo * mWidth * 3 + i * 3] - mHeightMap[jSwooce * mWidth * 3 + i * 3]);
       
       glm::vec3 n = glm::cross(s, t);
       
       glm::normalize(n);
       
-      int ind = 3 * i;
+      //         height            width
+      int ind = (j * mWidth * 3) + (i * 3);
 
-      mNormalMap[j * ind] = 255 * 0.5f * (s.x + 1);      // R
-      mNormalMap[j * (ind + 1)] = 255 * 0.5f * (s.y + 1);  // G
-      mNormalMap[j * (ind + 2)] = 255 * 0.5f * (s.z + 1);  // B
+      mNormalMap[ind] = 255 * 0.5f * (s.x + 1);      // R
+      mNormalMap[ind + 1] = 255 * 0.5f * (s.y + 1);  // G
+      mNormalMap[ind + 2] = 255 * 0.5f * (s.z + 1);  // B
     }
   }
 

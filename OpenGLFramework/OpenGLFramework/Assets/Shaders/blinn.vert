@@ -14,6 +14,9 @@ out vec3 oObjNorm;
 out vec4 oViewPos;
 out vec4 oViewNorm;
 
+out vec4 oViewTangent;
+out vec4 oViewBitangent;
+
 out mat3 TBN;
 
 void main()
@@ -23,9 +26,12 @@ void main()
 
   // invert
   // model space
-  vec3 tang = vec3((view * model * vec4(aTangent, 0)).xyz);
-  vec3 bitang = vec3((view * model * vec4(aBitangent, 0)).xyz);
-  vec3 norm = vec3((view * model * vec4(aNormal, 0)).xyz);
+  vec4 tang = view * model * vec4(normalize(aTangent), 0);
+  vec4 bitang = view * model * vec4(normalize(aBitangent), 0);
+  vec4 norm = view * model * vec4(normalize(aNormal), 0);
+
+  oViewTangent = tang;
+  oViewBitangent = bitang;
 
   TBN = mat3(tang, bitang, norm);
   

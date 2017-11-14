@@ -81,6 +81,8 @@ namespace ELBA
     matLoc = glGetUniformLocation(shdrPrg, "Material.shininess");
     glUniform1f(matLoc, mMaterial.shininess);
 
+    int loc = glGetUniformLocation(shdrPrg, "DebugColors");
+    glUniform1i(loc, mDebugColorMode);
 
     glBindVertexArray(mVAO);
     glDrawElements(GL_TRIANGLES, mFaces.size() * 3, GL_UNSIGNED_INT, 0);
@@ -269,6 +271,22 @@ namespace ELBA
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(Vertex), mVertices.data(), GL_STATIC_DRAW);
     //////////////////////////////
 
+    // tell OpenGL how it should interpret all vertex data
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mPos));
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mNormal));
+
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mTangent));
+
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mBitangent));
+
+
+    //// Element Buffer Object ////
+    // create and bind empty element buffer object
     unsigned int *indices = new unsigned int[mFaces.size() * 3];
 
     for (unsigned int i = 0; i < mFaces.size(); ++i)
@@ -279,25 +297,11 @@ namespace ELBA
       }
     }
 
-    //// Element Buffer Object ////
-    // create and bind empty element buffer object
     glGenBuffers(1, &mEBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mEBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mFaces.size() * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
     ///////////////////////////////
 
-    // tell OpenGL how it should interpret all vertex data
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
-
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mNormal));
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mTangent));
-
-    glEnableVertexAttribArray(2);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, mBitangent));
 
     glBindVertexArray(0);
 
@@ -594,7 +598,7 @@ namespace ELBA
 
       if (abs(den) < 0.0000001f)
       {
-        den = 9999999999.0f;
+        den = 0.00000001f;
       }
 
       float r = 1.0f / den;

@@ -94,6 +94,7 @@ namespace ELBA
     // shader for drawing debug lines
     Shader *mDebugShader;
 
+
   };
 
 }
