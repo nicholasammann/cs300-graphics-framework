@@ -14,6 +14,9 @@ out vec3 oObjNorm;
 out vec4 oViewPos;
 out vec4 oViewNorm;
 
+out vec3 modTang;
+out vec3 modBitang;
+
 out vec4 oViewTangent;
 out vec4 oViewBitangent;
 
@@ -33,7 +36,7 @@ void main()
   oViewTangent = tang;
   oViewBitangent = bitang;
 
-  TBN = mat3(tang, bitang, norm);
+  TBN = mat3(tang.xyz, bitang.xyz, norm.xyz);
   
   // calculate position and normal in view space
   vec4 vPos = view * model * vec4(aPos, 1);

@@ -10,6 +10,9 @@ in vec4 oViewNorm;
 in vec4 oViewTangent;
 in vec4 oViewBitangent;
 
+in vec3 modTang;
+in vec3 modBitang;
+
 in mat3 TBN;
 
 // texture uniforms
@@ -364,7 +367,7 @@ void main()
     trueNormal = vec4(normalize(viewspaceNorm), 0);
   }
 
-  vec4 finalColor = vec4(0, 0, 0, 1);
+  vec4 finalColor = vec4(0, 0, 0, 255);
   
   // draw normally
   if (DebugColors == 0)
@@ -374,12 +377,12 @@ void main()
   // use Tangent for RBG
   else if (DebugColors == 1)
   {
-    finalColor.rgb = oViewTangent.xyz;
+    finalColor.rgb = TBN * modTang.xyz;
   }
   // use Bitangent for RBG
   else if (DebugColors == 2)
   {
-    finalColor.rgb = oViewBitangent.xyz;
+    finalColor.rgb = TBN * modBitang.xyz;
   }
   // use Normal for RBG
   else if (DebugColors == 3)
