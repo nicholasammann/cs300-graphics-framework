@@ -168,11 +168,11 @@ namespace ELBA
 
   void Application::ProcessInput()
   {
-    float camSpeed = 0.1f;
+    float camSpeed = 0.05f;
 
     if (glfwGetKey(mWindow, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
     {
-      camSpeed = 0.2f;
+      camSpeed = 0.075f;
     }
 
     if (glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -293,7 +293,7 @@ namespace ELBA
     mod->mMappingType = 0;
     mod->mUsingTextures = true;
 
-    NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
+    NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/testnormal.tga");
     mod->mNormalTexture = normTex;
     mod->mUsingNormalMap = true;
 

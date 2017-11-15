@@ -146,7 +146,7 @@ vec4 spotlight_computeColor(in int lightIdx, in vec4 adiffuse, in float shinines
   // calculate specular color
   vec4 viewVec = -vec4(oViewPos.xyz, 0);
   vec4 halfVec = lightUnitVec + viewVec;
-  float specFactor = pow(max(dot(trueNormal.xyz, halfVec.xyz), 0), Material.shininess);
+  float specFactor = pow(max(dot(trueNormal, halfVec), 0), Material.shininess);
   vec4 specColor = light.specular * Material.specular * specFactor;
   
 
@@ -363,11 +363,15 @@ void main()
   if (UseNormalMap == 1)
   {
     vec3 sampledNorm = texture(normalTexture, uv).rgb;
+
+    sampledNorm = 2 * (sampledNorm - vec3(0.5, 0.5, 0.5));
+
     vec3 viewspaceNorm = TBN * sampledNorm;
-    trueNormal = vec4(normalize(viewspaceNorm), 0);
+
+    trueNormal = normalize(vec4(viewspaceNorm, 0));
   }
 
-  vec4 finalColor = vec4(0, 0, 0, 255);
+  vec4 finalColor = vec4(0, 0, 0, 1);
   
   // draw normally
   if (DebugColors == 0)
@@ -377,12 +381,12 @@ void main()
   // use Tangent for RBG
   else if (DebugColors == 1)
   {
-    finalColor.rgb = TBN * modTang.xyz;
+    finalColor.rgb = oViewTangent.xyz;
   }
   // use Bitangent for RBG
   else if (DebugColors == 2)
   {
-    finalColor.rgb = TBN * modBitang.xyz;
+    finalColor.rgb = oViewBitangent.xyz;
   }
   // use Normal for RBG
   else if (DebugColors == 3)

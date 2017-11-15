@@ -596,12 +596,7 @@ namespace ELBA
 
       float den = (P_UV.x * Q_UV.y - P_UV.y * Q_UV.x);
 
-      if (abs(den) < 0.0000001f)
-      {
-        den = 0.00000001f;
-      }
-
-      float r = 1.0f / den;
+      float r = (den == 0.0f) ? 0.0f : 1 / den;
 
       glm::vec3 T = (P * Q_UV.y - Q * P_UV.y) * r;
       glm::vec3 B = (Q * P_UV.x - P * Q_UV.x) * r;

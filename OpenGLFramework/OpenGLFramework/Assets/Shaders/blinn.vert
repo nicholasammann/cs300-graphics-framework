@@ -27,8 +27,6 @@ void main()
   oObjPos = aPos;
   oObjNorm = aNormal;
 
-  // invert
-  // model space
   vec4 tang = view * model * vec4(normalize(aTangent), 0);
   vec4 bitang = view * model * vec4(normalize(aBitangent), 0);
   vec4 norm = view * model * vec4(normalize(aNormal), 0);
