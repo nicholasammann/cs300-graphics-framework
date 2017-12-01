@@ -99,4 +99,35 @@ namespace ELBA
     UpdateVectors();
   }
 
+  glm::mat4 Camera::ConstructSkyboxView()
+  {
+    UpdateVectors();
+
+    glm::vec3 p(0, 0, 0);
+
+    glm::mat4 view;
+
+    // column 0
+    view[0][0] = mCameraRight.x;
+    view[1][0] = mCameraRight.y;
+    view[2][0] = mCameraRight.z;
+    view[3][0] = -dot(mCameraRight, p);
+
+    // column 1
+    view[0][1] = mCameraUp.x;
+    view[1][1] = mCameraUp.y;
+    view[2][1] = mCameraUp.z;
+    view[3][1] = -dot(mCameraUp, p);
+
+    // column 2
+    view[0][2] = -mDirection.x;
+    view[1][2] = -mDirection.y;
+    view[2][2] = -mDirection.z;
+    view[3][2] = dot(mDirection, p);
+
+    view[3][3] = 1.0f;
+
+    return view;
+  }
+
 }

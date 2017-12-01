@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace ELBA
 {
   
@@ -18,11 +20,18 @@ namespace ELBA
 
     void Destroy();
 
+    void BindTexture(char aSlot);
+
+    void SetTextureUniform(unsigned int aShaderPrg, std::string aUniform , char aSlot);
+
+    void UnbindTexture();
 
     unsigned int mHandle;
     unsigned int mRenderBuffer;
     unsigned int mTexture;
+    char mTextureSlot;
     unsigned char *mTextureData;
+
 
   };
 

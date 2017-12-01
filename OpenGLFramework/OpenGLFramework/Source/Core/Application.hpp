@@ -32,6 +32,7 @@ namespace ELBA
   class Camera;
   class Editor;
   class CubeMap;
+  class Skybox;
 
   using shdr_info = std::tuple<std::string, std::string, std::string>;
   using shader_path_vec = std::vector<shdr_info>;
@@ -76,9 +77,11 @@ namespace ELBA
 
     void UpdateCamera();
 
-    void Render(Camera *aCamera, int aWidth, int aHeight);
+    void Render(Camera *aCamera, int aWidth, int aHeight, bool aUseClearColor);
 
   private:
+
+    Skybox *mSkybox;
 
     Editor *mEditor;
 

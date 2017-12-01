@@ -27,6 +27,7 @@ Creation date: 10/23/17
 #include "../Graphics/NormalMap.hpp"
 #include "../Graphics/Shader.hpp"
 #include "../Graphics/Texture.hpp"
+#include "../Graphics/Skybox.hpp"
 
 #include "Application.hpp"
 #include "Camera.hpp"
@@ -102,7 +103,15 @@ namespace ELBA
 
     mEditor->Update();
     
-    Render(mCamera, mWindowWidth, mWindowHeight);
+    for (auto m : mModels)
+    {
+      if (m->mUsingEnvironmentMap)
+      {
+        m->UpdateEnvironmentMap();
+      }
+    }
+
+    Render(mCamera, mWindowWidth, mWindowHeight, true);
 
     ImGui::Render();
 
@@ -218,11 +227,18 @@ namespace ELBA
     }
   }
 
-  void Application::Render(Camera *aCamera, int aWidth, int aHeight)
+  void Application::Render(Camera *aCamera, int aWidth, int aHeight, bool aUseClearColor)
   {
     // rendering commands
-    glClearColor(mBackgroundColor.r, mBackgroundColor.g, mBackgroundColor.b, mBackgroundColor.a);
+    if (aUseClearColor)
+    {
+      glClearColor(mBackgroundColor.r, mBackgroundColor.g, mBackgroundColor.b, mBackgroundColor.a);
+      glViewport(0, 0, aWidth, aHeight);
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    mSkybox->Draw();
 
     for (Model *m : mModels)
     {
@@ -237,6 +253,8 @@ namespace ELBA
       shdr->UseShaderProgram();
 
       BindLights(shdrPrg);
+
+      std::cout << "Pos: " << aCamera->mPosition.x << ", " << aCamera->mPosition.y << ", " << aCamera->mPosition.z << std::endl;
 
       glm::mat4 view = aCamera->ConstructViewMatrix();
       unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
@@ -277,12 +295,15 @@ namespace ELBA
 
     CreateShader("Light Model", p + "light_model.vert", p + "light_model.frag");
     mShaderPaths.emplace_back(shdr_info("Light Model", p + "light_model.vert", p + "light_model.frag"));
+
+    CreateShader("Skybox", p + "skybox.vert", p + "skybox.frag");
+    mShaderPaths.emplace_back(shdr_info("Skybox", p + "skybox.vert", p + "skybox.frag"));
   }
 
   void Application::CreateInitialModels()
   {
     Model *mod = new Model(this, "../OpenGLFramework/Assets/Models/cube.obj", "Cube");
-    mod->SetShader("Blinn");
+    mod->SetShader("Phong Shading");
     mod->GetTransform().mWorldPos.z = 0.0f;
     
     Texture *diffTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_diff_512x512.tga");
@@ -300,13 +321,17 @@ namespace ELBA
 
     mModels.push_back(mod);
 
-    Model *plane = new Model(this, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
-    plane->SetShader("Blinn");
-    plane->GetTransform().mWorldPos.y = -2.0f;
-    plane->GetTransform().mScale.x = 10.0f;
-    plane->GetTransform().mScale.z = 10.0f;
-    mModels.push_back(plane);
+    //Model *plane = new Model(this, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
+    //plane->SetShader("Blinn");
+    //plane->GetTransform().mWorldPos.y = -2.0f;
+    //plane->GetTransform().mScale.x = 10.0f;
+    //plane->GetTransform().mScale.z = 10.0f;
+    //mModels.push_back(plane);
 
+    int skyboxShader = GetShader("Skybox")->GetShaderProgram();
+
+    mSkybox = new Skybox(this, skyboxShader);
+    mSkybox->Build();
   }
 
   void Application::CreateInitialLights()

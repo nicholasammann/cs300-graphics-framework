@@ -47,29 +47,29 @@ ELBA::NormalMap::NormalMap(const char *aPath)
     }
   }
 
-  std::ofstream file("normal_map.ppm");
-
-  if (file.is_open())
-  {
-    file << "P3 " << mWidth << " " << mHeight << " " << 255 << '\n';
-
-    for (int j = 0; j < mHeight; j++)
-    {
-      for (int i = 0; i < mWidth; i++)
-      {
-        int col = mNormalMap[j * mWidth + i];
-        file << col << " ";
-
-        col = mNormalMap[j * mWidth + i + 1];
-        file << col << " ";
-
-        col = mNormalMap[j * mWidth + i + 2];
-        file << col << " ";
-      }
-      file << '\n';
-    }
-    file.close();
-  }
+  //std::ofstream file("normal_map.ppm");
+  //
+  //if (file.is_open())
+  //{
+  //  file << "P3 " << mWidth << " " << mHeight << " " << 255 << '\n';
+  //
+  //  for (int j = 0; j < mHeight; j++)
+  //  {
+  //    for (int i = 0; i < mWidth; i++)
+  //    {
+  //      int col = mNormalMap[j * mWidth + i];
+  //      file << col << " ";
+  //
+  //      col = mNormalMap[j * mWidth + i + 1];
+  //      file << col << " ";
+  //
+  //      col = mNormalMap[j * mWidth + i + 2];
+  //      file << col << " ";
+  //    }
+  //    file << '\n';
+  //  }
+  //  file.close();
+  //}
 
   glGenTextures(1, &mTexture);
 

@@ -102,6 +102,12 @@
     <ClInclude Include="Source\Graphics\Framebuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Graphics\Skybox.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Utils\stb_image_write.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />
@@ -165,6 +171,9 @@
     <ClCompile Include="Source\Graphics\Framebuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Graphics\Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\BasicFragment.glsl" />
@@ -181,5 +190,7 @@
     <None Include="Assets\Shaders\phong_lighting.vert" />
     <None Include="Assets\Shaders\light_model.vert" />
     <None Include="Assets\Shaders\light_model.frag" />
+    <None Include="Assets\Shaders\skybox.frag" />
+    <None Include="Assets\Shaders\skybox.vert" />
   </ItemGroup>
 </Project>

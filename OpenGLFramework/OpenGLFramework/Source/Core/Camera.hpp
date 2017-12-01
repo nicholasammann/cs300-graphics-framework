@@ -35,6 +35,8 @@ namespace ELBA
 
     void SetTargetPoint(glm::vec3 aPoint);
 
+    glm::mat4 ConstructSkyboxView();
+
     glm::vec3 mPosition;
     glm::vec3 mTarget;
     glm::vec3 mDirection;

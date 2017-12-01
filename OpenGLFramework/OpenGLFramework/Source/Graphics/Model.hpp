@@ -24,6 +24,7 @@ namespace ELBA
   class Texture;
   class Application;
   class NormalMap;
+  class CubeMap;
 
   struct Transform
   {

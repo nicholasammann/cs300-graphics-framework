@@ -20,16 +20,31 @@ uniform int UseTextures;
 uniform int MappingType;
 uniform int DebugColors;
 
+
+// standard textures
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
 uniform sampler2D normalTexture;
 
 uniform int UseNormalMap;
 
+
+// environment mapping textures
+uniform sampler2D CubeMapTop;
+uniform sampler2D CubeMapBottom;
+uniform sampler2D CubeMapFront;
+uniform sampler2D CubeMapBack;
+uniform sampler2D CubeMapLeft;
+uniform sampler2D CubeMapRight;
+
+uniform int UseEnvironmentMap;
+
 uniform vec3 pMin;
 uniform vec3 pMax;
 
+uniform mat4 model;
 uniform mat4 view;
+uniform mat4 projection;
 
 // LIGHT UNIFORMS
 
@@ -367,12 +382,86 @@ void main()
     trueNormal = normalize(vec4(viewspaceNorm, 0));
   }
 
+
+  if (UseEnvironmentMap != 0)
+  {
+    // calculate reflection/refraction of the view vector wrt normal
+    vec4 viewVec = normalize(vec4(0, 0, 0, 1) - oViewPos);
+
+    vec4 normal = -oViewNorm;
+
+    vec4 reflec = 2.0 * normal * dot(normal, viewVec) - viewVec;
+    
+    vec3 posReflec = vec3(abs(reflec.x), abs(reflec.y), abs(reflec.z));
+
+    // use reflection/refraction vec to choose cube map side
+    float maxVal = max(max(posReflec.x, posReflec.y), posReflec.z);
+
+    if (maxVal == posReflec.x)
+    {
+      uv.x = reflec.y / reflec.x;
+      uv.y = reflec.z / reflec.x;
+
+      uv.x = (uv.x + 1.0) / 2.0;
+      uv.y = (uv.y + 1.0) / 2.0;
+      
+      // choose left texture
+      if (reflec.x < 0)
+      {
+        diffuse = vec4(texture(CubeMapLeft, uv).rgb, 1);
+      }
+      // choose right texture
+      else
+      {
+        diffuse = vec4(texture(CubeMapRight, uv).rgb, 1);
+      }
+    }
+    else if (maxVal == posReflec.y)
+    {
+      uv.x = reflec.x / reflec.y;
+      uv.y = reflec.z / reflec.y;
+    
+      uv.x = (uv.x + 1.0) / 2.0;
+      uv.y = (uv.y + 1.0) / 2.0;
+    
+      // choose bottom texture
+      if (reflec.y < 0)
+      {
+        diffuse = vec4(texture(CubeMapBottom, uv).rgb, 1);
+      }
+      // choose top texture
+      else
+      {
+        diffuse = vec4(texture(CubeMapTop, uv).rgb, 1);
+      }
+    }
+    else if (maxVal == posReflec.z)
+    {
+      uv.x = reflec.x / reflec.z;
+      uv.y = reflec.y / reflec.z;
+    
+      uv.x = (uv.x + 1.0) / 2.0;
+      uv.y = (uv.y + 1.0) / 2.0;
+    
+      // choose back texture
+      if (reflec.z < 0)
+      {
+        diffuse = vec4(texture(CubeMapBack, uv).rgb, 1);
+      }
+      // choose front texture
+      else
+      {
+        diffuse = vec4(texture(CubeMapFront, uv).rgb, 1);
+      }
+    }
+  }
+
   vec4 finalColor = vec4(0, 0, 0, 1);
   
   // draw normally
   if (DebugColors == 0)
   {
-    finalColor = computeFragmentColor(diffuse, shininess, trueNormal);
+    finalColor = diffuse;   //computeFragmentColor(diffuse, shininess, trueNormal);
   }
   // use Tangent for RBG
   else if (DebugColors == 1)

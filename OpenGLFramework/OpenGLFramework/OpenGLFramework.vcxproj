@@ -138,6 +138,7 @@
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\NormalMap.cpp" />
     <ClCompile Include="Source\Graphics\Shader.cpp" />
+    <ClCompile Include="Source\Graphics\Skybox.cpp" />
     <ClCompile Include="Source\Graphics\Texture.cpp" />
     <ClCompile Include="Source\Graphics\TextureMapping.cpp" />
     <ClCompile Include="Source\ImGui\imgui.cpp" />
@@ -158,6 +159,7 @@
     <ClInclude Include="Source\Graphics\CubeMap.hpp" />
     <ClInclude Include="Source\Graphics\Framebuffer.hpp" />
     <ClInclude Include="Source\Graphics\NormalMap.hpp" />
+    <ClInclude Include="Source\Graphics\Skybox.hpp" />
     <ClInclude Include="Source\Graphics\TextureMapping.hpp" />
     <ClInclude Include="Source\Utils\MathUtils.hpp" />
     <ClInclude Include="Source\Utils\stb_image.h" />
@@ -178,6 +180,7 @@
     <ClInclude Include="Source\ImGui\stb_textedit.h" />
     <ClInclude Include="Source\ImGui\stb_truetype.h" />
     <ClInclude Include="Source\Utils\MeshLoader.hpp" />
+    <ClInclude Include="Source\Utils\stb_image_write.h" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="Lib\glew32.lib" />
@@ -196,6 +199,8 @@
     <None Include="Assets\Shaders\phong_shading.vert" />
     <None Include="Assets\Shaders\simple.frag" />
     <None Include="Assets\Shaders\simple.vert" />
+    <None Include="Assets\Shaders\skybox.frag" />
+    <None Include="Assets\Shaders\skybox.vert" />
     <None Include="DLLS\glew32.dll" />
     <None Include="Shaders\BasicFragment.glsl" />
   </ItemGroup>

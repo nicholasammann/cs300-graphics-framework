@@ -37,9 +37,7 @@ void main()
   TBN = mat3(tang.xyz, bitang.xyz, norm.xyz);
   
   // calculate position and normal in view space
-  vec4 vPos = view * model * vec4(aPos, 1);
-
-  oViewPos = vPos;
+  oViewPos = view * model * vec4(aPos, 1);
   oViewNorm = view * model * vec4(aNormal, 0);
 
   // final world coordinates

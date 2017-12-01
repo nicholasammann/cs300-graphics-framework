@@ -14,6 +14,10 @@ namespace ELBA
 
     void UpdateTextures(glm::vec3 aPos);
 
+    void SetTextureUniforms(unsigned int aShaderPrg);
+
+    void UnbindTextures();
+
   private:
     Application *mApplication;
 

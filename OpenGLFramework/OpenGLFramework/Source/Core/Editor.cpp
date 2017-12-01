@@ -574,7 +574,7 @@ void ELBA::Editor::Update()
       path += mLoadBuffer;
 
       Model *mod = new Model(mApp, path.data(), mLoadBuffer);
-      mod->SetShader("Blinn");
+      mod->SetShader("Phong Shading");
 
       Texture *diffTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_diff_512x512.tga");
       mod->mDiffuseTexture = diffTex;
@@ -592,12 +592,12 @@ void ELBA::Editor::Update()
       mApp->GetModels().clear();
       mApp->GetModels().push_back(mod);
 
-      Model *plane = new Model(mApp, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
-      plane->SetShader("Blinn");
-      plane->GetTransform().mWorldPos.y = -2.0f;
-      plane->GetTransform().mScale.x = 10.0f;
-      plane->GetTransform().mScale.z = 10.0f;
-      mApp->GetModels().push_back(plane);
+      //Model *plane = new Model(mApp, "../OpenGLFramework/Assets/Models/plane.obj", "Plane");
+      //plane->SetShader("Blinn");
+      //plane->GetTransform().mWorldPos.y = -2.0f;
+      //plane->GetTransform().mScale.x = 10.0f;
+      //plane->GetTransform().mScale.z = 10.0f;
+      //mApp->GetModels().push_back(plane);
     }
 
     ImGui::SameLine();

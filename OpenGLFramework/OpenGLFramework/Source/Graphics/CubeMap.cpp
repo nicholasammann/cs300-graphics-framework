@@ -1,10 +1,22 @@
 #include <GL/glew.h>
 
+#include <iostream>
+
 #include "../Core/Application.hpp"
 
 #include "Framebuffer.hpp"
 
 #include "CubeMap.hpp"
+
+enum TexSlots
+{
+  Top = 0,
+  Bottom,
+  Front,
+  Back,
+  Left,
+  Right
+};
 
 
 namespace ELBA
@@ -35,46 +47,81 @@ namespace ELBA
 
   void CubeMap::UpdateTextures(glm::vec3 aPos)
   {
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
     mCamera->SetPosition(aPos);
+    
     mCamera->SetTargetPoint(aPos + glm::vec3(0, 1, 0));
     mTop->Bind();
-    mApplication->Render(mCamera, 512, 512);
+    mTop->Clear();
+    mApplication->Render(mCamera, 512, 512, false);
     mTop->Unbind();
 
-    
-    mCamera->SetPosition(aPos);
     mCamera->SetTargetPoint(aPos + glm::vec3(0, -1, 0));
     mBottom->Bind();
-    mApplication->Render(mCamera, 512, 512);
+    mBottom->Clear();
+    mApplication->Render(mCamera, 512, 512, false);
     mBottom->Unbind();
-
-
-    mCamera->SetPosition(aPos);
+    
     mCamera->SetTargetPoint(aPos + glm::vec3(0, 0, 1));
     mFront->Bind();
-    mApplication->Render(mCamera, 512, 512);
+    mFront->Clear();
+    mApplication->Render(mCamera, 512, 512, false);
     mFront->Unbind();
-
-
-    mCamera->SetPosition(aPos);
+    
     mCamera->SetTargetPoint(aPos + glm::vec3(0, 0, -1));
     mBack->Bind();
-    mApplication->Render(mCamera, 512, 512);
+    mBack->Clear();
+    mApplication->Render(mCamera, 512, 512, false);
     mBack->Unbind();
-
-
-    mCamera->SetPosition(aPos);
+    
     mCamera->SetTargetPoint(aPos + glm::vec3(-1, 0, 0));
     mLeft->Bind();
-    mApplication->Render(mCamera, 512, 512);
+    mLeft->Clear();
+    mApplication->Render(mCamera, 512, 512, false);
     mLeft->Unbind();
-
-
-    mCamera->SetPosition(aPos);
+    
     mCamera->SetTargetPoint(aPos + glm::vec3(1, 0, 0));
     mRight->Bind();
-    mApplication->Render(mCamera, 512, 512);
+    mRight->Clear();
+    mApplication->Render(mCamera, 512, 512, false);
     mRight->Unbind();
+
+    glDisable(GL_CULL_FACE);
+  }
+
+
+  void CubeMap::SetTextureUniforms(unsigned int aShaderPrg)
+  {
+    mTop->SetTextureUniform(aShaderPrg, "CubeMapTop", Top);
+    mTop->BindTexture(Top);
+    
+    mBottom->SetTextureUniform(aShaderPrg, "CubeMapBottom", Bottom);
+    mBottom->BindTexture(Bottom);
+
+    mFront->SetTextureUniform(aShaderPrg, "CubeMapFront", Front);
+    mFront->BindTexture(Front);
+    
+    mBack->SetTextureUniform(aShaderPrg, "CubeMapBack", Back);
+    mBack->BindTexture(Back);
+
+    mLeft->SetTextureUniform(aShaderPrg, "CubeMapLeft", Left);
+    mLeft->BindTexture(Left);
+    
+    mRight->SetTextureUniform(aShaderPrg, "CubeMapRight", Right);
+    mRight->BindTexture(Right);
+  }
+
+  void CubeMap::UnbindTextures()
+  {
+    mTop->UnbindTexture();
+    mBottom->UnbindTexture();
+
+    mFront->UnbindTexture();
+    mBack->UnbindTexture();
+
+    mLeft->UnbindTexture();
+    mRight->UnbindTexture();
   }
 
 }

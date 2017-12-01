@@ -9,17 +9,15 @@ namespace ELBA
   Framebuffer::Framebuffer()
   {
   }
-
+  
   void Framebuffer::Build()
   {
-    mTextureData = new unsigned char[512 * 512 * 3];
-
     // create top texture
     glGenTextures(1, &mTexture);
     glBindTexture(GL_TEXTURE_2D, mTexture);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, mTextureData);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
     // create framebuffer
     glGenFramebuffers(1, &mHandle);
@@ -54,7 +52,7 @@ namespace ELBA
 
   void Framebuffer::Clear()
   {
-    glClearColor(0.f, 0.f, 0.f, 1.f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClearDepth(1.f);
   }
 
@@ -70,6 +68,25 @@ namespace ELBA
 
     glDeleteFramebuffers(1, &mHandle);
     mHandle = 0;
+  }
+
+  void Framebuffer::BindTexture(char aSlot)
+  {
+    glActiveTexture(GL_TEXTURE0 + aSlot);
+    glBindTexture(GL_TEXTURE_2D, mTexture);
+    mTextureSlot = aSlot;
+  }
+
+  void Framebuffer::SetTextureUniform(unsigned int aShaderPrg, std::string aUniform, char aSlot)
+  {
+    int loc = glGetUniformLocation(aShaderPrg, aUniform.c_str());
+    glUniform1i(loc, GL_TEXTURE0 + aSlot);
+  }
+
+  void Framebuffer::UnbindTexture()
+  {
+    glActiveTexture(GL_TEXTURE0 + mTextureSlot);
+    glBindTexture(GL_TEXTURE_2D, 0);
   }
 
 }

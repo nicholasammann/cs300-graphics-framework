@@ -36,7 +36,8 @@ namespace ELBA
     : mApp(aApp), mName(aName), mTransform(), mShaderName(""),
       mCurrentShaderSelect(0), mDiffuseTexture(nullptr),
       mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0),
-      mNormalTexture(nullptr), mUsingNormalMap(true)
+      mNormalTexture(nullptr), mUsingNormalMap(true),
+      mUsingEnvironmentMap(true)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();
@@ -98,6 +99,14 @@ namespace ELBA
       }
     }
 
+    loc = glGetUniformLocation(prg, "UseEnvironmentMap");
+    glUniform1i(loc, mUsingEnvironmentMap);
+
+    if (mUsingEnvironmentMap)
+    {
+      mEnvironmentMap->SetTextureUniforms(prg);
+    }
+
 
     for (unsigned int i = 0; i < mMeshes.size(); ++i)
     {
@@ -113,6 +122,11 @@ namespace ELBA
     if (mNormalTexture)
     {
       mNormalTexture->UnbindNormalMapTexture();
+    }
+
+    if (mUsingEnvironmentMap)
+    {
+      mEnvironmentMap->UnbindTextures();
     }
   }
 
