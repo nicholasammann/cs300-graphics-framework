@@ -388,7 +388,7 @@ void main()
     // calculate reflection/refraction of the view vector wrt normal
     vec4 viewVec = normalize(vec4(0, 0, 0, 1) - oViewPos);
 
-    vec4 normal = -oViewNorm;
+    vec4 normal = oViewNorm;
 
     vec4 reflec = 2.0 * normal * dot(normal, viewVec) - viewVec;
     

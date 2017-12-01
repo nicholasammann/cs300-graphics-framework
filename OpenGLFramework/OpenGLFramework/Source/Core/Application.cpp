@@ -254,7 +254,7 @@ namespace ELBA
 
       BindLights(shdrPrg);
 
-      std::cout << "Pos: " << aCamera->mPosition.x << ", " << aCamera->mPosition.y << ", " << aCamera->mPosition.z << std::endl;
+      //std::cout << "Pos: " << aCamera->mPosition.x << ", " << aCamera->mPosition.y << ", " << aCamera->mPosition.z << std::endl;
 
       glm::mat4 view = aCamera->ConstructViewMatrix();
       unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
