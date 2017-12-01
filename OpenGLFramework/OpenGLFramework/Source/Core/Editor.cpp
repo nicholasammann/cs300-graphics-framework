@@ -167,6 +167,14 @@ void ELBA::Editor::Update()
       }
 
 
+      if (ImGui::TreeNode("Environment Maps"))
+      {
+        ImGui::Checkbox("Use Environment Map", &models[k]->mUsingEnvironmentMap);
+
+        ImGui::TreePop();
+      }
+
+
       // for each mesh on the model
       auto meshes = models[k]->GetMeshes();
       

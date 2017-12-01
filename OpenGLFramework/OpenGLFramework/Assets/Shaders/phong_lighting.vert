@@ -1,6 +1,8 @@
 #version 330 core
 layout (location = 0) in vec3 aPos;
 layout (location = 1) in vec3 aNormal;
+layout (location = 2) in vec3 aTangent;
+layout (location = 3) in vec3 aBitangent;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -8,17 +10,19 @@ uniform mat4 projection;
 
 out vec4 litFragColor;
 
-
 // texture uniforms
 uniform int UseTextures;
 uniform int MappingType;
+uniform int DebugColors;
 
 uniform sampler2D diffuseTexture;
 uniform sampler2D specularTexture;
+uniform sampler2D normalTexture;
+
+uniform int UseNormalMap;
 
 uniform vec3 pMin;
 uniform vec3 pMax;
-
 
 // LIGHT UNIFORMS
 
@@ -66,6 +70,7 @@ struct PointLight
   float c2;
   float c3;
 };
+
 uniform int PointLightCount;
 uniform PointLight PointLights[MaxLights];
 
@@ -89,7 +94,7 @@ uniform struct
 } Material;
 
 
-vec4 dirlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, in vec4 adiffuse, in float shininess)
+vec4 dirlight_computeColor(in vec4 viewPos, in int lightIdx, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   DirLight light = DirLights[lightIdx];
 
@@ -101,7 +106,7 @@ vec4 dirlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, i
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
+  float diffuseFactor = max(dot(trueNormal, lightUnitVec), 0);
   vec4 diffuse = diffuseFactor * light.diffuse * adiffuse;
 
   // calculate specular color
@@ -116,8 +121,7 @@ vec4 dirlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, i
 }
 
 
-
-vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, in vec4 adiffuse, in float shininess)
+vec4 spotlight_computeColor(in vec4 viewPos, in int lightIdx, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   SpotLight light = SpotLights[lightIdx];
 
@@ -129,7 +133,7 @@ vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, 
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
+  float diffuseFactor = max(dot(trueNormal.xyz, lightUnitVec.xyz), 0);
   vec4 diff = diffuseFactor * light.diffuse * adiffuse;
 
   // calculate specular color
@@ -137,7 +141,6 @@ vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, 
   vec4 reflec = 2.0 * viewVec * dot(viewVec, lightUnitVec) - lightUnitVec;
   float specFactor = pow(max(dot(reflec, viewVec), 0), shininess);
   vec4 specColor = light.specular * Material.specular * specFactor;
-  
 
   // calculate light source attenuation
   vec4 d = lightVec;
@@ -147,7 +150,7 @@ vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, 
 
   // calculate spotlight effect
   vec4 spotUnitDir = normalize(view * -light.direction);
-  float alpha = dot(spotUnitDir, lightUnitVec);
+  float alpha = dot(spotUnitDir.xyz, lightUnitVec.xyz);
 
   float phi = cos(radians(spotOuterAngle));
   float theta = cos(radians(spotInnerAngle));
@@ -173,7 +176,7 @@ vec4 spotlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, 
 }
 
 
-vec4 pointlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx, in vec4 adiffuse, in float shininess)
+vec4 pointlight_computeColor(in vec4 viewPos, in int lightIdx, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   PointLight light = PointLights[lightIdx];
 
@@ -185,16 +188,14 @@ vec4 pointlight_computeColor(in vec4 viewPos, in vec4 viewNorm, in int lightIdx,
   vec4 ambient = light.ambient * Material.ambient;
 
   // calculate diffuse color
-  float diffuseFactor = max(dot(viewNorm, lightUnitVec), 0);
+  float diffuseFactor = max(dot(trueNormal, lightUnitVec), 0);
   vec4 diffuse = diffuseFactor * light.diffuse * adiffuse;
-
 
   // calculate specular color
   vec4 viewVec = normalize(-vec4(viewPos.xyz, 0));
   vec4 reflec = 2.0 * viewVec * dot(viewVec, lightUnitVec) - lightUnitVec;
   float specFactor = pow(max(dot(reflec, viewVec), 0), shininess);
   vec4 specColor = light.specular * Material.specular * specFactor;
-  
 
   // calculate light source attenuation
   vec4 d = lightVec;
@@ -214,23 +215,23 @@ float compute_atmosphericAttenuation(in vec4 viewPos)
 }
 
 
-vec4 computeFragmentColor(in vec4 viewPos, in vec4 viewNorm, in vec4 adiffuse, in float shininess)
+vec4 computeFragmentColor(in vec4 viewPos, in vec4 adiffuse, in float shininess, in vec4 trueNormal)
 {
   vec4 color = vec4(0, 0, 0, 0);
 
   for (int i = 0; i < DirLightCount; ++i)
   {
-    color += dirlight_computeColor(viewPos, viewNorm, i, adiffuse, shininess);
+    color += dirlight_computeColor(viewPos, i, adiffuse, shininess, trueNormal);
   }
 
   for (int i = 0; i < SpotLightCount; ++i)
   {
-    color += spotlight_computeColor(viewPos, viewNorm, i, adiffuse, shininess);
+    color += spotlight_computeColor(viewPos, i, adiffuse, shininess, trueNormal);
   }
 
   for (int i = 0; i < PointLightCount; ++i)
   {
-    color += pointlight_computeColor(viewPos, viewNorm, i, adiffuse, shininess);
+    color += pointlight_computeColor(viewPos, i, adiffuse, shininess, trueNormal);
   }
 
   // calculate local
@@ -243,6 +244,7 @@ vec4 computeFragmentColor(in vec4 viewPos, in vec4 viewNorm, in vec4 adiffuse, i
 
   return final;
 }
+
 
 vec2 planarMapping()
 {
@@ -335,32 +337,71 @@ void main()
   
   vec4 diffuse = Material.diffuse;
   float shininess = Material.shininess;
+  vec4 trueNormal = viewNorm;
 
-  // compute final fragment color
+  vec4 tang = view * model * vec4(normalize(aTangent), 0);
+  vec4 bitang = view * model * vec4(normalize(aBitangent), 0);
+  vec4 norm = view * model * vec4(normalize(aNormal), 0);
+
+  mat3 TBN = mat3(tang.xyz, bitang.xyz, norm.xyz);
+
+  vec2 uv;
+
+  if (MappingType == 0)
+  {
+    uv = planarMapping();
+  }
+  else if (MappingType == 1)
+  {
+    uv = cylindricalMapping();
+  }
+  else if (MappingType == 2)
+  {
+    uv = sphericalMapping();
+  }
+
+  uv.x = clamp(uv.x, 0, 1);
+  uv.y = clamp(uv.y, 0, 1);
+
   if (UseTextures == 1)
   {
-    vec2 uv;
-
-    if (MappingType == 0)
-    {
-      uv = planarMapping();
-    }
-    else if (MappingType == 1)
-    {
-      uv = cylindricalMapping();
-    }
-    else if (MappingType == 2)
-    {
-      uv = sphericalMapping();
-    }
-
-    uv.x = clamp(uv.x, 0, 1);
-    uv.y = clamp(uv.y, 0, 1);
-    
     diffuse = vec4(texture(diffuseTexture, uv).rgb, 1);
     shininess = float(texture(specularTexture, uv).r);
   }
 
-  litFragColor = computeFragmentColor(viewPos, viewNorm, diffuse, shininess);
+  if (UseNormalMap == 1)
+  {
+    vec3 sampledNorm = texture(normalTexture, uv).rgb;
 
+    sampledNorm = 2 * (sampledNorm - vec3(0.5, 0.5, 0.5));
+
+    vec3 viewspaceNorm = TBN * sampledNorm;
+
+    trueNormal = normalize(vec4(viewspaceNorm, 0));
+  }
+
+  vec4 finalColor = vec4(0, 0, 0, 1);
+  
+  // draw normally
+  if (DebugColors == 0)
+  {
+    finalColor = computeFragmentColor(viewPos, diffuse, shininess, trueNormal);
+  }
+  // use Tangent for RBG
+  else if (DebugColors == 1)
+  {
+    finalColor.rgb = tang.xyz;
+  }
+  // use Bitangent for RBG
+  else if (DebugColors == 2)
+  {
+    finalColor.rgb = bitang.xyz;
+  }
+  // use Normal for RBG
+  else if (DebugColors == 3)
+  {
+    finalColor.rgb = trueNormal.xyz;
+  }
+
+  litFragColor = finalColor;
 }

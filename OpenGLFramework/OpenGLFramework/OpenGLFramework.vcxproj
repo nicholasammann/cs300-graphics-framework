@@ -132,6 +132,8 @@
     <ClCompile Include="Source\Core\Camera.cpp" />
     <ClCompile Include="Source\Core\Editor.cpp" />
     <ClCompile Include="Source\Core\Scene.cpp" />
+    <ClCompile Include="Source\Graphics\CubeMap.cpp" />
+    <ClCompile Include="Source\Graphics\Framebuffer.cpp" />
     <ClCompile Include="Source\Graphics\Mesh.cpp" />
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\NormalMap.cpp" />
@@ -153,6 +155,8 @@
     <ClInclude Include="Include\GL\glew.h" />
     <ClInclude Include="Include\GL\glxew.h" />
     <ClInclude Include="Include\GL\wglew.h" />
+    <ClInclude Include="Source\Graphics\CubeMap.hpp" />
+    <ClInclude Include="Source\Graphics\Framebuffer.hpp" />
     <ClInclude Include="Source\Graphics\NormalMap.hpp" />
     <ClInclude Include="Source\Graphics\TextureMapping.hpp" />
     <ClInclude Include="Source\Utils\MathUtils.hpp" />

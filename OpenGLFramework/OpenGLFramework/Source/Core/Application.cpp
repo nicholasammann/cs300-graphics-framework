@@ -22,10 +22,11 @@ Creation date: 10/23/17
 #include "../ImGui/imgui.h"
 #include "../ImGui/imgui_impl_glfw_gl3.h"
 
-#include "../Graphics/Shader.hpp"
+#include "../Graphics/CubeMap.hpp"
 #include "../Graphics/Model.hpp"
-#include "../Graphics/Texture.hpp"
 #include "../Graphics/NormalMap.hpp"
+#include "../Graphics/Shader.hpp"
+#include "../Graphics/Texture.hpp"
 
 #include "Application.hpp"
 #include "Camera.hpp"
@@ -101,7 +102,7 @@ namespace ELBA
 
     mEditor->Update();
     
-    Render();
+    Render(mCamera, mWindowWidth, mWindowHeight);
 
     ImGui::Render();
 
@@ -217,7 +218,7 @@ namespace ELBA
     }
   }
 
-  void Application::Render()
+  void Application::Render(Camera *aCamera, int aWidth, int aHeight)
   {
     // rendering commands
     glClearColor(mBackgroundColor.r, mBackgroundColor.g, mBackgroundColor.b, mBackgroundColor.a);
@@ -237,11 +238,11 @@ namespace ELBA
 
       BindLights(shdrPrg);
 
-      glm::mat4 view = mCamera->ConstructViewMatrix();
+      glm::mat4 view = aCamera->ConstructViewMatrix();
       unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
       glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-      glm::mat4 projection = mCamera->ConstructProjMatrix(mWindowWidth, mWindowHeight);
+      glm::mat4 projection = aCamera->ConstructProjMatrix(aWidth, aHeight);
       unsigned int projLoc = glGetUniformLocation(shdrPrg, "projection");
       glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
@@ -293,7 +294,7 @@ namespace ELBA
     mod->mMappingType = 0;
     mod->mUsingTextures = true;
 
-    NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/testnormal.tga");
+    NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
     mod->mNormalTexture = normTex;
     mod->mUsingNormalMap = true;
 

@@ -31,6 +31,7 @@ namespace ELBA
   class Model;
   class Camera;
   class Editor;
+  class CubeMap;
 
   using shdr_info = std::tuple<std::string, std::string, std::string>;
   using shader_path_vec = std::vector<shdr_info>;
@@ -75,6 +76,8 @@ namespace ELBA
 
     void UpdateCamera();
 
+    void Render(Camera *aCamera, int aWidth, int aHeight);
+
   private:
 
     Editor *mEditor;
@@ -82,7 +85,6 @@ namespace ELBA
     GLFWwindow *mWindow;
 
     void ProcessInput();
-    void Render();
 
     std::map<std::string, Shader*> mShaders;
 

@@ -120,7 +120,7 @@ namespace ELBA
     glBufferData(GL_ARRAY_BUFFER, mFaceNormals.size() * sizeof(glm::vec3) * 2, mFaceNormPoints.data(), GL_DYNAMIC_DRAW);
 
     glLineWidth(mDebugLineWidth);
-    glDrawArrays(GL_LINES, 0, mFaceNormPoints.size() * 3);
+    glDrawArrays(GL_LINES, 0, mFaceNormPoints.size());
     glBindVertexArray(0);
   }
 
@@ -159,7 +159,7 @@ namespace ELBA
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mVertNormPoints.data(), GL_DYNAMIC_DRAW);
 
     glLineWidth(mDebugLineWidth);
-    glDrawArrays(GL_LINES, 0, mVertNormPoints.size() * 3);
+    glDrawArrays(GL_LINES, 0, mVertNormPoints.size());
     glBindVertexArray(0);
   }
 
@@ -198,7 +198,7 @@ namespace ELBA
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mTangentPoints.data(), GL_DYNAMIC_DRAW);
 
     glLineWidth(mDebugLineWidth);
-    glDrawArrays(GL_LINES, 0, mTangentPoints.size() * 3);
+    glDrawArrays(GL_LINES, 0, mTangentPoints.size());
     glBindVertexArray(0);
   }
 
@@ -237,7 +237,7 @@ namespace ELBA
     glBufferData(GL_ARRAY_BUFFER, mVertices.size() * sizeof(glm::vec3) * 2, mBitangentPoints.data(), GL_DYNAMIC_DRAW);
 
     glLineWidth(mDebugLineWidth);
-    glDrawArrays(GL_LINES, 0, mBitangentPoints.size() * 3);
+    glDrawArrays(GL_LINES, 0, mBitangentPoints.size());
     glBindVertexArray(0);
   }
 

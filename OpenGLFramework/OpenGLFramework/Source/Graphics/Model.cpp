@@ -22,10 +22,12 @@ Creation date: 10/23/17
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "CubeMap.hpp"
 #include "Model.hpp"
 #include "../Core/Application.hpp"
 #include "../Utils/MeshLoader.hpp"
 #include "Texture.hpp"
+#include "NormalMap.hpp"
 
 
 namespace ELBA
@@ -39,6 +41,7 @@ namespace ELBA
     mMeshes.push_back(Utils::LoadMesh(aPath, this));
     mMeshes.back()->SetUpMesh();
     SetDebugShader();
+    mEnvironmentMap = new CubeMap(mApp);
   }
 
   void Model::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
@@ -85,8 +88,8 @@ namespace ELBA
     {
       if (mNormalTexture)
       {
-        mDiffuseTexture->SetUniform(prg, "normalTexture", 2);
-        mDiffuseTexture->Bind(2);
+        mNormalTexture->SetNormalMapUniform(prg, "normalTexture", 2);
+        mNormalTexture->BindNormalMapTexture(2);
       }
       else
       {
@@ -105,6 +108,11 @@ namespace ELBA
     {
       mDiffuseTexture->Unbind();
       mSpecularTexture->Unbind();
+    }
+
+    if (mNormalTexture)
+    {
+      mNormalTexture->UnbindNormalMapTexture();
     }
   }
 
@@ -154,7 +162,7 @@ namespace ELBA
     }
   }
 
-  Shader * Model::GetDebugShader()
+  Shader* Model::GetDebugShader()
   {
     return mDebugShader;
   }
@@ -174,20 +182,25 @@ namespace ELBA
     return mShaderName;
   }
 
-  Transform & Model::GetTransform()
+  Transform& Model::GetTransform()
   {
     return mTransform;
   }
 
   glm::mat4 Model::ConstructModelMatrix()
   {
-    glm::mat4 scale = glm::scale(glm::mat4(),  mTransform.mScale);
+    glm::mat4 scale = glm::scale(glm::mat4(), mTransform.mScale);
     
-    glm::mat4 rot = glm::yawPitchRoll(mTransform.mWorldRot[1], mTransform.mWorldRot[0], mTransform.mWorldRot[2]);
+    glm::mat4 rot = glm::yawPitchRoll(mTransform.mWorldRot.y, mTransform.mWorldRot.x, mTransform.mWorldRot.z);
 
     glm::mat4 trans = glm::translate(glm::mat4(), mTransform.mWorldPos);
     
-    return  trans *rot * scale;
+    return  trans * rot * scale;
+  }
+
+  void Model::UpdateEnvironmentMap()
+  {
+    mEnvironmentMap->UpdateTextures(mTransform.mWorldPos);
   }
 
 }

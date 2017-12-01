@@ -22,46 +22,28 @@ ELBA::NormalMap::NormalMap(const char *aPath)
   // iterate through the height map, calculating the normal at each position
   for (int j = 0; j < mHeight; j++)
   {
-    int jWoo = j + 1;
-    if (jWoo >= mHeight)
+    for (int i = 0; i < mWidth; i++)
     {
-      jWoo = 0;
-    }
 
-    int jSwooce = j - 1;
-    if (jSwooce < 0)
-    {
-      jSwooce = 0;
-    }
+      float r = (float)mHeightMap[indexAt(i + 1, j)] / 255.0f;
+      float l = (float)mHeightMap[indexAt(i - 1, j)] / 255.0f;
 
-    for (int i = 0; i < mWidth - 1; i++)
-    {
-      int iWoo = i + 1;
-      if (iWoo >= mWidth)
-      {
-        iWoo = 0;
-      }
+      glm::vec3 s(1, 0, r - l);
 
-      int iSwooce = i - 1;
-      if (iSwooce < 0)
-      {
-        iSwooce = mWidth - 1;
-      }
-
-      glm::vec3 s(1, 0, 500 * (mHeightMap[j * mWidth * 3 + iWoo * 3] - mHeightMap[j * mWidth + iSwooce * 3]));
-
-      glm::vec3 t(0, 1, 500 * (mHeightMap[jWoo * mWidth * 3 + i * 3] - mHeightMap[jSwooce * mWidth * 3 + i * 3]));
+      float u = (float)mHeightMap[indexAt(i, j + 1)] / 255.0f;
+      float d = (float)mHeightMap[indexAt(i, j - 1)] / 255.0f;
       
+      glm::vec3 t(0, 1, u - d);
+
       glm::vec3 n = glm::cross(s, t);
-      
-      n = glm::normalize(n);
-      
-      //         height            width
-      int ind = (j * mWidth * 3) + (i * 3);
 
-      mNormalMap[ind + 0] = 255 * 0.5f * (s.x + 1);      // R
-      mNormalMap[ind + 1] = 255 * 0.5f * (s.y + 1);  // G
-      mNormalMap[ind + 2] = 255 * 0.5f * (s.z + 1);  // B
+      n = glm::normalize(n);
+
+      int ind = indexAt(i, j);
+
+      mNormalMap[ind + 0] = 255 * 0.5f * (n.x + 1.0f);  // R
+      mNormalMap[ind + 1] = 255 * 0.5f * (n.y + 1.0f);  // G
+      mNormalMap[ind + 2] = 255 * 0.5f * (n.z + 1.0f);  // B
     }
   }
 
@@ -73,9 +55,15 @@ ELBA::NormalMap::NormalMap(const char *aPath)
 
     for (int j = 0; j < mHeight; j++)
     {
-      for (int i = 0; i < mWidth * 3; i++)
+      for (int i = 0; i < mWidth; i++)
       {
-        int col = mNormalMap[j * mWidth * 3 + i];
+        int col = mNormalMap[j * mWidth + i];
+        file << col << " ";
+
+        col = mNormalMap[j * mWidth + i + 1];
+        file << col << " ";
+
+        col = mNormalMap[j * mWidth + i + 2];
         file << col << " ";
       }
       file << '\n';
@@ -121,4 +109,13 @@ void ELBA::NormalMap::UnbindNormalMapTexture()
 {
   glActiveTexture(GL_TEXTURE0 + mSlot);
   glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+int ELBA::NormalMap::indexAt(int x, int y)
+{
+  int yRet = (y < 0) ? mHeight - y : y % mHeight;
+
+  int xRet = (x < 0) ? mWidth - x : x % mWidth;
+
+  return 3 * (yRet * mWidth + xRet);
 }

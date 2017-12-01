@@ -73,6 +73,10 @@ namespace ELBA
     glm::vec3 pMin;
     glm::vec3 pMax;
 
+    void UpdateEnvironmentMap();
+    CubeMap *mEnvironmentMap;
+    bool mUsingEnvironmentMap;
+
   private:
 
     Application *mApp;

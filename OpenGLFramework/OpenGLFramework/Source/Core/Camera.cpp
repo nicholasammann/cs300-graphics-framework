@@ -25,7 +25,7 @@ namespace ELBA
     mPosition = glm::vec3(0.0f, 0.0f, 10.0f);
     mTarget = glm::vec3(0.0f, 0.0f, 0.0f);
     mDirection = glm::normalize(mTarget - mPosition);
-    mWorldUp = glm::vec3(0.0f, 0.1f, 0.0f);
+    mWorldUp = glm::vec3(0.0f, 1.0f, 0.0f);
     mCameraRight = glm::normalize(glm::cross(mWorldUp, mDirection));
     mCameraUp = glm::cross(mDirection, mCameraRight);
   }
@@ -72,7 +72,7 @@ namespace ELBA
   {
     glm::mat4 proj;
 
-    float rad = glm::radians(45.0f);
+    float rad = glm::radians(90.0f);
     float tanHalfFovy = tan(rad / 2.0f);
     float aspect = (float)aWidth / aHeight;
     float zNear = 0.1f;

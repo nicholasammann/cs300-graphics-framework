@@ -30,7 +30,7 @@ namespace ELBA
     unsigned int mTexture;
     char mSlot;
 
-
+    int indexAt(int x, int y);
 
   };
 
