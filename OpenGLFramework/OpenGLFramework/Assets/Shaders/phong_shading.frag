@@ -28,7 +28,6 @@ uniform sampler2D normalTexture;
 
 uniform int UseNormalMap;
 
-
 // environment mapping textures
 uniform sampler2D CubeMapTop;
 uniform sampler2D CubeMapBottom;
@@ -388,9 +387,9 @@ void main()
     // calculate reflection/refraction of the view vector wrt normal
     vec4 viewVec = normalize(vec4(0, 0, 0, 1) - oViewPos);
 
-    vec4 normal = oViewNorm;
+    vec4 normal = inverse(view) * oViewNorm;
 
-    vec4 reflec = 2.0 * normal * dot(normal, viewVec) - viewVec;
+    vec4 reflec = 2.0 * normal * dot(normal, inverse(view) * viewVec) - inverse(view) * viewVec;
     
     vec3 posReflec = vec3(abs(reflec.x), abs(reflec.y), abs(reflec.z));
 

@@ -10,7 +10,7 @@
 
 enum TexSlots
 {
-  Top = 0,
+  Top = 3,
   Bottom,
   Front,
   Back,
@@ -27,22 +27,22 @@ namespace ELBA
     mCamera = new Camera();
 
     mTop = new Framebuffer();
-    mTop->Build();
+    mTop->Build(Front);
 
     mBottom = new Framebuffer();
-    mBottom->Build();
+    mBottom->Build(Bottom);
 
     mFront = new Framebuffer();
-    mFront->Build();
+    mFront->Build(Front);
 
     mBack = new Framebuffer();
-    mBack->Build();
+    mBack->Build(Back);
 
     mLeft = new Framebuffer();
-    mLeft->Build();
+    mLeft->Build(Left);
 
     mRight = new Framebuffer();
-    mRight->Build();
+    mRight->Build(Right);
   }
 
   void CubeMap::UpdateTextures(glm::vec3 aPos)
