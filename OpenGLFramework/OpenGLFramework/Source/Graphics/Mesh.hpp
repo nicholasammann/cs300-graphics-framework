@@ -104,7 +104,7 @@ namespace ELBA
 
     void SetUpMesh();
 
-    void Preprocess();
+    void Preprocess(bool invertNorms);
 
     glm::vec3 GetFaceCentroid(Face aFace);
 

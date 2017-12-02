@@ -10,7 +10,7 @@ namespace ELBA
   class CubeMap
   {
   public:
-    CubeMap(Application *aApp);
+    CubeMap(Application *aApp, unsigned int aShaderPrg);
 
     void UpdateTextures(glm::vec3 aPos);
 
@@ -20,8 +20,6 @@ namespace ELBA
 
   private:
     Application *mApplication;
-
-    Camera *mCamera;
 
     Framebuffer *mTop;
     Framebuffer *mBottom;

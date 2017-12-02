@@ -99,10 +99,6 @@ namespace ELBA
 
     UpdateLights();
 
-    UpdateCamera();
-
-    mEditor->Update();
-    
     for (auto m : mModels)
     {
       if (m->mReflection || m->mRefraction)
@@ -110,6 +106,10 @@ namespace ELBA
         m->UpdateEnvironmentMap();
       }
     }
+
+    mEditor->Update();
+
+    UpdateCamera();
 
     Render(mCamera, mWindowWidth, mWindowHeight, true);
 
@@ -229,9 +229,6 @@ namespace ELBA
 
   void Application::Render(Camera *aCamera, int aWidth, int aHeight, bool aUseClearColor)
   {
-    aWidth = mWindowWidth;
-    aHeight = mWindowHeight;
-
     // rendering commands
     if (aUseClearColor)
     {
@@ -241,7 +238,26 @@ namespace ELBA
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    mSkybox->Draw();
+    // render skybox
+    glDepthMask(GL_FALSE);
+    unsigned int skyShader = mSkybox->GetShader()->GetShaderProgram();
+    mSkybox->GetShader()->UseShaderProgram();
+
+    glm::mat4 skyView = aCamera->ConstructSkyboxView();
+    unsigned int skyViewLoc = glGetUniformLocation(skyShader, "view");
+    glUniformMatrix4fv(skyViewLoc, 1, GL_FALSE, glm::value_ptr(skyView));
+
+    glm::mat4 skyProj = aCamera->ConstructProjMatrix(aWidth, aHeight);
+    unsigned int skyProjLoc = glGetUniformLocation(skyShader, "projection");
+    glUniformMatrix4fv(skyProjLoc, 1, GL_FALSE, glm::value_ptr(skyProj));
+
+    glm::mat4 skyModel = mSkybox->ConstructModelMatrix();
+    unsigned int skyModelLoc = glGetUniformLocation(skyShader, "model");
+    glUniformMatrix4fv(skyModelLoc, 1, GL_FALSE, glm::value_ptr(skyModel));
+
+    mSkybox->Draw(skyProj, skyView, skyModel);
+    glDepthMask(GL_TRUE);
+
 
     for (Model *m : mModels)
     {
@@ -256,8 +272,6 @@ namespace ELBA
       shdr->UseShaderProgram();
 
       BindLights(shdrPrg);
-
-      //std::cout << "Pos: " << aCamera->mPosition.x << ", " << aCamera->mPosition.y << ", " << aCamera->mPosition.z << std::endl;
 
       glm::mat4 view = aCamera->ConstructViewMatrix();
       unsigned int viewLoc = glGetUniformLocation(shdrPrg, "view");
@@ -309,18 +323,21 @@ namespace ELBA
     mod->SetShader("Phong Shading");
     mod->GetTransform().mWorldPos.z = 0.0f;
     
-    Texture *diffTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_diff_512x512.tga");
-    mod->mDiffuseTexture = diffTex;
-
-    Texture *specTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
-    mod->mSpecularTexture = specTex;
+    //Texture *diffTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_diff_512x512.tga");
+    //mod->mDiffuseTexture = diffTex;
+    //
+    //Texture *specTex = new Texture("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
+    //mod->mSpecularTexture = specTex;
     
     mod->mMappingType = 0;
     mod->mUsingTextures = false;
 
-    NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
-    mod->mNormalTexture = normTex;
-    mod->mUsingNormalMap = false;
+    mod->mReflection = true;
+    mod->mRefraction = true;
+
+    //NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
+    //mod->mNormalTexture = normTex;
+    //mod->mUsingNormalMap = false;
 
     mModels.push_back(mod);
 
@@ -333,8 +350,17 @@ namespace ELBA
 
     int skyboxShader = GetShader("Skybox")->GetShaderProgram();
 
-    mSkybox = new Skybox(this, skyboxShader);
-    mSkybox->Build();
+    mSkybox = new Model(this, "../OpenGLFramework/Assets/Models/cube.obj", "Skybox", true);
+    mSkybox->GetTransform().mScale = glm::vec3(20, 20, 20);
+    mSkybox->SetShader("Skybox");
+
+    mSkybox->mIsSkybox = true;
+    mSkybox->mSkyTop = new Texture("../OpenGLFramework/Assets/Textures/skybox/ashcanyon_up.tga");
+    mSkybox->mSkyBot = new Texture("../OpenGLFramework/Assets/Textures/skybox/ashcanyon_dn.tga");
+    mSkybox->mSkyFro = new Texture("../OpenGLFramework/Assets/Textures/skybox/ashcanyon_ft.tga");
+    mSkybox->mSkyBac = new Texture("../OpenGLFramework/Assets/Textures/skybox/ashcanyon_bk.tga");
+    mSkybox->mSkyLef = new Texture("../OpenGLFramework/Assets/Textures/skybox/ashcanyon_lf.tga");
+    mSkybox->mSkyRig = new Texture("../OpenGLFramework/Assets/Textures/skybox/ashcanyon_rt.tga");
   }
 
   void Application::CreateInitialLights()
@@ -361,7 +387,6 @@ namespace ELBA
 
   void Application::BindLights(unsigned int aShaderPrg)
   {
-
     GLuint loc = glGetUniformLocation(aShaderPrg, "globalAmbient");
     glUniform4fv(loc, 1, mLightUniforms.globalAmbient);
 
@@ -698,7 +723,7 @@ namespace ELBA
     vec4 initPos = vec4(10, 0.75f * cos(glfwGetTime()), 0, 1);
 
     // rotation based on time
-    float angle = 0.75f * static_cast<float>(glfwGetTime());
+    float angle = 0.45f * static_cast<float>(glfwGetTime());
     mat4 rot = rotate(mat4(), angle, vec3(0, 1, 0));
 
     // apply matrices to initial position
@@ -714,8 +739,8 @@ namespace ELBA
     }
     else
     {
-      //mCamera->SetPosition(glm::vec3(0.0f, 0.0f, 10.0f));
-      //mCamera->SetTargetPoint(mModels[0]->GetTransform().mWorldPos);
+      //mCamera->SetPosition(mModels[0]->GetTransform().mWorldPos);
+      mCamera->SetTargetPoint(mModels[0]->GetTransform().mWorldPos);
     }
   }
 }

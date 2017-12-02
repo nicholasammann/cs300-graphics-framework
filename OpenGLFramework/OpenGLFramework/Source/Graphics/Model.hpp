@@ -39,7 +39,7 @@ namespace ELBA
   {
   public:
 
-    Model(Application *aApp, const char *aPath, std::string aName);
+    Model(Application *aApp, const char *aPath, std::string aName, bool invertNormals = false);
 
     void Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel);
 
@@ -78,6 +78,16 @@ namespace ELBA
     CubeMap *mEnvironmentMap;
     bool mReflection;
     bool mRefraction;
+
+    bool mIsSkybox;
+
+    // skybox
+    Texture *mSkyTop;
+    Texture *mSkyBot;
+    Texture *mSkyFro;
+    Texture *mSkyBac;
+    Texture *mSkyLef;
+    Texture *mSkyRig;
 
   private:
 

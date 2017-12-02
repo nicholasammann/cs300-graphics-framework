@@ -28,6 +28,6 @@ namespace ELBA
   {
     void ParseLine(std::string line, Mesh *mesh);
 
-    Mesh* LoadMesh(std::string const &objFile, Model *aParent);
+    Mesh* LoadMesh(std::string const &objFile, Model *aParent, bool invertNormals);
   }
 }

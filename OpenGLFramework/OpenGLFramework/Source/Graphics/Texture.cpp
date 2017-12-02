@@ -47,7 +47,7 @@ namespace ELBA
   void Texture::SetUniform(unsigned int aShaderPrg, std::string aUniform, char aSlot)
   {
     int loc = glGetUniformLocation(aShaderPrg, aUniform.c_str());
-    glUniform1i(loc, GL_TEXTURE0 + aSlot);
+    glUniform1i(loc, aSlot);
   }
 
 

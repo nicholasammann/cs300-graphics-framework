@@ -32,17 +32,16 @@ Creation date: 10/23/17
 
 namespace ELBA
 {
-  Model::Model(Application *aApp, const char *aPath, std::string aName)
+  Model::Model(Application *aApp, const char *aPath, std::string aName, bool invertNormals)
     : mApp(aApp), mName(aName), mTransform(), mShaderName(""),
       mCurrentShaderSelect(0), mDiffuseTexture(nullptr),
       mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0),
       mNormalTexture(nullptr), mUsingNormalMap(false),
-      mReflection(true), mRefraction(true)
+      mReflection(false), mRefraction(false), mIsSkybox(false)
   {
-    mMeshes.push_back(Utils::LoadMesh(aPath, this));
+    mMeshes.push_back(Utils::LoadMesh(aPath, this, invertNormals));
     mMeshes.back()->SetUpMesh();
     SetDebugShader();
-    mEnvironmentMap = new CubeMap(mApp);
   }
 
   void Model::Draw(glm::mat4 &aProj, glm::mat4 &aView, glm::mat4 &aModel)
@@ -108,6 +107,33 @@ namespace ELBA
     }
 
 
+
+
+
+
+
+    if (mIsSkybox)
+    {
+      mSkyTop->SetUniform(prg, "Top", 0);
+      mSkyTop->Bind(0);
+
+      mSkyBot->SetUniform(prg, "Bottom", 1);
+      mSkyBot->Bind(1);
+
+      mSkyFro->SetUniform(prg, "Front", 2);
+      mSkyFro->Bind(2);
+
+      mSkyBac->SetUniform(prg, "Back", 3);
+      mSkyBac->Bind(3);
+
+      mSkyLef->SetUniform(prg, "Left", 4);
+      mSkyLef->Bind(4);
+
+      mSkyRig->SetUniform(prg, "Right", 5);
+      mSkyRig->Bind(5);
+    }
+
+
     for (unsigned int i = 0; i < mMeshes.size(); ++i)
     {
       mMeshes[i]->Draw(aProj, aView, aModel);
@@ -127,6 +153,16 @@ namespace ELBA
     if (mReflection || mRefraction)
     {
       mEnvironmentMap->UnbindTextures();
+    }
+
+    if (mIsSkybox)
+    {
+      mSkyTop->Unbind();
+      mSkyBot->Unbind();
+      mSkyFro->Unbind();
+      mSkyBac->Unbind();
+      mSkyLef->Unbind();
+      mSkyRig->Unbind();
     }
   }
 
@@ -155,6 +191,8 @@ namespace ELBA
         break;
       }
     }
+
+    mEnvironmentMap = new CubeMap(mApp, s->GetShaderProgram());
   }
 
   Shader* Model::GetShader()

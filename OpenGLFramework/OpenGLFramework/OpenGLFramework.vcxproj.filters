@@ -192,5 +192,7 @@
     <None Include="Assets\Shaders\light_model.frag" />
     <None Include="Assets\Shaders\skybox.frag" />
     <None Include="Assets\Shaders\skybox.vert" />
+    <None Include="Assets\Shaders\skybox2.frag" />
+    <None Include="Assets\Shaders\skybox2.vert" />
   </ItemGroup>
 </Project>

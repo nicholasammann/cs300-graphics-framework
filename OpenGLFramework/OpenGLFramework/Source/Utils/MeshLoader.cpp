@@ -70,7 +70,7 @@ namespace ELBA
     }
 
 
-    Mesh* LoadMesh(std::string const &objFile, Model *aParent)
+    Mesh* LoadMesh(std::string const &objFile, Model *aParent, bool invertNormals)
     {
       std::ifstream input = std::ifstream(objFile);
       
@@ -87,7 +87,7 @@ namespace ELBA
         ParseLine(line, mesh);
       }
 
-      mesh->Preprocess();
+      mesh->Preprocess(invertNormals);
 
       return mesh;
 

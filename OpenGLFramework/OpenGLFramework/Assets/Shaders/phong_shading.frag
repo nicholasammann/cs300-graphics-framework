@@ -22,9 +22,9 @@ uniform int DebugColors;
 
 
 // standard textures
-uniform sampler2D diffuseTexture;
-uniform sampler2D specularTexture;
-uniform sampler2D normalTexture;
+//uniform sampler2D diffuseTexture;
+//uniform sampler2D specularTexture;
+//uniform sampler2D normalTexture;
 
 uniform int UseNormalMap;
 
@@ -371,19 +371,19 @@ void main()
 
   if (UseTextures == 1)
   {
-    diffuse = vec4(texture(diffuseTexture, uv).rgb, 1);
-    shininess = float(texture(specularTexture, uv).r);
+    //diffuse = vec4(texture(diffuseTexture, uv).rgb, 1);
+    //shininess = float(texture(specularTexture, uv).r);
   }
 
   if (UseNormalMap == 1)
   {
-    vec3 sampledNorm = texture(normalTexture, uv).rgb;
-
-    sampledNorm = 2 * (sampledNorm - vec3(0.5, 0.5, 0.5));
-
-    vec3 viewspaceNorm = TBN * sampledNorm;
-
-    trueNormal = normalize(vec4(viewspaceNorm, 0));
+    //vec3 sampledNorm = texture(normalTexture, uv).rgb;
+    //
+    //sampledNorm = 2 * (sampledNorm - vec3(0.5, 0.5, 0.5));
+    //
+    //vec3 viewspaceNorm = TBN * sampledNorm;
+    //
+    //trueNormal = normalize(vec4(viewspaceNorm, 0));
   }
 
   vec4 reflectionCol = vec4(0, 0, 0, 1);
@@ -391,11 +391,13 @@ void main()
   if (UseReflection != 0)
   {
     // calculate reflection/refraction of the view vector wrt normal
-    vec4 viewVec = normalize(vec4(0, 0, 0, 1) - oViewPos);
+    vec4 viewVec = normalize(-oViewPos);
 
-    vec4 normal = oViewNorm;
+    vec4 normal = normalize(oViewNorm);
 
     vec4 reflec = 2.0 * normal * dot(normal, viewVec) - viewVec;
+
+    reflec = reflec;
     
     vec3 posReflec = vec3(abs(reflec.x), abs(reflec.y), abs(reflec.z));
 
@@ -462,13 +464,14 @@ void main()
   }
 
 
+  vec4 refractionCol = vec4(0, 0, 0, 1);
+
   if (UseRefraction != 0)
   {
-    vec4 T = 
-    
+    float k = 1.0f / RefractiveIndex;
+
+
   }
-
-
 
   vec4 finalColor = vec4(0, 0, 0, 1);
   

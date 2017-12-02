@@ -10,7 +10,7 @@
 
 enum TexSlots
 {
-  Top = 0,
+  Top = 4,
   Bottom,
   Front,
   Back,
@@ -22,70 +22,77 @@ enum TexSlots
 namespace ELBA
 {
 
-  CubeMap::CubeMap(Application *aApp) : mApplication(aApp)
+  CubeMap::CubeMap(Application *aApp, unsigned int aShaderPrg) : mApplication(aApp)
   {
-    mCamera = new Camera();
-
     mTop = new Framebuffer();
-    mTop->Build();
+    mTop->Build(aShaderPrg);
 
     mBottom = new Framebuffer();
-    mBottom->Build();
+    mBottom->Build(aShaderPrg);
 
     mFront = new Framebuffer();
-    mFront->Build();
+    mFront->Build(aShaderPrg);
 
     mBack = new Framebuffer();
-    mBack->Build();
+    mBack->Build(aShaderPrg);
 
     mLeft = new Framebuffer();
-    mLeft->Build();
+    mLeft->Build(aShaderPrg);
 
     mRight = new Framebuffer();
-    mRight->Build();
+    mRight->Build(aShaderPrg);
   }
 
   void CubeMap::UpdateTextures(glm::vec3 aPos)
   {
     glCullFace(GL_BACK);
     glEnable(GL_CULL_FACE);
-    mCamera->SetPosition(aPos);
-    
-    mCamera->SetTargetPoint(aPos + glm::vec3(0, 1, 0));
+
+    Camera *camera = mApplication->GetCamera();
+
+    glm::vec3 oldPos = camera->mPosition;
+    glm::vec3 oldDir = camera->mDirection;
+
+    camera->SetPosition(aPos);
+
+    camera->SetDirection(glm::vec3(0, 10, 0.1));
     mTop->Bind();
     mTop->Clear();
-    mApplication->Render(mCamera, 512, 512, false);
+    mApplication->Render(camera, 512, 512, false);
     mTop->Unbind();
 
-    mCamera->SetTargetPoint(aPos + glm::vec3(0, -1, 0));
+    camera->SetDirection(glm::vec3(0, -10, 0.1));
     mBottom->Bind();
     mBottom->Clear();
-    mApplication->Render(mCamera, 512, 512, false);
+    mApplication->Render(camera, 512, 512, false);
     mBottom->Unbind();
     
-    mCamera->SetTargetPoint(aPos + glm::vec3(0, 0, 1));
+    camera->SetDirection(glm::vec3(0, 0, 10));
     mFront->Bind();
     mFront->Clear();
-    mApplication->Render(mCamera, 512, 512, false);
+    mApplication->Render(camera, 512, 512, false);
     mFront->Unbind();
     
-    mCamera->SetTargetPoint(aPos + glm::vec3(0, 0, -1));
+    camera->SetDirection(glm::vec3(0, 0, -10));
     mBack->Bind();
     mBack->Clear();
-    mApplication->Render(mCamera, 512, 512, false);
+    mApplication->Render(camera, 512, 512, false);
     mBack->Unbind();
     
-    mCamera->SetTargetPoint(aPos + glm::vec3(-1, 0, 0));
+    camera->SetDirection(glm::vec3(-10, 0, 0));
     mLeft->Bind();
     mLeft->Clear();
-    mApplication->Render(mCamera, 512, 512, false);
+    mApplication->Render(camera, 512, 512, false);
     mLeft->Unbind();
     
-    mCamera->SetTargetPoint(aPos + glm::vec3(1, 0, 0));
+    camera->SetDirection(glm::vec3(10, 0, 0));
     mRight->Bind();
     mRight->Clear();
-    mApplication->Render(mCamera, 512, 512, false);
+    mApplication->Render(camera, 512, 512, false);
     mRight->Unbind();
+
+    camera->SetPosition(oldPos);
+    //camera->SetDirection(oldDir);
 
     glDisable(GL_CULL_FACE);
   }
@@ -98,13 +105,13 @@ namespace ELBA
     
     mBottom->SetTextureUniform(aShaderPrg, "CubeMapBottom", Bottom);
     mBottom->BindTexture(Bottom);
-
+    
     mFront->SetTextureUniform(aShaderPrg, "CubeMapFront", Front);
     mFront->BindTexture(Front);
     
     mBack->SetTextureUniform(aShaderPrg, "CubeMapBack", Back);
     mBack->BindTexture(Back);
-
+    
     mLeft->SetTextureUniform(aShaderPrg, "CubeMapLeft", Left);
     mLeft->BindTexture(Left);
     

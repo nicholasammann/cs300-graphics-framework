@@ -302,7 +302,6 @@ namespace ELBA
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, mFaces.size() * 3 * sizeof(unsigned int), indices, GL_STATIC_DRAW);
     ///////////////////////////////
 
-
     glBindVertexArray(0);
 
     BindVertNorms();
@@ -311,7 +310,7 @@ namespace ELBA
     BindBitangents();
   }
 
-  void Mesh::Preprocess()
+  void Mesh::Preprocess(bool invertNorms)
   {
     std::unordered_map<glm::vec3*, std::vector<glm::vec3>> adjNormals;
 
@@ -357,6 +356,11 @@ namespace ELBA
     for (unsigned int i = 0; i < mVertices.size(); ++i)
     {
       mVertices[i].mNormal = glm::normalize(mVertices[i].mNormal);
+
+      if (invertNorms)
+      {
+        mVertices[i].mNormal = -mVertices[i].mNormal;
+      }
     }
 
     CenterMesh();

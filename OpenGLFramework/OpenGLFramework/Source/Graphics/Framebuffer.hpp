@@ -11,7 +11,7 @@ namespace ELBA
 
     Framebuffer();
 
-    void Build();
+    void Build(unsigned int aShaderPrg);
 
     void Bind();
     void Unbind();
@@ -20,9 +20,9 @@ namespace ELBA
 
     void Destroy();
 
-    void BindTexture(char aSlot);
+    void BindTexture(int aSlot);
 
-    void SetTextureUniform(unsigned int aShaderPrg, std::string aUniform , char aSlot);
+    void SetTextureUniform(unsigned int aShaderPrg, std::string aUniform , int aSlot);
 
     void UnbindTexture();
 
@@ -30,7 +30,6 @@ namespace ELBA
     unsigned int mRenderBuffer;
     unsigned int mTexture;
     char mTextureSlot;
-    unsigned char *mTextureData;
 
 
   };

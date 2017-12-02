@@ -99,6 +99,14 @@ namespace ELBA
     UpdateVectors();
   }
 
+  void Camera::SetDirection(glm::vec3 aDir)
+  {
+    mDirection = normalize(aDir);
+    mTarget = mPosition + mDirection;
+    mCameraRight = glm::normalize(glm::cross(mWorldUp, mDirection));
+    mCameraUp = glm::cross(mDirection, mCameraRight);
+  }
+
   glm::mat4 Camera::ConstructSkyboxView()
   {
     UpdateVectors();
