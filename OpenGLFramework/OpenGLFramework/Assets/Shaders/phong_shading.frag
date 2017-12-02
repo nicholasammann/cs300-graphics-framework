@@ -36,7 +36,12 @@ uniform sampler2D CubeMapBack;
 uniform sampler2D CubeMapLeft;
 uniform sampler2D CubeMapRight;
 
-uniform int UseEnvironmentMap;
+uniform int UseReflection;
+uniform int UseRefraction;
+uniform int UseEmissive;
+
+uniform float RefractiveIndex;
+
 
 uniform vec3 pMin;
 uniform vec3 pMax;
@@ -381,15 +386,16 @@ void main()
     trueNormal = normalize(vec4(viewspaceNorm, 0));
   }
 
+  vec4 reflectionCol = vec4(0, 0, 0, 1);
 
-  if (UseEnvironmentMap != 0)
+  if (UseReflection != 0)
   {
     // calculate reflection/refraction of the view vector wrt normal
     vec4 viewVec = normalize(vec4(0, 0, 0, 1) - oViewPos);
 
-    vec4 normal = inverse(view) * oViewNorm;
+    vec4 normal = oViewNorm;
 
-    vec4 reflec = 2.0 * normal * dot(normal, inverse(view) * viewVec) - inverse(view) * viewVec;
+    vec4 reflec = 2.0 * normal * dot(normal, viewVec) - viewVec;
     
     vec3 posReflec = vec3(abs(reflec.x), abs(reflec.y), abs(reflec.z));
 
@@ -407,12 +413,12 @@ void main()
       // choose left texture
       if (reflec.x < 0)
       {
-        diffuse = vec4(texture(CubeMapLeft, uv).rgb, 1);
+        reflectionCol = vec4(texture(CubeMapLeft, uv).rgb, 1);
       }
       // choose right texture
       else
       {
-        diffuse = vec4(texture(CubeMapRight, uv).rgb, 1);
+        reflectionCol = vec4(texture(CubeMapRight, uv).rgb, 1);
       }
     }
     else if (maxVal == posReflec.y)
@@ -426,12 +432,12 @@ void main()
       // choose bottom texture
       if (reflec.y < 0)
       {
-        diffuse = vec4(texture(CubeMapBottom, uv).rgb, 1);
+        reflectionCol = vec4(texture(CubeMapBottom, uv).rgb, 1);
       }
       // choose top texture
       else
       {
-        diffuse = vec4(texture(CubeMapTop, uv).rgb, 1);
+        reflectionCol = vec4(texture(CubeMapTop, uv).rgb, 1);
       }
     }
     else if (maxVal == posReflec.z)
@@ -445,22 +451,31 @@ void main()
       // choose back texture
       if (reflec.z < 0)
       {
-        diffuse = vec4(texture(CubeMapBack, uv).rgb, 1);
+        reflectionCol = vec4(texture(CubeMapBack, uv).rgb, 1);
       }
       // choose front texture
       else
       {
-        diffuse = vec4(texture(CubeMapFront, uv).rgb, 1);
+        reflectionCol = vec4(texture(CubeMapFront, uv).rgb, 1);
       }
     }
   }
+
+
+  if (UseRefraction != 0)
+  {
+    vec4 T = 
+    
+  }
+
+
 
   vec4 finalColor = vec4(0, 0, 0, 1);
   
   // draw normally
   if (DebugColors == 0)
   {
-    finalColor = diffuse;   //computeFragmentColor(diffuse, shininess, trueNormal);
+    finalColor = reflectionCol ;/// + computeFragmentColor(diffuse, shininess, trueNormal);
   }
   // use Tangent for RBG
   else if (DebugColors == 1)

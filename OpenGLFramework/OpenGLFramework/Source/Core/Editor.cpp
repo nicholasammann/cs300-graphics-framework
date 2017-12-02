@@ -167,9 +167,10 @@ void ELBA::Editor::Update()
       }
 
 
-      if (ImGui::TreeNode("Environment Maps"))
+      if (ImGui::TreeNode("Environment Mappping"))
       {
-        ImGui::Checkbox("Use Environment Map", &models[k]->mUsingEnvironmentMap);
+        ImGui::Checkbox("Use Reflection", &models[k]->mReflection);
+        ImGui::Checkbox("Use Refraction", &models[k]->mRefraction);
 
         ImGui::TreePop();
       }

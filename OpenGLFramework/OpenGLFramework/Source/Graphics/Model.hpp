@@ -76,7 +76,8 @@ namespace ELBA
 
     void UpdateEnvironmentMap();
     CubeMap *mEnvironmentMap;
-    bool mUsingEnvironmentMap;
+    bool mReflection;
+    bool mRefraction;
 
   private:
 

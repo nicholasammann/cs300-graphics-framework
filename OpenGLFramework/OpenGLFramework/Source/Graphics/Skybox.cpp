@@ -143,8 +143,8 @@ namespace ELBA
     glBindVertexArray(mVAO);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
     glDepthMask(GL_TRUE);
   }
-
-
 }

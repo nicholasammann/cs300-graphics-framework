@@ -105,7 +105,7 @@ namespace ELBA
     
     for (auto m : mModels)
     {
-      if (m->mUsingEnvironmentMap)
+      if (m->mReflection || m->mRefraction)
       {
         m->UpdateEnvironmentMap();
       }
@@ -229,6 +229,9 @@ namespace ELBA
 
   void Application::Render(Camera *aCamera, int aWidth, int aHeight, bool aUseClearColor)
   {
+    aWidth = mWindowWidth;
+    aHeight = mWindowHeight;
+
     // rendering commands
     if (aUseClearColor)
     {
@@ -313,11 +316,11 @@ namespace ELBA
     mod->mSpecularTexture = specTex;
     
     mod->mMappingType = 0;
-    mod->mUsingTextures = true;
+    mod->mUsingTextures = false;
 
     NormalMap *normTex = new NormalMap("../OpenGLFramework/Assets/Textures/metal_roof_spec_512x512.tga");
     mod->mNormalTexture = normTex;
-    mod->mUsingNormalMap = true;
+    mod->mUsingNormalMap = false;
 
     mModels.push_back(mod);
 

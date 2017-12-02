@@ -19,15 +19,16 @@ namespace ELBA
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 512, 512, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
 
-    // create framebuffer
-    glGenFramebuffers(1, &mHandle);
-    glBindFramebuffer(GL_FRAMEBUFFER, mHandle);
-    glViewport(0, 0, 512, 512);
 
     // add depth buffer
     glGenRenderbuffers(1, &mRenderBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, mRenderBuffer);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, 512, 512);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT24, 512, 512);
+    
+    // create framebuffer
+    glGenFramebuffers(1, &mHandle);
+    glBindFramebuffer(GL_FRAMEBUFFER, mHandle);
+    glViewport(0, 0, 512, 512);
 
     // add the render target
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, mTexture, 0);
@@ -53,7 +54,7 @@ namespace ELBA
   void Framebuffer::Clear()
   {
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    glClearDepth(1.f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
   void Framebuffer::Destroy()
