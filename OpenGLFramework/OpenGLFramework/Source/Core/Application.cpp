@@ -27,7 +27,6 @@ Creation date: 10/23/17
 #include "../Graphics/NormalMap.hpp"
 #include "../Graphics/Shader.hpp"
 #include "../Graphics/Texture.hpp"
-#include "../Graphics/Skybox.hpp"
 
 #include "Application.hpp"
 #include "Camera.hpp"
@@ -331,7 +330,7 @@ namespace ELBA
     
     mod->mMappingType = 0;
     mod->mUsingTextures = false;
-
+    mod->mIsSkybox = false;
     mod->mReflection = true;
     mod->mRefraction = true;
 

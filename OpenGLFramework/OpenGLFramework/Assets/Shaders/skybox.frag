@@ -12,68 +12,77 @@ uniform sampler2D Right;
 in vec4 modelPos;
 in vec4 modelNorm;
 
-vec2 computeBoxUV()
+vec3 computeBoxUV()
 {
   // pick UV based on maximal extents (this is not used in CS300 assignment 2,
   // it's merely another way to generate UVs)...only allow comps in [-1, 1]
   vec3 position = clamp(modelPos.xyz, vec3(-1), vec3(1));
-  
+
+  vec3 color = vec3(0, 0, 0);
+
   // find largest standard basis bias
   vec3 mag = abs(position);
-  vec3 biasUVs = vec3(0.5) + 0.5 * position;
+
+  vec2 uv;
+
   if (mag.x > mag.y && mag.x > mag.z)
   {
-    // facing pos or neg x axis; use corrected y/z for UV
-    return biasUVs.yz;
+    // skybox left
+    if (modelNorm.x > 0)
+    {
+      uv.x = ((modelPos.z / modelPos.x) + 1.0f) / 2.0f;
+      uv.y = ((modelPos.y / modelPos.x) + 1.0f) / 2.0f;
+      color = texture(Left, uv).rgb;
+    }
+    // skybox right
+    else if (modelNorm.x < 0)
+    {
+      uv.x = ((modelPos.z / modelPos.x) + 1.0f) / 2.0f;
+      uv.y = ((-modelPos.y / modelPos.x) + 1.0f) / 2.0f;
+      color = texture(Right, uv).rgb;
+    }
   }
   else if (mag.y > mag.z)
   {
-    // facing pos or neg y axis; use corrected x/z for UV
-    return biasUVs.xz;
+    // skybox top
+    if (modelNorm.y < 0)
+    {
+      uv.x = ((modelPos.x / modelPos.y) + 1.0f) / 2.0f;
+      uv.y = ((-modelPos.z / modelPos.y) + 1.0f) / 2.0f;
+      color = texture(Top, uv).rgb;
+    }
+    // skybox bottom
+    else if (modelNorm.y > 0)
+    {
+      uv.x = ((-modelPos.x / modelPos.y) + 1.0f) / 2.0f;
+      uv.y = ((-modelPos.z / modelPos.y) + 1.0f) / 2.0f;
+      color = texture(Bottom, uv).rgb;
+    }
   }
-  else // z is the largest
+  else
   {
-    // facing pos or neg z axis; use corrected x/y for UV
-    return biasUVs.xy;
+    // skybox front
+    if (modelNorm.z < 0)
+    {
+      uv.x = ((-modelPos.x / modelPos.z) + 1.0f) / 2.0f;
+      uv.y = ((-modelPos.y / modelPos.z) + 1.0f) / 2.0f;
+      color = texture(Front, uv).rgb;
+    }
+    // skybox back
+    else if (modelNorm.z > 0)
+    {
+      uv.x = ((-modelPos.x / modelPos.z) + 1.0f) / 2.0f;
+      uv.y = ((modelPos.y / modelPos.z) + 1.0f) / 2.0f;
+      color = texture(Back, uv).rgb;
+    }
   }
+
+  return color;
 }
 
 void main()
 {
-  vec2 uv = computeBoxUV();
-
-  vec4 finalColor = vec4(0, 0, 0, 1);
-
-  // skybox top
-  if (modelNorm.y < 0)
-  {
-    finalColor.rgb = texture(Top, uv).rgb;
-  }
-  // skybox bottom
-  else if (modelNorm.y > 0)
-  {
-    finalColor.rgb = texture(Bottom, uv).rgb;
-  }
-  // skybox front
-  else if (modelNorm.z > 0)
-  {
-    finalColor.rgb = texture(Front, uv).rgb;
-  }
-  // skybox back
-  else if (modelNorm.z < 0)
-  {
-    finalColor.rgb = texture(Back, uv).rgb;
-  }
-  // skybox left
-  else if (modelNorm.x < 0)
-  {
-    finalColor.rgb = texture(Left, uv).rgb;
-  }
-  // skybox right
-  else if (modelNorm.x > 0)
-  {
-    finalColor.rgb = texture(Right, uv).rgb;
-  }
-
+  vec4 finalColor = vec4(computeBoxUV(), 1);
+  
   vFragColor = finalColor;
 }

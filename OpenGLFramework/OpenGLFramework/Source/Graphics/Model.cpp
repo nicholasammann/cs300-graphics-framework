@@ -37,7 +37,8 @@ namespace ELBA
       mCurrentShaderSelect(0), mDiffuseTexture(nullptr),
       mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0),
       mNormalTexture(nullptr), mUsingNormalMap(false),
-      mReflection(false), mRefraction(false), mIsSkybox(false)
+      mReflection(false), mRefraction(false), mIsSkybox(false),
+      mRefIndex(1.0f)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this, invertNormals));
     mMeshes.back()->SetUpMesh();
@@ -101,16 +102,16 @@ namespace ELBA
     loc = glGetUniformLocation(prg, "UseReflection");
     glUniform1i(loc, mReflection);
 
-    if (mReflection)
+    loc = glGetUniformLocation(prg, "UseRefraction");
+    glUniform1i(loc, mRefraction);
+
+    loc = glGetUniformLocation(prg, "RefractiveIndex");
+    glUniform1f(loc, mRefIndex);
+
+    if (mReflection || mRefraction)
     {
       mEnvironmentMap->SetTextureUniforms(prg);
     }
-
-
-
-
-
-
 
     if (mIsSkybox)
     {
@@ -192,7 +193,10 @@ namespace ELBA
       }
     }
 
-    mEnvironmentMap = new CubeMap(mApp, s->GetShaderProgram());
+    if (!mIsSkybox)
+    {
+      mEnvironmentMap = new CubeMap(mApp, s->GetShaderProgram());
+    }
   }
 
   Shader* Model::GetShader()
@@ -252,7 +256,13 @@ namespace ELBA
 
   void Model::UpdateEnvironmentMap()
   {
-    mEnvironmentMap->UpdateTextures(mTransform.mWorldPos);
+    if (mReflection || mRefraction)
+    {
+      if (mEnvironmentMap)
+      {
+        mEnvironmentMap->UpdateTextures(mTransform.mWorldPos);
+      }
+    }
   }
 
 }

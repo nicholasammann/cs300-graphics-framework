@@ -22,6 +22,7 @@ out vec4 oViewBitangent;
 
 out mat3 TBN;
 
+
 void main()
 {
   oObjPos = aPos;

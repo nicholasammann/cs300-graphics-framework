@@ -138,7 +138,6 @@
     <ClCompile Include="Source\Graphics\Model.cpp" />
     <ClCompile Include="Source\Graphics\NormalMap.cpp" />
     <ClCompile Include="Source\Graphics\Shader.cpp" />
-    <ClCompile Include="Source\Graphics\Skybox.cpp" />
     <ClCompile Include="Source\Graphics\Texture.cpp" />
     <ClCompile Include="Source\Graphics\TextureMapping.cpp" />
     <ClCompile Include="Source\ImGui\imgui.cpp" />
@@ -159,7 +158,6 @@
     <ClInclude Include="Source\Graphics\CubeMap.hpp" />
     <ClInclude Include="Source\Graphics\Framebuffer.hpp" />
     <ClInclude Include="Source\Graphics\NormalMap.hpp" />
-    <ClInclude Include="Source\Graphics\Skybox.hpp" />
     <ClInclude Include="Source\Graphics\TextureMapping.hpp" />
     <ClInclude Include="Source\Utils\MathUtils.hpp" />
     <ClInclude Include="Source\Utils\stb_image.h" />

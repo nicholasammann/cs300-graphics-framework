@@ -102,9 +102,6 @@
     <ClInclude Include="Source\Graphics\Framebuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Graphics\Skybox.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Source\Utils\stb_image_write.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -169,9 +166,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Graphics\Framebuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Graphics\Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

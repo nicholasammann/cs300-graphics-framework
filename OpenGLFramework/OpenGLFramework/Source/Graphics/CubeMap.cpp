@@ -45,13 +45,13 @@ namespace ELBA
 
   void CubeMap::UpdateTextures(glm::vec3 aPos)
   {
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
-
     Camera *camera = mApplication->GetCamera();
 
     glm::vec3 oldPos = camera->mPosition;
     glm::vec3 oldDir = camera->mDirection;
+
+    glm::vec3 modPos = mApplication->GetModels()[0]->GetTransform().mWorldPos;
+    mApplication->GetModels()[0]->GetTransform().mWorldPos = glm::vec3(10000, 0, 0);
 
     camera->SetPosition(aPos);
 
@@ -94,7 +94,7 @@ namespace ELBA
     camera->SetPosition(oldPos);
     //camera->SetDirection(oldDir);
 
-    glDisable(GL_CULL_FACE);
+    mApplication->GetModels()[0]->GetTransform().mWorldPos = modPos;
   }
 
 

@@ -42,6 +42,7 @@ uniform int UseEmissive;
 
 uniform float RefractiveIndex;
 
+const float FresnelPower = 5.0f;
 
 uniform vec3 pMin;
 uniform vec3 pMax;
@@ -397,7 +398,7 @@ void main()
 
     vec4 reflec = 2.0 * normal * dot(normal, viewVec) - viewVec;
 
-    reflec = reflec;
+    reflec = inverse(view) * reflec;
     
     vec3 posReflec = vec3(abs(reflec.x), abs(reflec.y), abs(reflec.z));
 
@@ -405,64 +406,56 @@ void main()
     float maxVal = max(max(posReflec.x, posReflec.y), posReflec.z);
 
     if (maxVal == posReflec.x)
-    {
-      uv.x = reflec.y / reflec.x;
-      uv.y = reflec.z / reflec.x;
-
-      uv.x = (uv.x + 1.0) / 2.0;
-      uv.y = (uv.y + 1.0) / 2.0;
-      
-      // choose left texture
+    {      // choose left texture
       if (reflec.x < 0)
       {
+        uv.x = ((reflec.z / posReflec.x) + 1.0f) / 2.0f;
+        uv.y = ((reflec.y / posReflec.x) + 1.0f) / 2.0f;
         reflectionCol = vec4(texture(CubeMapLeft, uv).rgb, 1);
       }
       // choose right texture
       else
       {
+        uv.x = ((reflec.z / posReflec.x) + 1.0f) / 2.0f;
+        uv.y = ((reflec.y / posReflec.x) + 1.0f) / 2.0f;
         reflectionCol = vec4(texture(CubeMapRight, uv).rgb, 1);
       }
     }
     else if (maxVal == posReflec.y)
     {
-      uv.x = reflec.x / reflec.y;
-      uv.y = reflec.z / reflec.y;
-    
-      uv.x = (uv.x + 1.0) / 2.0;
-      uv.y = (uv.y + 1.0) / 2.0;
-    
       // choose bottom texture
       if (reflec.y < 0)
       {
+        uv.x = ((reflec.x / posReflec.y) + 1.0f) / 2.0f;
+        uv.y = ((-reflec.z / posReflec.y) + 1.0f) / 2.0f;
         reflectionCol = vec4(texture(CubeMapBottom, uv).rgb, 1);
       }
       // choose top texture
       else
       {
+        uv.x = ((-reflec.x / posReflec.y) + 1.0f) / 2.0f;
+        uv.y = ((-reflec.z / posReflec.y) + 1.0f) / 2.0f;
         reflectionCol = vec4(texture(CubeMapTop, uv).rgb, 1);
       }
     }
     else if (maxVal == posReflec.z)
     {
-      uv.x = reflec.x / reflec.z;
-      uv.y = reflec.y / reflec.z;
-    
-      uv.x = (uv.x + 1.0) / 2.0;
-      uv.y = (uv.y + 1.0) / 2.0;
-    
       // choose back texture
       if (reflec.z < 0)
       {
+        uv.x = ((-reflec.x / posReflec.z) + 1.0f) / 2.0f;
+        uv.y = ((reflec.y / posReflec.z) + 1.0f) / 2.0f;
         reflectionCol = vec4(texture(CubeMapBack, uv).rgb, 1);
       }
       // choose front texture
       else
       {
+        uv.x = ((-reflec.x / posReflec.z) + 1.0f) / 2.0f;
+        uv.y = ((reflec.y / posReflec.z) + 1.0f) / 2.0f;
         reflectionCol = vec4(texture(CubeMapFront, uv).rgb, 1);
       }
     }
   }
-
 
   vec4 refractionCol = vec4(0, 0, 0, 1);
 
@@ -470,7 +463,68 @@ void main()
   {
     float k = 1.0f / RefractiveIndex;
 
+    vec4 V = normalize(-oViewPos);
 
+    vec4 N = normalize(oViewNorm);
+
+    float dtp = dot(N, V);
+
+    vec4 refractBoi = (k * dtp - sqrt(1 - k * k * (1 - (dtp * dtp)))) * N - k * V;
+
+    vec3 posRefract = vec3(abs(refractBoi.x), abs(refractBoi.y), abs(refractBoi.z));
+    float maxVal = max(max(posRefract.x, posRefract.y), posRefract.z);
+
+    if (maxVal == posRefract.x)
+    { 
+      // choose left texture
+      if (refractBoi.x < 0)
+      {
+        uv.x = ((refractBoi.z / posRefract.x) + 1.0f) / 2.0f;
+        uv.y = ((refractBoi.y / posRefract.x) + 1.0f) / 2.0f;
+        refractionCol = vec4(texture(CubeMapLeft, uv).rgb, 1);
+      }
+      // choose right texture
+      else
+      {
+        uv.x = ((refractBoi.z / posRefract.x) + 1.0f) / 2.0f;
+        uv.y = ((refractBoi.y / posRefract.x) + 1.0f) / 2.0f;
+        refractionCol = vec4(texture(CubeMapRight, uv).rgb, 1);
+      }
+    }
+    else if (maxVal == posRefract.y)
+    {
+      // choose bottom texture
+      if (refractBoi.y < 0)
+      {
+        uv.x = ((refractBoi.x / posRefract.y) + 1.0f) / 2.0f;
+        uv.y = ((-refractBoi.z / posRefract.y) + 1.0f) / 2.0f;
+        refractionCol = vec4(texture(CubeMapBottom, uv).rgb, 1);
+      }
+      // choose top texture
+      else
+      {
+        uv.x = ((-refractBoi.x / posRefract.y) + 1.0f) / 2.0f;
+        uv.y = ((-refractBoi.z / posRefract.y) + 1.0f) / 2.0f;
+        refractionCol = vec4(texture(CubeMapTop, uv).rgb, 1);
+      }
+    }
+    else if (maxVal == posRefract.z)
+    {
+      // choose back texture
+      if (refractBoi.z < 0)
+      {
+        uv.x = ((-refractBoi.x / posRefract.z) + 1.0f) / 2.0f;
+        uv.y = ((refractBoi.y / posRefract.z) + 1.0f) / 2.0f;
+        refractionCol = vec4(texture(CubeMapBack, uv).rgb, 1);
+      }
+      // choose front texture
+      else
+      {
+        uv.x = ((-refractBoi.x / posRefract.z) + 1.0f) / 2.0f;
+        uv.y = ((refractBoi.y / posRefract.z) + 1.0f) / 2.0f;
+        refractionCol = vec4(texture(CubeMapFront, uv).rgb, 1);
+      }
+    }
   }
 
   vec4 finalColor = vec4(0, 0, 0, 1);
@@ -478,7 +532,27 @@ void main()
   // draw normally
   if (DebugColors == 0)
   {
-    finalColor = reflectionCol ;/// + computeFragmentColor(diffuse, shininess, trueNormal);
+    vec4 V = normalize(-oViewPos);
+    vec4 N = normalize(oViewNorm);
+    
+    float Eta = 1.0f / RefractiveIndex;
+
+    float F = ((1.0-Eta) * (1.0-Eta)) / ((1.0+Eta) * (1.0+Eta));
+    
+    float Ratio = F + (1.0 - F) * pow((1.0 - dot(V, N)), FresnelPower);
+
+    if (UseRefraction != 0 && UseReflection != 0)
+    {
+        finalColor.rgb = mix(refractionCol, reflectionCol, Ratio).rgb; /// + computeFragmentColor(diffuse, shininess, trueNormal);
+    }
+    else if (UseRefraction != 0)
+    {
+        finalColor.rgb = refractionCol.rgb;
+    }
+    else
+    {
+        finalColor.rgb = reflectionCol.rgb;
+    }
   }
   // use Tangent for RBG
   else if (DebugColors == 1)

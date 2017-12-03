@@ -78,6 +78,7 @@ namespace ELBA
     CubeMap *mEnvironmentMap;
     bool mReflection;
     bool mRefraction;
+    float mRefIndex;
 
     bool mIsSkybox;
 
