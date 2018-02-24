@@ -72,7 +72,7 @@ namespace ELBA
   {
     glm::mat4 proj;
 
-    float rad = glm::radians(45.0f);
+    float rad = glm::radians(90.0f);
     float tanHalfFovy = tan(rad / 2.0f);
     float aspect = (float)aWidth / aHeight;
     float zNear = 0.1f;

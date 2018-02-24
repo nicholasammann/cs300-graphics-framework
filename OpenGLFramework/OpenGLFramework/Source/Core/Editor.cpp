@@ -176,6 +176,8 @@ void ELBA::Editor::Update()
         ImGui::DragFloat("Refractive Index", &models[k]->mRefIndex, 0.05f, 1.0f, 15.0f);
         ImGui::PopItemWidth();
 
+        ImGui::Checkbox("Use Emissive", &models[k]->mUseEmissive);
+
         ImGui::TreePop();
       }
 

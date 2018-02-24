@@ -38,7 +38,7 @@ namespace ELBA
       mSpecularTexture(nullptr), mUsingTextures(0), mMappingType(0),
       mNormalTexture(nullptr), mUsingNormalMap(false),
       mReflection(false), mRefraction(false), mIsSkybox(false),
-      mRefIndex(1.0f)
+      mRefIndex(1.66f), mUseEmissive(false)
   {
     mMeshes.push_back(Utils::LoadMesh(aPath, this, invertNormals));
     mMeshes.back()->SetUpMesh();
@@ -104,6 +104,9 @@ namespace ELBA
 
     loc = glGetUniformLocation(prg, "UseRefraction");
     glUniform1i(loc, mRefraction);
+
+    loc = glGetUniformLocation(prg, "UseEmissive");
+    glUniform1i(loc, mUseEmissive);
 
     loc = glGetUniformLocation(prg, "RefractiveIndex");
     glUniform1f(loc, mRefIndex);

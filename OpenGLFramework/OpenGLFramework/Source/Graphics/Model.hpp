@@ -79,6 +79,7 @@ namespace ELBA
     bool mReflection;
     bool mRefraction;
     float mRefIndex;
+    bool mUseEmissive;
 
     bool mIsSkybox;
 

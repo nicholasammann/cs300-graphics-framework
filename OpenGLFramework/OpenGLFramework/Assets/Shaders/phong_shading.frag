@@ -553,6 +553,11 @@ void main()
     {
         finalColor.rgb = reflectionCol.rgb;
     }
+
+    if (UseEmissive != 0)
+    {
+        finalColor.rgb += Material.emissive.rgb;
+    }
   }
   // use Tangent for RBG
   else if (DebugColors == 1)
